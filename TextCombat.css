@@ -1,0 +1,196 @@
+/*
+ *main
+ * textBox
+ * input, logout, name, id
+ * extra
+ */
+
+body{
+background-color:#A89423; /*old background*/
+/*background-color:#624A0A;*/
+/*overflow: scroll;*/
+overflow: hidden;
+}
+
+#main{
+/*margin-left: auto;
+margin-right: auto;
+width:600px;*/
+border: solid 1px brown;
+}
+.textBox{
+    position: absolute;
+    display: inline-block;
+    width: 47%;
+    opacity: 1;
+    white-space: pre-wrap;      /* CSS3 */   
+    white-space: -moz-pre-wrap; /* Firefox */    
+    white-space: -pre-wrap;     /* Opera <7 */   
+    white-space: -o-pre-wrap;   /* Opera 7 */    
+    word-wrap: break-word;      /* IE */
+}
+#textBox2{
+    position: absolute;
+    right: 10px;
+}
+#hub{
+    position: absolute;
+    bottom: 10px;
+}
+#logout{
+    cursor: pointer;
+}
+#logout:hover{
+    text-decoration: underline;
+}
+#wait{
+    color:black;
+    visibility: hidden;
+}
+
+.name{ /*names in chat. 5hp is max*/
+    font-weight: bold;
+    color: black;
+    cursor: pointer;
+}
+.b4{
+    color: #570000;
+}
+.b3{
+    color: #820000;
+}
+.b2{
+    color: #960000;
+}
+.b1{
+    color: #CC0000;
+}
+.b0{
+    text-decoration: line-through;
+}
+.item{ /*item names in chat*/
+    color: #7A012A;
+    cursor: pointer;
+}
+.path{ /*location names in chat*/
+    color: #7A012A;
+    cursor: pointer;
+}
+.sceneName{ /*current location name in chat*/
+    text-decoration: underline;
+}
+.action{ /*interacting in chat*/
+    text-decoration: overline;
+    color: #7A012A;
+    cursor: pointer;
+}
+.keyword{
+    color: blue;
+    cursor: pointer;
+}
+.npc{
+    font-weight: bold;
+    cursor: pointer;
+}
+/*The done and cancel buttons in the extra menu*/
+.textAreaButton{
+    cursor: pointer;
+    margin-left: 20px;
+}
+/* active classes turn inactive */
+.inactive{ /*location names, no longer visitable*/
+    color: black;
+    cursor: auto;
+}
+.menuButton{ /*the buttons on the side of the alert menu*/
+    width: 30px;
+    height:30px;
+    background-color: brown;
+    position: absolute;
+    left:400px;
+    cursor: pointer;
+}
+.paper{
+    display: inline-block;
+    background: #9EA832;
+    width:99%;
+    margin: 0px;
+    padding: 0px;
+}
+
+#error{
+    background-color: #A89423;
+}
+/*player name in the hub*/
+#hubName{
+    cursor: pointer;
+}
+#hubName:hover{
+    text-decoration: underline;
+}
+#extra{
+    display: none;
+    margin-top: 10px;
+}
+#textArea{
+    margin-left: auto;
+    margin-right: auto;
+}
+#alert{
+color:black;
+cursor: pointer;
+}
+#alert:hover{
+text-decoration: underline;
+}
+#menuMain{
+background-color: grey;
+position:absolute;
+left:50%;
+top:100px;
+margin-left:-200px;
+visibility:hidden;
+width:400px;
+height:400px;
+border:solid 3px brown;
+z-index:3;
+font-size:20px;
+color:gold;
+#menuMainInside{
+    
+}
+}
+#menuMainClose{
+position:absolute;
+bottom:5px;
+right:5px;
+color:brown;
+cursor:pointer;
+}
+#menuMainClose:hover{
+text-decoration:underline;
+}
+#menuMainMute{
+position:absolute;
+bottom:5px;
+right:80px;
+color:black;
+cursor:pointer;  
+}
+#menuMainMute:hover{
+text-decoration:underline;
+}
+#alertsMenuButton{
+    background-image: url("images/exclamation.png");
+}
+#optionsMenuButton{
+    background-image: url("images/gear.png");
+    top:35px;
+}
+#clearAlertsButton{
+    color: black;
+    cursor: pointer;
+}
+#clearAlertsButton:hover{
+    text-decoration: underline;
+}
