@@ -1,11 +1,8 @@
 body{
 background-color:#624A0A;
-background-image:url('images/flames.jpg');
+background-image:url('../images/flames.jpg');
 background-repeat:no-repeat;
 background-position:center;
-color:tan;
-}
-a{
 color:tan;
 }
 #info{
