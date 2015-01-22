@@ -51,7 +51,7 @@ class AdminInterface extends Interface_class{
                             "PRIMARY KEY (ID)".
                             ")");
         
-        //scene ID -> item ID
+        //keyword ID -> possible synonyms
         self::$db->querySingle("CREATE TABLE keywordwords (".
                             "Word varchar(20) ,".
                             "ID int(3) ,".
@@ -59,12 +59,28 @@ class AdminInterface extends Interface_class{
                             "PRIMARY KEY (ID, Word)".
                             ")");
         
-        //scene ID -> item ID
+        //npc ID -> npc keywords
         self::$db->querySingle("CREATE TABLE npckeywords (".
                             "ID int(3) ,".
                             "keywordID int(3) ,".
                             "type int(3) ,".
                             "PRIMARY KEY (ID, keywordID)".
+                            ")");
+        
+        //npc ID -> item ID
+        self::$db->querySingle("CREATE TABLE npcs (".
+                            "ID int(3) ,".
+                            "name char(20) ,".
+                            "description varchar(1000) ,".
+                            "level int(3) ,".
+                            "PRIMARY KEY (ID)".
+                            ")");
+        
+        //player ID -> alert ID
+        self::$db->querySingle("CREATE TABLE playeralerts (".
+                            "playerID int(3) ,".
+                            "alertID int(3) ,".
+                            "PRIMARY KEY (playerID)".
                             ")");
         
     }
