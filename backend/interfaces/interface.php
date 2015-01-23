@@ -1,6 +1,6 @@
 <?php
 
-require_once("../database.php");
+require_once("../backend/database.php");
 
 /**
  *The interface between the logic/application and the database
@@ -23,7 +23,7 @@ class Interface_class {
         return $var;
     }
     
-    protected static getDatabaseName(){
+    protected static function getDatabaseName(){
         return self::$db->getDatabaseName();
     }
 }

@@ -1,11 +1,8 @@
 <?php
         function handle($e){  
             //prevents the rest of the page from loading
-            echo "general exception:";
-            echo $e->getMessage();
-            
                 //db exception
-                /*if($e instanceof dbException){
+                if($e instanceof dbException){
                     if($e->getCode() == dbException::CODE_COULD_NOT_CONNECT){
                         echo $e->getMessage();
                     }
@@ -13,7 +10,7 @@
                 } else{
                     echo "general exception:";
                     echo $e->getMessage();
-                }*/
+                }
             }
         set_exception_handler("handle");
     ?>

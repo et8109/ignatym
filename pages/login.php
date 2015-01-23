@@ -20,11 +20,12 @@ if(isset($_SESSION['playerID'])){
 <?php include("shared/header2.inc");?>
 <!--inside <body>
 ------------------------------------>
-<?
+<?php
 //logging in
 if(isset($_POST['uname'])){
     $uname = $_POST['uname'];
     $pass = $_POST['pass'];
+    include("../backend/interfaces/loginInterface.php");
     if($uname == "" || $pass == ""){
         throw new Exception("please enter a valid username and password");
     }

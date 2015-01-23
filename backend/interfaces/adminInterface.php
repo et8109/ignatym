@@ -83,6 +83,76 @@ class AdminInterface extends Interface_class{
                             "PRIMARY KEY (playerID)".
                             ")");
         
+        //player ID -> player info
+        self::$db->querySingle("CREATE TABLE playerinfo (".
+                            "ID int(3) ,".
+                            "Name char(20) ,".
+                            "Password char(20) ,".
+                            "Description varchar(1000) ,".
+                            "Scene int(3) ,".
+                            "CraftSkill int(1) ,".
+                            "Health int(1) ,".
+                            "FrontLoadScenes tinyint(1) ,".
+                            "FrontLoadKeywords tinyint(1) ,".
+                            "Email varchar(35) ,".
+                            "LoggedIn int(1) ,".
+                            "LastLoginTime timestamp ,".
+                            "PRIMARY KEY (ID)".
+                            ")");
+        
+        //player ID -> player keywords
+        self::$db->querySingle("CREATE TABLE playerkeywords (".
+                            "ID int(3) ,".
+                            "keywordID int(3) ,".
+                            "locationID int(3) ,".
+                            "type int(3) ,".
+                            "PRIMARY KEY (ID)".
+                            ")");
+        
+        //scene ID -> scene keywords
+        self::$db->querySingle("CREATE TABLE scenekeywords (".
+                            "ID int(3) ,".
+                            "keywordID int(3) ,".
+                            "type int(3) ,".
+                            "PRIMARY KEY (ID)".
+                            ")");
+        
+        //scene ID -> scene npcs
+        self::$db->querySingle("CREATE TABLE scenenpcs (".
+                            "sceneID int(3) ,".
+                            "npcID int(3) ,".
+                            "npcName char(20) ,".
+                            "health int(3) ,".
+                            "PRIMARY KEY (sceneID, npcID)".
+                            ")");
+        
+        //scene ID -> scene ID
+        //**always low to high
+        self::$db->querySingle("CREATE TABLE scenenpcs (".
+                            "lowID int(3) ,".
+                            "highID int(3) ,".
+                            "PRIMARY KEY (lowID, highID)".
+                            ")");
+        
+        //scene ID -> playerID
+        self::$db->querySingle("CREATE TABLE sceneplayers (".
+                            "sceneID int(3) ,".
+                            "playerID int(3) ,".
+                            "playerName char(20) ,".
+                            "PRIMARY KEY (sceneID, playerID)".
+                            ")");
+        
+        //scene ID -> scene info
+        self::$db->querySingle("CREATE TABLE scenes (".
+                            "ID int(3) ,".
+                            "Name char(20) ,".
+                            "Description varchar(1000) ,".
+                            "DescDraft varchar(1000) ,".
+                            "Appshp tinyint(1) ,".
+                            "Town int(3) ,".
+                            "Land int(3) ,".
+                            "PRIMARY KEY (ID)".
+                            ")");
     }
 }
 ?>

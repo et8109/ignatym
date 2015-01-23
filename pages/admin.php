@@ -12,7 +12,7 @@
 <?php include("shared/header2.inc");?>
 <!--inside <body>
 ------------------------------------>
-<?
+<?php
 $msg = "";
 //resetting db
 if(isset($_POST['reset'])){
