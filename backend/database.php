@@ -47,9 +47,16 @@ class Database {
         return mysqli_affected_rows($this->con);
     }
     
+    /**
+     *returns the ID of the last affted row by a query
+     */
+    public function lastQueryID(){
+        return mysqli_insert_id($this->con);
+    }
+    
     private function getConnection(){
         //produces a warning if db name is given and db does not exist
-        $con = mysqli_connect(self::$hostName,self::$username,self::$password/*,self::$name*/);
+        $con = mysqli_connect(self::$hostName,self::$username,self::$password,self::$name);
         //check connection
         if (mysqli_connect_errno()){
             throw new dbException("could not connect to database", dbException::CODE_COULD_NOT_CONNECT);

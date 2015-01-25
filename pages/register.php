@@ -1,3 +1,6 @@
+<!-----------------
+--before anything--
+------------------>
 <?php
 ob_start();
 session_start();
@@ -6,23 +9,48 @@ if(isset($_SESSION['playerID'])){
 }
 ?>
 
-<html>
-    <head>
-	<!-- shared favicon code -->
-        <title>Ignatym</title>
-        <link rel="icon" href="images/favicon.ico" type="image/x-icon"/>
-        <link rel="shortcut icon" href="images/favicon.ico" type="image/x-icon"/>
-        <link rel="stylesheet" type="text/css" href="login.css" />
-	<script src="register.js"></script>
-    </head>
-    <body>
-Username: <INPUT TYPE = 'TEXT' id ='username' maxlength="20"></br>
-Password: <INPUT TYPE = 'password' id ='password' maxlength="20"></br>
-Password: <INPUT TYPE = 'password' id ='password2' maxlength="20"></br>
-<input type="button" onclick="register()" value="submit">
-	<a href="login.php">back</a></br>
-	<!-- shared error message -->
-        <img id="errorPoint" src="images/errorPoint.png" style="visibility: hidden"><span id="error"></span></br>
-	<span id="message"></span>
-    </body>
-</html>
+<!---------------------------------->
+<?php include("shared/header1.inc");?>
+<!--inside <head>
+------------------------------------>
+<title>Register</title>
+
+<!---------------------------------->
+<?php include("shared/header2.inc");?>
+<!--inside <body>
+------------------------------------>
+<?php
+try{
+    //logging in
+    if(isset($_POST['uname'])){
+        $uname = $_POST['uname'];
+        $pass1 = $_POST['pass1'];
+	$pass2 = $_POST['pass2'];
+        if($uname == "" || $pass1 == "" || $pass2 == ""){
+            throw new Exception("please enter a valid username and password");
+        }
+	if($pass1 != $pass2){
+	    throw new Exception("your passwords don't match");
+	}
+        include("../backend/interfaces/registerInterface.php");
+        RegisterInterface::registerPlayer($uname, $pass1);
+        
+        echo "Success! <a href='login.php'>Back to login</a></br>";
+    }
+} catch(Exception $e){
+    include("shared/errorHandler.php");
+    ErrorHandler::handle($e);
+}
+?>
+
+<!-- login form -->
+<form action="register.php" method="post">
+    I am <input type="text" name="uname" maxlength=20><br>
+    Password: <input type="password" name="pass1" maxlength=20><br>
+    Password: <input type="password" name="pass2" maxlength=20><br>
+    <input type="submit">
+</form>
+
+<?php
+include("shared/footer.inc");
+?>

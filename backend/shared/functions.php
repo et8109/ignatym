@@ -21,31 +21,6 @@ todo:
 sql db backups
 */
 
-include_once 'constants.php';
-
-error_reporting(0);
-
-session_start();
-//check inputs
-_checkInputIsClean();
-//get connection to db
-$con = _getConnection();
-//check if logged in
-$function = $_POST['function'];
-if($function != 'register' && $function != 'login'){
-    //check session
-    if(!isset($_SESSION['playerID'])){
-        session_destroy();
-        sendError("Your session was lost. Please log in again.");
-    }
-    $loginRow = query("select loggedIn from playerinfo where ID=".prepVar($_SESSION['playerID']));
-    //check login id
-    if($loginRow['loggedIn'] != $_SESSION['loginID']){
-        session_destroy();
-        sendError("You were recently logged out. Please log in again.");
-    }
-}
-
 /**
  *prints the input string to the debug file.
  *adds a new line
@@ -56,107 +31,6 @@ function printDebug($word){
     fclose($debugFile);
 }
 
-/**
- *returns a connection ($con) to the db.
- *set the global connection, if applicable, to this
- */
-function _getConnection(){
-    $con = mysqli_connect(constants::dbhostName,constants::dbusername,constants::dbpassword,constants::dbname);
-    //check connection
-    if (mysqli_connect_errno()){
-        sendError("could not connect");
-    }
-    return $con;
-}
-
-/**
- *querys the databse and returns the row.
- *only returns 1 row. If you need more, use queryMulti.
- *uses $GLOBALS['con']. doesn't work if not set
- *frees the result on its own
- *returns false on fail
- */
-function query($sql){
-    $result = mysqli_query($GLOBALS['con'], $sql);
-    if(is_bool($result)){
-        return false;
-    }
-    $numRows = mysqli_num_rows($result);
-    if($numRows > 1){
-        sendError("result error");
-    }
-    $row = mysqli_fetch_array($result);
-    mysqli_free_result($result);
-    return $row;
-}
-
-/**
- *querys and returns the result rather than the row.
- *used when multiple rows are taken
- *uses $GLOBALS['con']. doesn't work if not set
- *dont't forget mysqli_free_result($result);
- */
-function queryMulti($sql){
-    $result = mysqli_query($GLOBALS['con'], $sql);
-    return $result;
-}
-
-/**
- *querys the db and returns the insert id.
- *uses $GLOBALS['con']. doesn't work if not set
- */
-function lastIDQuery($sql){
-    mysqli_query($GLOBALS['con'], $sql);
-    return mysqli_insert_id($GLOBALS['con']);
-}
-/**
- *returns the number of rows affected by the last query
- */
-function lastQueryNumRows(){
-    return mysqli_affected_rows($GLOBALS['con']);
-}
-/**
- *sanatizes a variable
- */
-function prepVar($var){
-    $var = mysqli_real_escape_string($GLOBALS['con'],$var);
-    //replace ' with ''
-    //$var = str_replace("'", "''", $var);
-    //if not a number, surround in quotes
-    if(!is_numeric($var)){
-        $var = "'".$var."'";
-    }
-    return $var;
-}
-/**
- *makes sure an input is clean
- *throws error if not
- *assumes inputs are all get
- */
-function _checkInputIsClean(){
-    /**
-    *the characters or strings not allowed in inputs
-    */
-    $restrictedInputs = array(
-       "<",
-       ">",
-       "<?php",
-       "\r",
-       "\n"
-    );
-    $numRestricted = sizeof($restrictedInputs);
-    foreach ($_POST as $key => $value) {
-        if($value == null || $value==""){
-            sendError("restricted char/string in input");
-        }
-        for($i=0; $i<$numRestricted; $i++){
-            //php said to use ===
-            if(strpos($value,$restrictedInputs[$i]) === true){
-                sendError("restricted char/string in input");
-            }
-        }
-    }
-}
 /**
  *sends the error to the client
  *terminates all php

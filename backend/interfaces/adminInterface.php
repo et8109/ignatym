@@ -46,7 +46,7 @@ class AdminInterface extends Interface_class{
         
         //keyword ID -> keyword description
         self::$db->querySingle("CREATE TABLE keywords (".
-                            "ID int(3) ,".
+                            "ID int(3) AUTO_INCREMENT,".
                             "Description varchar(255) ,".
                             "PRIMARY KEY (ID)".
                             ")");
@@ -85,7 +85,7 @@ class AdminInterface extends Interface_class{
         
         //player ID -> player info
         self::$db->querySingle("CREATE TABLE playerinfo (".
-                            "ID int(3) ,".
+                            "ID int(3) AUTO_INCREMENT,".
                             "Name char(20) ,".
                             "Password char(20) ,".
                             "Description varchar(1000) ,".
@@ -144,7 +144,7 @@ class AdminInterface extends Interface_class{
         
         //scene ID -> scene info
         self::$db->querySingle("CREATE TABLE scenes (".
-                            "ID int(3) ,".
+                            "ID int(3) AUTO_INCREMENT,".
                             "Name char(20) ,".
                             "Description varchar(1000) ,".
                             "DescDraft varchar(1000) ,".

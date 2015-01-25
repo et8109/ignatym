@@ -21,14 +21,27 @@ if(isset($_SESSION['playerID'])){
 <!--inside <body>
 ------------------------------------>
 <?php
-//logging in
-if(isset($_POST['uname'])){
-    $uname = $_POST['uname'];
-    $pass = $_POST['pass'];
-    include("../backend/interfaces/loginInterface.php");
-    if($uname == "" || $pass == ""){
-        throw new Exception("please enter a valid username and password");
+try{
+    //logging in
+    if(isset($_POST['uname'])){
+        $uname = $_POST['uname'];
+        $pass = $_POST['pass'];
+        if($uname == "" || $pass == ""){
+            throw new Exception("please enter a valid username and password");
+        }
+        include("../backend/interfaces/loginInterface.php");
+        $playerRow = LoginInterface::loginPlayer($uname, $pass);
+        
+        //set session
+        $_SESSION['playerID'] = $playerRow['id'];
+        $_SESSION['playerName'] = $playerRow['Name'];
+        $_SESSION['currentScene'] = $playerRow['Scene'];
+        $_SESSION['lastChatTime'] = 0;
+        header("Location: index.php");
     }
+} catch(Exception $e){
+    include("shared/errorHandler.php");
+    ErrorHandler::handle($e);
 }
 ?>
 
@@ -41,12 +54,11 @@ if(isset($_POST['uname'])){
 
 <!-- additional links -->
 <a href="register.php">Need to register?</a></br>
-Guest account available,</br>username and password are "guest".</br>
+Guest account available,</br>username and password are "guest".</br></br>
 <div id="info">
     <a href="guide.php" target="_newtab">Guide</a></br></br>
     <a href="http://ignatym.freeforums.net/" target="_newtab">Forums</a></br></br>
     Welcome to the alpha!</br></br></br>
-    [ <a href="http://audiogame.ignatym.com">Audio Game</a> in progress. p2p chat not quite working yet! ]
 </div>
 
 <?php

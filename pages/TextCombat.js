@@ -17,9 +17,10 @@ var frontLoadKeywords;
  */
 (function(){
    sendRequest(
-        "setup.php",
+        "../backend/setup.php",
         "function=setUp&version="+version,
         function(response){
+            alert(response);
             response = response.split("<>");
             playerID = parseInt(response[1]);
             currentScene = parseInt(response[2]);
@@ -37,7 +38,7 @@ var frontLoadKeywords;
 var sceneText={};
 if (frontLoadSceneText) {
     sendRequest(
-        "setup.php",
+        "../backend/setup.php",
         "function=frontLoadScenes",
         function(response){
             var sceneTextsAndIDs = response.split("<>");
@@ -52,7 +53,7 @@ if (frontLoadSceneText) {
 var keywordText={};
 if (frontLoadKeywords) {
     sendRequest(
-        "setup.php",
+        "../backend/setup.php",
         "function=frontLoadKeywords",
         function(response) {
             var keywordTextAndDesc = response.split("<>");
@@ -368,7 +369,7 @@ function textTyped(e){
 *adds the lines to the text box
 */
 function updateChat(){
-    sendRequest("FilesBack.php","function=updateChat",
+    sendRequest("chat.php","function=updateChat",
         function(response){
             response = response.split("<<<");
             var numAlerts = response[1];
