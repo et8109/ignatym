@@ -190,8 +190,6 @@ class SharedInterface extends Interface_class{
         return $r;
     }
     
-    
-    
     /**
     *returns the table where the object's keywords are
     */
@@ -232,84 +230,6 @@ class SharedInterface extends Interface_class{
                 break;
         }
         return null;
-    }
-    
-    
-    public static function getPlayersInScene($sid){
-        $sid = self::prepVar($sid);
-        $r = self::$db->querySingle("select playerID,playerName from sceneplayers where sceneID=$sid");
-        return $r;
-    }
-    
-    public static function getNpcsInScene($sid){
-        $sid = self::prepVar($sid);
-        $r = self::$db->querySingle("select npcID,npcName from scenenpcs where sceneID=$sid and health>0");
-        return $r;
-    }
-    
-    public static function getSceneJobs($sid){
-        $sid = self::prepVar($sid);
-        $r = self::$db->querySingle("select town,land,appshp from scenes where ID=$sid");
-        return $r;
-    }
-    
-    public static function getSceneWorker($type, $locID){
-        $locID = self::prepVar($locID);
-        $type = self::prepVar($type);
-        $r = self::$db->querySingle("select P.Name from playerkeywords K, playerinfo P where K.type=$type and K.locationID=$locID");
-        return $r;
-    }
-    
-    public static function changePlayerScene($pid, $sid, $pname){
-        $pid = self::prepVar($pid);
-        $sid = self::prepVar($sid);
-        $pname = self::prepVar($pname);
-        self::$db->querySingle("delete from sceneplayers where playerID=$pid");
-        self::$db->querySingle("insert into sceneplayers (sceneID,playerID,playerName) values($sid,$pid,$pname)");
-        self::$db->querySingle("Update playerinfo set Scene=$sid where ID=$pid");
-    }
-    
-    public static function deleteItem($iid){
-        $iid = self::prepVar($iid);
-        self::$db->querySingle("delete from items where ID=$iid");
-        self::$db->querySingle("delete from itemkeywords where ID=$iid");
-    }
-    
-    //needed?
-    public static function getSceneName($sid){
-        $sid = self::prepVar($sid);
-        $r = self::$db->querySingle("select Name from scenes where ID=$sid");
-        return $r;
-    }
-    
-    //needed?
-    public static function getItemName($iid){
-        $iid = self::prepVar($iid);
-        $r = self::$db->querySingle("select ID from items where Name=$iid");
-        return $r;
-    }
-    
-    //needed?
-    public static function getPlayerID($pid){
-        $pid = self::prepVar($pid);
-        $r = self::$db->querySingle("select ID from playerinfo where Name=$pid");
-        return $r;
-    }
-    
-    //needed?
-    public static function getPlayersItemID($pid, $iname){
-        $pid = self::prepVar($pid);
-        $iname = self::prepVar($iname);
-        $r = self::$db->querySingle("select ID from items where playerID=$pid and Name=$iname");
-        return $r;
-    }
-    
-    //needed?
-    public static function getItemContainer($pid, $iname){
-        $pid = self::prepVar($pid);
-        $iname = self::prepVar($iname);
-        $r = self::$db->querySingle("select ID,insideOf from items where playerID=$pid and Name=$iname");
-        return $r;
     }
 }
 ?>

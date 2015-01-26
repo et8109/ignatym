@@ -4,36 +4,6 @@ require_once("interface.php");
 class GeneralInterface extends Interface_class{
     private function __construct() {}//static only
     
-    public static function getDescItem($iid){
-        $iid = self::prepVar($iid);
-        $r = self::$db->querySingle("select Name, Description from items where ID=$iid");
-        return $r;
-    }
-    
-    public static function getDescKeyword($word){
-        $word = self::prepVar($word);
-        $r = self::$db->querySingle("select K.Description from keywordwords W, keywords K where W.Word=$word");
-        return $r;
-    }
-    
-    public static function getDescPlayer($pid){
-        $pid = self::prepVar($pid);
-        $r = self::$db->querySingle("select Name, Description from playerinfo where ID=$pid");
-        return $r;
-    }
-    
-    public static function getDescNpc($nid){
-        $nid = self::prepVar($nid);
-        $r = self::$db->querySingle("select name,description from npcs where ID=$nid");
-        return $r;
-    }
-    
-    public static function getDescScene($sid){
-        $sid = self::prepVar($sid);
-        $r = self::$db->querySingle("select Name, Description from scenes where ID=$sid");
-        return $r;
-    }
-    
     public static function getPlayersInScene($sid){
         $sid = self::prepVar($sid);
         $r = self::$db->querySingle("select playerID,playerName from sceneplayers where sceneID=$sid");
@@ -96,18 +66,44 @@ class GeneralInterface extends Interface_class{
     }
     
     //needed?
-    public static function getPlayersItemID($pid, $iname){
+    public static function getPlayersItemInfo($pid, $iname){
         $pid = self::prepVar($pid);
         $iname = self::prepVar($iname);
-        $r = self::$db->querySingle("select ID from items where playerID=$pid and Name=$iname");
+        $r = self::$db->querySingle("select room,ID,insideOf from items where playerID=$pid and Name=$iname");
         return $r;
     }
     
-    //needed?
-    public static function getItemContainer($pid, $iname){
-        $pid = self::prepVar($pid);
-        $iname = self::prepVar($iname);
-        $r = self::$db->querySingle("select ID,insideOf from items where playerID=$pid and Name=$iname");
+    public static function checkItemHasKeywordType($iid, $kwtype){
+        $kwtype = self::prepVar($kwtype);
+        $iid = self::prepVar($iid);
+        $r = self::$db->queryMulti("select count(1) from itemkeywords where ID=$iid and type=$kwtype");
+        return $r;
+    }
+    
+    public static function putItemInItem($putid, $conainerid){
+        $putid = self::prepVar($putid);
+        $conainerid = self::prepVar($conainerid);
+        self::$db->querySingle("update items set insideOf=$conainerid where ID=$putid");
+        self::$db->querySingle("update items set room=room-1 where ID=$conainerid");
+    }
+    
+    public static function removeItemFromItem($takeid, $conainerid){
+        $takeid = self::prepVar($takeid);
+        $conainerid = self::prepVar($conainerid);
+        self::$db->querySingle("update items set insideOf=0 where ID=$takeid");
+        self::$db->querySingle("update items set room=room+1 where ID=$conainerid");
+    }
+    
+    public static function getItemsInScene($sid){
+        $sid = self::prepVar($sid);
+        $r = self::$db->queryMulti("select S.itemID, S.note, I.Name from itemsinscenes S, items I where sceneID=$sid and S.itemID = I.ID");
+        return $r;
+    }
+    
+    public static function SceneKeywordsOfType($sid, $type){
+        $sid = self::prepVar($sid);
+        $type = self::prepVar($type);
+        $r = self::$db->queryMulti("select Word, ID from keywordwords where ID = (select keywordID from scenekeywords where ID=$sid and type=$type) limit 1");
         return $r;
     }
 }

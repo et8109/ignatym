@@ -9,27 +9,27 @@ try{
         case('getDesc'):
             switch($_POST['type']){
                 case(spanTypes::ITEM):
-                    $info = GeneralInterface::getDescItem($_POST['ID']);
+                    $info = SharedInterface::getDescItem($_POST['ID']);
                     echo getSpanText(spanTypes::ITEM,$_POST['ID'],$info["Name"])."<>".$info["Description"];
                     break;
                 case(spanTypes::KEYWORD):
-                    $info = GeneralInterface::getDescKeyword($_POST['ID']);
+                    $info = SharedInterface::getDescKeyword($_POST['ID']);
                     echo getSpanText(spanTypes::KEYWORD,$_POST['ID'],$_POST['ID'])."<>".$info["Description"];
                     break;
                 case(spanTypes::PLAYER):
                     //if no id is set, make it the player
                     $ID = isset($_POST['ID']) ? $_POST['ID'] : $_SESSION['playerID'];
-                    $info = GeneralInterface::getDescPlayer($ID);
+                    $info = SharedInterface::getDescPlayer($ID);
                     echo getSpanText(spanTypes::PLAYER,$ID,$info["Name"])."<>".$info["Description"];
                     break;
                 case(spanTypes::NPC):
-                    $info = GeneralInterface::getDescNpc($_POST['ID']);
+                    $info = SharedInterface::getDescNpc($_POST['ID']);
                     echo getSpanText(spanTypes::NPC,$_POST['ID'],$info['name'])."<>".$info['description'];
                     break;
                 case(spanTypes::SCENE):
                     //if no id set, it's the current scene
                     $ID = is_numeric($_POST['ID']) ? $_POST['ID'] : $_SESSION['currentScene'];
-                    $info = GeneralInterface::getDescScene($ID));
+                    $info = SharedInterface::getDescScene($ID));
                     echo getSpanText(spanTypes::SCENE,$ID,$info["Name"])."<>".$info["Description"];
                     //players
                     $playersResult = GeneralInterface::getPlayersInScene($_SESSION['currentScene']);
@@ -112,7 +112,7 @@ try{
                 sendError("Could not find ".$_POST['playerName']." nearby.");
             }
             //find id of item
-            $itemRow = GeneralInterface::getPlayersItemId($_SESSION['playerID'], $_POST['itemName']);
+            $itemRow = GeneralInterface::getPlayersItemInfo($_SESSION['playerID'], $_POST['itemName']);
             if($itemRow == false){
                 sendError("Could not find ".$_POST['itemName']);
             }
@@ -125,8 +125,8 @@ try{
             $itemName = prepVar($_POST['itemName']);
             $containerName = prepVar($_POST['containerName']);
             //get item and container info
-            $itemRow = GeneralInterface::getItemContainer($_SESSION['playerID'], $itemName);
-            $containerRow = query("select room,ID from items where playerID=".prepVar($_SESSION['playerID'])." and Name=".$containerName);
+            $itemRow = GeneralInterface::getPlayersItemInfo($_SESSION['playerID'], $itemName);
+            $containerRow = GeneralInterface::getPlayersItemInfo($_SESSION['playerID'], $containerName);
             //make sure item was found
             if(!isset($itemRow['ID'])){
                 sendError("the ".$itemName." was not found");
@@ -144,20 +144,19 @@ try{
                 sendError($itemName." is inside of something else. Remove it first.");
             }
             //make sure the item is not a bag
-            $itemIsBagRow = query("select count(1) from itemkeywords where ID=".prepVar($itemRow['ID'])." and type=".keywordTypes::CONTAINER);
+            $itemIsBagRow = GeneralInterface::checkItemHasKeywordType($itemRow['ID'], keywordTypes::CONTAINER);
             if($itemIsBagRow[0] > 0){
                 sendError("You can't put a container into another container.");
             }
             //put in
-            query("update items set insideOf=".prepVar($containerRow['ID'])." where ID=".prepVar($itemRow['ID']));
-            query("update items set room=".prepVar(intval($containerRow['room'])-1)." where ID=".prepVar($containerRow['ID']));
+            GeneralInterface::putItemInItem($itemRow['ID'], $containerRow['ID']);
             //add alert
             addAlert(alertTypes::hiddenItem);
             break;
         
         case('takeItemFrom'):
-            $itemRow = query("select ID,insideOf from items where playerID=".prepVar($_SESSION['playerID'])." and Name=".prepVar($_POST['itemName']));
-            $containerRow = query("select room,ID from items where playerID=".prepVar($_SESSION['playerID'])." and Name=".prepVar($_POST['containerName']));
+            $itemRow = GeneralInterface::getPlayersItemInfo($_SESSION['playerID'], $_POST['itemName']);
+            $containerRow = GeneralInterface::getPlayersItemInfo($_SESSION['playerID'], $_POST['containerName']);
             if($itemRow == false){
                 sendError("could not find ".$_POST['itemName']);
             }
@@ -168,51 +167,28 @@ try{
             if($itemRow['insideOf'] != $containerRow['ID']){
                 sendError("The ".$_POST['itemName']." is not in the ".$_POST['containerName']);
             }
-            //take out
-            query("update items set insideOf=0 where ID=".prepVar($itemRow['ID']));
-            query("update items set room=".prepVar(intval($containerRow['room'])+1)." where ID=".prepVar($containerRow['ID']));
+            GeneralInterface::removeItemFromItem($itemRow['ID'], $containerRow['ID']);
             //add name to desc
             addItemIdToPlayer($itemRow['ID'],$_POST['itemName']);
             break;
         
         case('getItemsInScene'):
             //get item ids
-            $itemIDsResult = queryMulti("select itemID,note from itemsinscenes where sceneID=".prepVar($_SESSION['currentScene']));
+            $itemIDsResult = GeneralInterface::getItemsInScene($_SESSION['currentScene']);
             //store itemID note connection
             $itemNotes = array();
             //get items names and ids
-            if($row = mysqli_fetch_array($itemIDsResult)){
-                $itemNamesQuery = "select ID,Name from items where ID=".$row['itemID'];
-                $itemNotes[$row['itemID']] = $row['note'];
-                while($row = mysqli_fetch_array($itemIDsResult)){
-                    $itemNamesQuery .=" or ID=".$row['itemID'];
-                    $itemNotes[$row['itemID']] = $row['note'];
-                }
-                mysqli_free_result($itemIDsResult);
-                $itemNamesResult = queryMulti($itemNamesQuery);
+            foreach($itemIDsResult as $item){
                 //seperate into <>
-                while($row = mysqli_fetch_array($itemNamesResult)){
-                    echo getSpanText(spanTypes::ITEM,$row['ID'],$row['Name'])."<>";
-                    echo $itemNotes[$row['ID']];
-                }
-                mysqli_free_result($itemNamesResult);
+                echo getSpanText(spanTypes::ITEM,$item['itemID'],$item['Name'])."<>";
+                echo $item['note']];
             }
             //materials
-            $matIDsResult = queryMulti("select keywordID from scenekeywords where ID=".prepVar($_SESSION['currentScene'])." and type=".prepVar(keywordTypes::MATERIAL));
+            $matIDsResult = GeneralInterface::SceneKeywordsOfType($_SESSION['currentScene'], keywordTypes::MATERIAL);
             //get material names and ids
-            if($row = mysqli_fetch_array($matIDsResult)){
-                $matNamesQuery = "select Word from keywordwords where (ID=".$row['keywordID']." limit 1";
-                while($row = mysqli_fetch_array($matIDsResult)){
-                    $matNamesQuery .=" or ID=".$row['itemID']." limit 1";
-                }
-                $matNamesQuery.=")";
-                mysqli_free_result($matIDsResult);
-                $matNamesResult = queryMulti($matNamesQuery);
+            foreach($matIDsResult as $mat){
                 //seperate into <>
-                while($row = mysqli_fetch_array($matNamesResult)){
-                    echo getSpanText(spanTypes::KEYWORD,$row['ID'],$row['Word'])."<>";
-                }
-                mysqli_free_result($matNamesResult);
+                echo getSpanText(spanTypes::KEYWORD,$mat['ID'],$mat['Word'])."<>";
             }
             break;
         
