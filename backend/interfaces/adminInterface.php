@@ -126,12 +126,12 @@ class AdminInterface extends Interface_class{
                             "PRIMARY KEY (sceneID, npcID)".
                             ")");
         
-        //scene ID -> scene ID
-        //**always low to high
-        self::$db->querySingle("CREATE TABLE scenenpcs (".
-                            "lowID int(3) ,".
-                            "highID int(3) ,".
-                            "PRIMARY KEY (lowID, highID)".
+        //start scene ID -> end scene ID
+        //two-way paths will need 2 entries
+        self::$db->querySingle("CREATE TABLE scenepaths (".
+                            "startID int(3) ,".
+                            "endID int(3) ,".
+                            "PRIMARY KEY (startID, endID)".
                             ")");
         
         //scene ID -> playerID

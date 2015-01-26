@@ -87,5 +87,28 @@ class GeneralInterface extends Interface_class{
         $r = self::$db->querySingle("select ID from items where Name=$iid");
         return $r;
     }
+    
+    //needed?
+    public static function getPlayerID($pid){
+        $pid = self::prepVar($pid);
+        $r = self::$db->querySingle("select ID from playerinfo where Name=$pid");
+        return $r;
+    }
+    
+    //needed?
+    public static function getPlayersItemID($pid, $iname){
+        $pid = self::prepVar($pid);
+        $iname = self::prepVar($iname);
+        $r = self::$db->querySingle("select ID from items where playerID=$pid and Name=$iname");
+        return $r;
+    }
+    
+    //needed?
+    public static function getItemContainer($pid, $iname){
+        $pid = self::prepVar($pid);
+        $iname = self::prepVar($iname);
+        $r = self::$db->querySingle("select ID,insideOf from items where playerID=$pid and Name=$iname");
+        return $r;
+    }
 }
 ?>

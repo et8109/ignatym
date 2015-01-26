@@ -20,6 +20,7 @@ voice
 todo:
 sql db backups
 */
+require_once 'interfaces/sharedInterface.php';
 
 /**
  *prints the input string to the debug file.
@@ -77,15 +78,15 @@ function addAlert($alertNum, $optionalPlayerID = -1){
     if($optionalPlayerID == -1){
         $optionalPlayerID = $_SESSION['playerID'];
     }
-    query("insert into playeralerts (alertID, playerID) values (".$alertNum.",".prepVar($optionalPlayerID).")");
+    SharedInterface::addPlayerAlert($alertNum,$optionalPlayerID);
 }
 
 
 /**
- *removes the alert from the databse
+ *removes the alert from the databse from this player
  */
 function removeAlert($alertNum){
-    query("delete from playeralerts where playerID=".prepVar($_SESSION['playerID'])." and alertID=".$alertNum);
+    SharedInterface::removePlayerAlert($_SESSION['playerID'], $alertNum);
 }
 
 /**
@@ -174,7 +175,7 @@ function _replaceKeywordID($desc, $ID){
     $descArray = explode(" ",$desc);
     $descArrayLength = count($descArray);
     for($i=0; $i<$descArrayLength; $i++){
-        $keywordRow = query("select ID,Type from keywordwords where Word=".prepVar($descArray[$i])." and ID=".prepVar($ID));
+        $keywordRow = SharedInterface::getKeywordFromWord($descArray[$i], $ID);
         if(isset($keywordRow['ID'])){
             //found, success
             $spanType = spanTypes::KEYWORD;
@@ -191,19 +192,19 @@ function _replaceKeywordID($desc, $ID){
 /**
  *replaces all items in the player's description
  *sends error if not found
+ *returns the new description
  */
 function _replacePlayerItems($description){
     //find item names
-    $itemNamesResult = queryMulti("select Name,ID from items where playerID=".prepVar($_SESSION['playerID'])." and insideOf=0");
+    $itemNamesResult = SharedInterface::getVisibleItems($_SESSION['playerID']);
     //if failed in query
     if(is_bool($itemNamesResult)){
         sendError("could not find item names");
     }
-    while($itemRow = mysqli_fetch_array($itemNamesResult)){
+    foreach($itemNamesResult as $itemRow){
         //if an item is not found
         $pos = strpos($description, $itemRow['Name']);
         if($pos == false){
-            mysqli_free_result($itemNamesResult);
             sendError("description does not contain ".$itemRow['Name']);
         }
         else{
@@ -211,7 +212,6 @@ function _replacePlayerItems($description){
             $description = substr_replace($description,getSpanText(spanTypes::ITEM,$itemRow['ID'],$itemRow['Name']),$pos,strlen($itemRow['Name']));
         }
     }
-    mysqli_free_result($itemNamesResult);
     return $description;
 }
 
@@ -220,30 +220,16 @@ function _replacePlayerItems($description){
  *sends error if not found
  */
 function _replaceScenePaths($description){
-    $pathResult = queryMulti("select lowID,highID from scenepaths where lowID=".prepVar($_SESSION['currentScene'])." or highID=".prepVar($_SESSION['currentScene']));
+    $pathResult = $pathResult = SharedInterface::getPaths($_SESSION['currentScene']);
     if($pathResult == false){
         sendError("Error finding paths");
     }
-    //find path names
-    if($row = mysqli_fetch_array($pathResult)){
-        $pathID = $_SESSION['currentScene'] == $row['lowID'] ? $row['highID'] : $row['lowID'];
-        $nameQuery = "select ID,Name from scenes where ID=".prepVar($pathID);
-    }
-    while($row = mysqli_fetch_array($pathResult)){
-        $pathID = $_SESSION['currentScene'] == $row['lowID'] ? $row['highID'] : $row['lowID'];
-        $nameQuery .= " or ID=".prepVar($pathID);
-    }
-    $namesResult = queryMulti($nameQuery);
-    mysqli_free_result($pathResult);
-    if($namesResult == false){
-        sendError("Error finding paths");
-    }
-    while($row = mysqli_fetch_array($namesResult)){
-        $pos = strpos($description, $row['Name']);
+    foreach($pathResult as $path){
+        $pos = strpos($description, $path['Name']);
         if($pos == false){
-            sendError("Path not found: ".$row['Name']);
+            sendError("Path not found: ".$path['Name']);
         }
-         $description = substr_replace($description,getSpanText(spanTypes::PATH,$row['ID'],$row['Name']),$pos,strlen($row['Name']));
+         $description = substr_replace($description,getSpanText(spanTypes::PATH,$path['ID'],$path['Name']),$pos,strlen($path['Name']));
     }
     return $description;
 }
@@ -253,7 +239,6 @@ function _replaceScenePaths($description){
  */
 function updateDescription($ID, $description, $spanTypesType, $keywordTypeNames){
     $table = _getTable($spanTypesType);
-    $keywordTable = _getTableKeywords($spanTypesType);
     if($table == null){
         sendError("unfindeable type");
     }
@@ -266,25 +251,24 @@ function updateDescription($ID, $description, $spanTypesType, $keywordTypeNames)
         $description = _replaceScenePaths($description);
     }
     //get IDs of keywords
-    $keywordsResult = queryMulti("select keywordID,Type from ".$keywordTable." where ID=".$ID);
+    $keywordsResult = $keywordsResult = SharedInterface::getKeywordFromID($spanTypesType, $ID);
     if(is_bool($keywordsResult)){
         sendError("can't find the required keywords");
     }
     //replace one of each keyword ID
-    while($keywordRow = mysqli_fetch_array($keywordsResult)){
-        $description = _replaceKeywordID($description,$keywordRow['keywordID']);
+    foreach($keywordsResult as $kw){
+        $description = _replaceKeywordID($description,$kw['keywordID']);
         //if ID not found
         if($description == false){
-            sendError("could not find keyword type: ".$keywordTypeNames[intval($keywordRow['Type'])]);
+            sendError("could not find keyword type: ".$keywordTypeNames[intval($kw['Type'])]);
         }
     }
-    mysqli_free_result($keywordsResult);
     //make sure its under max length
     _checkDescIsUnderMaxLength($description,$spanTypesType);
     if($spanTypesType == spanTypes::SCENE){//second scene check in this method
         //log scene
     }
-    query("update ".$table." set Description=".prepVar($description)." where ID=".prepVar($ID));
+    SharedInterface::setDescription($description, $ID, $spanTypesType);
     return true;
 }
 
@@ -317,47 +301,6 @@ function _checkDescIsUnderMaxLength($desc, $spanType){
     }
 }
 
-/**
- *returns the table where the object itself it
- */
-function _getTable($spanTypesType){
-    switch($spanTypesType){
-        case(spanTypes::SCENE):
-            return 'scenes';
-            break;
-        case(spanTypes::ITEM):
-            return 'items';
-            break;
-        case(spanTypes::PLAYER):
-            return 'playerinfo';
-            break;
-        case(spanTypes::KEYWORD):
-            return 'keywords';
-            break;
-    }
-    return null;
-}
-
-/**
- *returns the table where the object's keywords are
- */
-function _getTableKeywords($spanTypesType){
-    switch($spanTypesType){
-        case(spanTypes::SCENE):
-            return 'scenekeywords';
-            break;
-        case(spanTypes::ITEM):
-            return 'items';
-            break;
-        case(spanTypes::PLAYER):
-            return 'playerkeywords';
-            break;
-        case(spanTypes::KEYWORD):
-            return 'keywords';
-            break;
-    }
-    return null;
-}
 
 /**
  *adds an item to the player's inventory
@@ -365,8 +308,9 @@ function _getTableKeywords($spanTypesType){
  *checkPlayerCanTakeItem first!
  */
 function addItemIdToPlayer($itemID, $itemName){
+    checkPlayerCanTakeItem();
     //change playerID for the item
-    query("update items set playerID=".prepVar($_SESSION['playerID'])." where ID=".prepVar($itemID));
+    SharedInterface::setItemOwner($itemID, $_SESSION['playerID']);
     addWordToPlayerDesc(spanTypes::ITEM,$itemID,$itemName,$_SESSION['playerID']);
     //add an alert for the player
     addAlert(alertTypes::newItem);
@@ -381,13 +325,13 @@ function checkPlayerCanTakeItem($playerID = null){
         $playerID = $_SESSION['playerID'];
     }
     //check player has less than max items
-    $numItems = query("select count(1) from items where playerID=".prepVar($_SESSION['playerID']));
+    $numItems = SharedInterface::getTotalItems($playerID);
     if($numItems[0] >= constants::maxPlayerItems){
         sendError("Item limit reached, found ".$numItems[0]);
     }
     //check player desc length
-    $row = query("select Description from playerinfo where ID=".prepVar($_SESSION['playerID']));
-    $playerDescription = $row['Description'];
+    $info = SharedInterface::getDescPlayer($_SESSION['playerID']);
+    $playerDescription = $info['Description'];
     checkDescIsUnderMaxLength($playerDescription,maxLength::maxSpanLength);
     return true;
 }
@@ -396,7 +340,7 @@ function checkPlayerCanTakeItem($playerID = null){
  *sends error on fail
  */
 function removeItemIdFromPlayer($itemID){
-    $updateRow = query("update items set playerID=0 where playerID=".prepVar($_SESSION['playerID'])." and ID=".prepVar($itemID));
+    $updateRow = SharedInterface::removeItemOwner($itemID, $_SESSION['playerID']);
     addAlert(alertTypes::removedItem);
     return true;
 }
@@ -411,9 +355,9 @@ function addKeywordToPlayer($keywordID,$keywordType,$location,$playerID = -1){
     if($playerID == -1){
         $playerID = $_SESSION['playerID'];
     }
-    $nameRow = query("select Word from keywordwords where ID=".prepVar($keywordID)." limit 1");
-    query("insert into playerkeywords (ID,keywordID,locationID,type) values (".prepVar($playerID).",".prepVar($keywordID).",".prepVar($location).",".prepVar($keywordType).")");
-    _addWordToPlayerDesc(spanTypes::KEYWORD,$keywordID,$nameRow['Word'],$playerID);
+    SharedInterfac::addPlayerKeyword($playerID, $keywordID, $location. $keywordType);
+    $wordRow = SharedInterface::getSingleKeywordFromID($keywordID);
+    _addWordToPlayerDesc(spanTypes::KEYWORD,$keywordID,$wordRow['Word'],$playerID);
 }
 
 /**
@@ -423,9 +367,9 @@ function _addWordToPlayerDesc($spanType, $kworitemID, $name, $playerID = -1){
     if($playerID == -1){
         $playerID = $_SESSION['playerID'];
     }
-    $descRow = query("select Description from playerinfo where ID=".prepVar($playerID));
+    $descRow = SharedInterface::getDescPlayer($playerID);
     $desc = $descRow['Description']." ".getSpanText($spanType,$kworitemID,$name);
-    query("Update playerinfo set Description=".prepVar($desc)." where ID=".prepVar($playerID));
+    SharedInterface::setDescription($desc,$playerID,spanTypes::PLAYER);
 }
 /**
  *returns the manage level of the player in the current scene, [as an int]
@@ -435,7 +379,7 @@ function _addWordToPlayerDesc($spanType, $kworitemID, $name, $playerID = -1){
 function getPlayerManageLevel(){
     //only works because there is 1 job per scene
     //type is hierarchy level
-    $keywordRow = query("select type, locationID from playerkeywords where ID=".prepVar($_SESSION['playerID'])." and (type=".keywordTypes::APPSHP." or type=".keywordTypes::MANAGER." or type=".keywordTypes::LORD." or type=".keywordTypes::MONARCH.")");
+    $keywordRow = SharedInterface::getJobType($_SESSION['playerID']);
     //apprentice
     if($keywordRow['type'] == keywordTypes::APPSHP && $keywordRow['locationID'] == $_SESSION['currentScene']){
         return keywordTypes::APPSHP;
@@ -445,7 +389,7 @@ function getPlayerManageLevel(){
         return keywordTypes::MANAGER;
     }
     //get the current scene town and land
-    $sceneRow = query("select town, land from scenes where ID=".prepVar($_SESSION['currentScene']));
+    $sceneRow = SharedInterface::getSceneLandInfo($_SESSION['currentScene']);
     //lord
     if($keywordRow['type'] == keywordTypes::LORD && $keywordRow['locationID'] == $sceneRow['town']){
         return keywordTypes::LORD;
@@ -465,8 +409,7 @@ function getPlayerManageLevel(){
  *returns false on fail.
  */
 function getMonarchId(){
-    $landQuery = "(select land from scenes where ID=".prepVar($_SESSION['currentScene']).")";
-    $monarchRow = query("select ID from playerkeywords where type =".keywordTypes::MONARCH." and locationID=".$landQuery);
+    $monarchRow = SharedInterface::getMonarchID($_SESSION['currentScene']);
     if($monarchRow == false){
         return false;
     }
@@ -487,16 +430,14 @@ function nearbyScenes($radius){
     while($currentRadius <= $radius){//for each radius
         while($index < $numScenesAfterLastCycle){//for each scene in last radius
             $checkID = $sceneIds[$index];
-            $IdQuery = queryMulti("select lowID, highID from scenepaths where lowID=".prepVar($checkID)." or highID=".prepVar($checkID));
-            while($row = mysqli_fetch_array($IdQuery)){
-                $ID = $checkID == $row['lowID'] ? $row['highID'] : $row['lowID'];
-                if(!in_array($ID,$sceneIds)){
-                    $sceneIds[] = $ID;
+            $IdQuery = SharedInterface::getPaths(($checkID);
+            foreach($IdQuery as $sid){
+                if(!in_array($sid,$sceneIds)){
+                    $sceneIds[] = $sid;
                     $numScenesThisCycle++;
                     $totalScenes++;
                 }
             }
-            mysqli_free_result($IdQuery);
             $index++;
         }
         $numScenesAfterLastCycle += $numScenesThisCycle;

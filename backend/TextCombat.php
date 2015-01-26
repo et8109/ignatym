@@ -1,7 +1,7 @@
 <?php
-include 'shared/initialize.php';
-include 'shared/functions.php';
-include 'interfaces/generalInterface.php';
+require_once 'shared/initialize.php';
+require_once 'shared/functions.php';
+require_once 'interfaces/generalInterface.php';
 
 try{
     $function = $_POST['function'];
@@ -107,12 +107,12 @@ try{
         
         case('giveItemTo'):
             //find id of reciever
-            $playerRow = query("select ID from playerinfo where Name=".prepVar($_POST['playerName']));
+            $playerRow = GeneralInterface::getPlayerID($_POST['playerName']);
             if($playerRow == false){
                 sendError("Could not find ".$_POST['playerName']." nearby.");
             }
             //find id of item
-            $itemRow = query("select ID from items where playerID=".prepVar($_SESSION['playerID'])." and Name=".prepVar($_POST['itemName']));
+            $itemRow = GeneralInterface::getPlayersItemId($_SESSION['playerID'], $_POST['itemName']);
             if($itemRow == false){
                 sendError("Could not find ".$_POST['itemName']);
             }
@@ -125,7 +125,7 @@ try{
             $itemName = prepVar($_POST['itemName']);
             $containerName = prepVar($_POST['containerName']);
             //get item and container info
-            $itemRow = query("select ID,insideOf from items where playerID=".prepVar($_SESSION['playerID'])." and Name=".$itemName);
+            $itemRow = GeneralInterface::getItemContainer($_SESSION['playerID'], $itemName);
             $containerRow = query("select room,ID from items where playerID=".prepVar($_SESSION['playerID'])." and Name=".$containerName);
             //make sure item was found
             if(!isset($itemRow['ID'])){
