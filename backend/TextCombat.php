@@ -184,7 +184,7 @@ try{
                 echo $item['note']];
             }
             //materials
-            $matIDsResult = GeneralInterface::SceneKeywordsOfType($_SESSION['currentScene'], keywordTypes::MATERIAL);
+            $matIDsResult = GeneralInterface::sceneKeywordsOfType($_SESSION['currentScene'], keywordTypes::MATERIAL);
             //get material names and ids
             foreach($matIDsResult as $mat){
                 //seperate into <>
@@ -192,16 +192,10 @@ try{
             }
             break;
         
-        //gets the id of any player from the same scene. scene is indexed in mysql
-        case('getPlayerIDFromScene'):
-            $row = query("SELECT ID FROM playerinfo WHERE Scene =".prepVar($_SESSION['currentScene'])." AND Name = ".prepVar($_POST['Name']));
-            echo $row['ID'];
-            break;
-        
         //used for /self
         case('getPlayerInfo'):
             //info
-            $playerRow = query("select Name,craftSkill,health from playerinfo where ID=".prepVar($_SESSION['playerID']));
+            $playerRow = GeneralInterface::getPlayerStats($_SESSION['playerID']);
             if($playerRow == false){
                 sendError("Error finding your stats.");
             }
@@ -210,70 +204,58 @@ try{
             echo "<>Craft skill: ".$playerRow['craftSkill'];
             echo "<>Health: ".$playerRow['health'];
             //keywords
-            $keywordsResult = queryMulti("select keywordID,locationID,type from playerkeywords where ID=".prepVar($_SESSION['playerID']));
-            $row;
-            if(!$row = mysqli_fetch_array($keywordsResult)){
-                //no keywords
+            $keywordsResult = GeneralInterface::getPlayerKeywords($_SESSION['playerID']);
+            if(count($keywordsResult) < 1){
                 echo "<>No keywords";
-                mysqli_free_result($keywordsResult);
             }
             else{
                 echo "<>-Keywords:";
-                do{
-                    //find first keyword option
-                    $wordRow = query("select word from keywordwords where ID=".prepVar($row['keywordID'])." limit 1");
-                    echo "<>".$wordRow['word'];
+                foreach($keywordsResult as $kw){
+                    echo "<>".$kw['word'];
                     //find location name, if applicable
-                    if($row['locationID'] != 0){
-                        if(intval($row['type'])==keywordTypes::LORD){
-                            echo " of town ".$row['locationID'];
+                    if($kw['locationID'] != 0){
+                        if(intval($kw['type'])==keywordTypes::LORD){
+                            echo " of town ".$kw['locationID'];
                         }
-                        else if(intval($row['type'])==keywordTypes::MONARCH){
-                            echo " of land ".$row['locationID'];
+                        else if(intval($kw['type'])==keywordTypes::MONARCH){
+                            echo " of land ".$kw['locationID'];
                         }
                         else{
-                            $locationRow = query("select name from scenes where ID=".prepVar($row['locationID']));
+                            $locationRow = GeneralInterface::getSceneNamequery($kw['locationID']);
                             echo " of: ".$locationRow['name'];
                         }
                     }
-                }while($row = mysqli_fetch_array($keywordsResult));
-                mysqli_free_result($keywordsResult);
+                }
             }
             //items
-            $itemsResult = queryMulti("select name from items where playerID=".prepVar($_SESSION['playerID']));
-            $row;
-            if(!$row = mysqli_fetch_array($itemsResult)){
+            $itemsResult = SharedInterface::getTotalItems($_SESSION['playerID']));
+            if(count($itemsResult) < 1){
                 //no items
                 echo "<>No items";
-                mysqli_free_result($itemsResult);
             }
             else{
                 echo "<>-Items:<>";
-                echo $row['name'];
-                while($row = mysqli_fetch_array($itemsResult)){
-                    echo ", ".$row['name'];
+                foreach($itemsResult as $item){
+                    echo $item['name'].",";
+                    //rtrim($string, ",")
                 }
-                mysqli_free_result($itemsResult);
             }
             break;
         
         case('setFrontLoadScenes'):
-            query("update playerinfo set frontLoadScenes=".$_POST['load']." where ID=".prepVar($_SESSION['playerID']));
+            GeneralInterface::setFrontLoadScenes($_SESSION['playerID'],$_POST['load']);
             break;
         
         case('setFrontLoadKeywords'):
-            query("update playerinfo set frontLoadKeywords=".$_POST['load']." where ID=".prepVar($_SESSION['playerID']));
+            GeneralInterface::setFrontLoadKeywords($_SESSION['playerID'], $_POST['load']);
             break;
         
         case('getAlertMessages'):
             //get all alert ids
-            $result = queryMulti("select alertID from playeralerts where playerID=".prepVar($_SESSION['playerID']));
-            while($row = mysqli_fetch_array($result)){
-                //get alert message and append
-                $row2 = query("select Description from alerts where ID=".prepVar($row['alertID']));
-                echo "</br>".$row2['Description'];
+            $alerts = GeneralInterface::getPlayerAlertMessages($_SESSION['playerID']);
+            foreach($alerts as $alert){
+                echo "</br>".$alert['Description'];
             }
-            mysqli_free_result($result);
             break;
         
         case('clearAlerts'):

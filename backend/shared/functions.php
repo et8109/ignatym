@@ -326,7 +326,7 @@ function checkPlayerCanTakeItem($playerID = null){
     }
     //check player has less than max items
     $numItems = SharedInterface::getTotalItems($playerID);
-    if($numItems[0] >= constants::maxPlayerItems){
+    if(count($numItems) >= constants::maxPlayerItems){
         sendError("Item limit reached, found ".$numItems[0]);
     }
     //check player desc length

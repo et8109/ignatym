@@ -102,7 +102,7 @@ class SharedInterface extends Interface_class{
      */
     public static getTotalItems($pid){
         $pid = self::prepVar($pid);
-        $r = self::$db->queryMulti("select count(1) from items where playerID=$pid");
+        $r = self::$db->queryMulti("select name,ID from items where playerID=$pid");
         return $r;
     }
     

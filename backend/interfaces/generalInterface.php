@@ -66,6 +66,20 @@ class GeneralInterface extends Interface_class{
     }
     
     //needed?
+    public static function getPlayerStats($pid){
+        $pid = self::prepVar($pid);
+        $r = self::$db->querySingle("select Name,craftSkill,health from playerinfo where ID=$pid");
+        return $r;
+    }
+    
+    //needed?
+    public static function getPlayerKeywords($pid){
+        $pid = self::prepVar($pid);
+        $r = self::$db->queryMulti("select P.keywordID,P.locationID,P.type,first(W.Word) from playerkeywords P, keywordwords W where P.ID=$pid and W.ID = P.keywordID");
+        return $r;
+    }
+    
+    //needed?
     public static function getPlayersItemInfo($pid, $iname){
         $pid = self::prepVar($pid);
         $iname = self::prepVar($iname);
@@ -100,10 +114,30 @@ class GeneralInterface extends Interface_class{
         return $r;
     }
     
-    public static function SceneKeywordsOfType($sid, $type){
+    public static function sceneKeywordsOfType($sid, $type){
         $sid = self::prepVar($sid);
         $type = self::prepVar($type);
         $r = self::$db->queryMulti("select Word, ID from keywordwords where ID = (select keywordID from scenekeywords where ID=$sid and type=$type) limit 1");
+        return $r;
+    }
+    
+    public static function setFrontLoadScenes($pid, $val){
+        $pid = self::prepVar($pid);
+        $val = self::prepVar($val);
+        $r = self::$db->queryMulti("update playerinfo set frontLoadScenes=$val where ID=$pid");
+        return $r;
+    }
+    
+    public static function setFrontLoadKeywords($pid, $val){
+        $pid = self::prepVar($pid);
+        $val = self::prepVar($val);
+        $r = self::$db->queryMulti("update playerinfo set frontLoadKeywords=$val where ID=$pid");
+        return $r;
+    }
+    
+    public static function getPlayerAlertMessages($pid){
+        $pid = self::prepVar($pid);
+        $r = self::$db->queryMulti("select P.alertID, A.Description from playeralerts P, alerts A where playerID=$pid and P.alertID = A.ID");
         return $r;
     }
 }
