@@ -12,6 +12,10 @@ class Interface_class {
         self::$db = new Database();
     }
     
+    protected static function getDatabaseName(){
+        return self::$db->getDatabaseName();
+    }
+    
     protected static function prepVar($var){
         $var = Interface_class::$db->escapeString($var);
         //replace ' with ''
@@ -21,10 +25,6 @@ class Interface_class {
             $var = "'".$var."'";
         }
         return $var;
-    }
-    
-    protected static function getDatabaseName(){
-        return self::$db->getDatabaseName();
     }
 }
 //initialize db object

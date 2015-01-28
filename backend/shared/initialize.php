@@ -1,5 +1,8 @@
 <?php
-include_once 'constants.php';
+require_once 'constants.php';
+require_once 'functions.php';
+require_once '../interfaces/DataRequest.php';
+
 error_reporting(0);
 session_start();
 //check inputs
@@ -48,7 +51,7 @@ function _checkIfLoggedIn(){
             session_destroy();
             sendError("Your session was lost. Please log in again.");
         }
-        $loginRow = query("select loggedIn from playerinfo where ID=".prepVar($_SESSION['playerID']));
+        $loginRow = Req::select->fromPlayerID($_SESSION['playerID'])->loggedIn()->run();
         //check login id
         if($loginRow['loggedIn'] != $_SESSION['loginID']){
             session_destroy();

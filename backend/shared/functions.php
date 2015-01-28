@@ -20,7 +20,6 @@ voice
 todo:
 sql db backups
 */
-require_once 'interfaces/sharedInterface.php';
 
 /**
  *prints the input string to the debug file.
@@ -78,6 +77,7 @@ function addAlert($alertNum, $optionalPlayerID = -1){
     if($optionalPlayerID == -1){
         $optionalPlayerID = $_SESSION['playerID'];
     }
+    
     SharedInterface::addPlayerAlert($alertNum,$optionalPlayerID);
 }
 
@@ -197,6 +197,7 @@ function _replaceKeywordID($desc, $ID){
 function _replacePlayerItems($description){
     //find item names
     $itemNamesResult = SharedInterface::getVisibleItems($_SESSION['playerID']);
+    Req::select->fromPlayerID($_SESSION['playerID'])->visibleItems()->run();
     //if failed in query
     if(is_bool($itemNamesResult)){
         sendError("could not find item names");

@@ -9,7 +9,7 @@ class GeneralInterface extends Interface_class{
         $r = self::$db->querySingle("select playerID,playerName from sceneplayers where sceneID=$sid");
         return $r;
     }
-    
+
     public static function getNpcsInScene($sid){
         $sid = self::prepVar($sid);
         $r = self::$db->querySingle("select npcID,npcName from scenenpcs where sceneID=$sid and health>0");
