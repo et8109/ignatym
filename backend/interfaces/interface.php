@@ -1,6 +1,6 @@
 <?php
 
-require_once("../backend/database.php");
+require_once("../shared/database.php");
 
 /**
  *The interface between the logic/application and the database
