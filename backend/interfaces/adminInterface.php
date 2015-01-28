@@ -14,6 +14,7 @@ class AdminInterface extends Interface_class{
         self::$db->querySingle("CREATE TABLE alerts (".
                             "ID int(3) AUTO_INCREMENT,".
                             "Description varchar(100),".
+                            "Perm tinyint(1),". //if the alert requires something to be removed
                             "PRIMARY KEY (ID)".
                             ")");
         

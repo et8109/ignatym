@@ -33,9 +33,14 @@ class GeneralInterface extends Interface_class{
         $pid = self::prepVar($pid);
         $sid = self::prepVar($sid);
         $pname = self::prepVar($pname);
-        self::$db->querySingle("delete from sceneplayers where playerID=$pid");
+        self::removePlayerFromScene($pid);
         self::$db->querySingle("insert into sceneplayers (sceneID,playerID,playerName) values($sid,$pid,$pname)");
         self::$db->querySingle("Update playerinfo set Scene=$sid where ID=$pid");
+    }
+    
+    private static function removePlayerFromScene($pid){
+        $pid = self::prepVar($pid);//twice?
+        self::$db->querySingle("delete from sceneplayers where playerID=$pid");
     }
     
     public static function deleteItem($iid){
@@ -139,6 +144,38 @@ class GeneralInterface extends Interface_class{
         $pid = self::prepVar($pid);
         $r = self::$db->queryMulti("select P.alertID, A.Description from playeralerts P, alerts A where playerID=$pid and P.alertID = A.ID");
         return $r;
+    }
+    
+    public static function clearAlerts($pid){
+        $pid = self::prepVar($pid);
+        self::$db->queryMulti("delete P from playeralerts P, alerts A where P.playerID=$pid and A.ID = P.alertID and A.Perm=0");
+    }
+    
+    public static function getLogin($uname, $pass){
+        $uname = self::prepVar($uname);
+        $pass = self::prepVar($pass);
+        $r = self::$db->queryMulti("select ID,Name,Scene,loggedIn from playerinfo where Name=$uname and password=$pass");
+        return $r;
+    }
+    
+    public static function setLoggedIn($pid, $loginID){
+        $pid = self::prepVar($pid);
+        $loginID = self::prepVar($loginID);
+        self::$db->queryMulti("update playerinfo set loggedIn=$loginID, lastLoginTime=CURRENT_TIMESTAMP where ID=$pid");
+    }
+    
+    public static function addNewUser($uname, $pass, $desc, $startScene){
+        $uname = self::prepVar($uname);
+        $pass = self::prepVar($pass);
+        $startScene = self::prepVar($startScene);
+        $desc = self::prepVar($desc);
+        self::$db->queryMulti("insert into playerinfo (Name,Password,Description,Scene)values($uname,$pass,$desc,$startScene)");
+    }
+    
+    public static function logoutPlayer($pid){
+        $pid = self::prepVar($pid);
+        self::removePlayerFromScene($pid);
+        self::$db->queryMulti("update playerinfo set loggedIn=0 where ID=$pid");
     }
 }
 ?>

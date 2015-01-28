@@ -12,6 +12,7 @@ final class constants {
     const maxHealth = 5;
     const errorSymbol = "<<-<<";//repeated in js code: main and login
     const numAlertsDivider = "<<<";//repeated in js code
+    const initDesc = "I am new, so be nice to me!";
 }
 /**
  *the maximum text size in the db

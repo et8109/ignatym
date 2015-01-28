@@ -259,22 +259,15 @@ try{
             break;
         
         case('clearAlerts'):
-            $permAlerts = array(
+            /*$permAlerts = array(
                 alertTypes::hiddenItem,
                 alertTypes::newItem,
                 alertTypes::removedItem,
                 alertTypes::newJob,
                 alertTypes::fired,
                 alertTypes::newSpell
-            );
-            $query = "delete from playeralerts where playerID=".prepVar($_SESSION['playerID'])." and not ( ";
-            $query.= "alertID=".$permAlerts[0];
-            $numPermAlerts = sizeof($permAlerts);
-            for($i=1; $i<$numPermAlerts; $i++){
-                $query.=" or alertID=".$permAlerts[$i];
-            }
-            $query.=" )";
-            query($query);
+            );*/
+            GeneralInterface::clearAlerts($_SESSION['playerID']);
             break;
         
         case('getTime'):
@@ -297,19 +290,18 @@ try{
                 sendError("Enter a valid password");
             }
             //get username, password
-            $playerRow = query("select ID,Name,Scene,loggedIn from playerinfo where Name=".prepVar($uname)." and password=".prepVar($pass));
+            $playerRow = GeneralInterface::getLogin($uname, $pass);
             if($playerRow == false){
                 sendError("Incorrect username or password");
             }
             if($playerRow['loggedIn'] == false){
-                query("insert into sceneplayers (sceneID,playerID,playerName) values(".prepVar($playerRow['Scene']).",".prepVar($playerRow['ID']).",".prepVar($playerRow['Name']).")");
+                GeneralInterface::changePlayerScene($playerRow['ID'], $playerRow['Scene'], $playerRow['Name']);
     
             }
             //find next login id
             $lastLogin = intval($playerRow['loggedIn']);
             $nextLogin = $lastLogin < 9 ? $lastLogin+1 : 1;
-            
-            $status = query("update playerinfo set loggedIn=".prepVar($nextLogin).", lastLoginTime=CURRENT_TIMESTAMP where ID=".prepVar($playerRow['ID']));
+            GeneralInterface::setLoggedIn($playerRow['ID'], $nextLogin);
             //select needed info from playerinfo
             $_SESSION['playerID'] = $playerRow['ID'];
             $_SESSION['playerName'] = $playerRow['Name'];
@@ -337,17 +329,16 @@ try{
                 sendError("Your passwords don't match");
             }
             //check players for name
-            $sharedNameRow = query("select ID from playerinfo where Name=".prepVar($uname));
+            $sharedNameRow = getPlayerID($uname);
             if($sharedNameRow != false){
                 sendError("Someone already has that name");
             }
             //add player
-            $playerID = lastIDQuery("insert into playerinfo (Name,Password,Description,Scene)values(".prepVar($uname).",".prepVar($pass).",".prepVar("I am new, so be nice to me!").",".constants::startSceneID.")");
+            $playerID = GeneralInterface::addNewUser($uname, $pass, constants::initDesc, constants::startSceneID);
             break;
         
         case('logout'):
-            query("delete from sceneplayers where playerID=".prepVar($_SESSION['playerID']));
-            query("update playerinfo set loggedIn=0 where ID=".prepVar($_SESSION['playerID']));
+            GeneralInterface::logoutPlayer($_SESSION['playerID']);
             session_destroy();
             sendError("logged out. <a href='login.php'>Back to login</a>");
             break;
