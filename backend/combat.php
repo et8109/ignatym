@@ -1,8 +1,6 @@
 <?php
 
-require_once 'shared/initialize.php';
-require_once 'shared/functions.php';
-require_once 'interfaces/combatInterface.php';
+include 'phpHelperFunctions.php';
 
 $function = $_POST['function'];
 switch($function){
