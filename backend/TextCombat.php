@@ -1,7 +1,5 @@
 <?php
 require_once 'shared/initialize.php';
-require_once 'shared/functions.php';
-require_once 'interfaces/generalInterface.php';
 
 try{
     $function = $_POST['function'];
@@ -9,22 +7,22 @@ try{
         case('getDesc'):
             switch($_POST['type']){
                 case(spanTypes::ITEM):
-                    $info = SharedInterface::getDescItem($_POST['ID']);
-                    echo getSpanText(spanTypes::ITEM,$_POST['ID'],$info["Name"])."<>".$info["Description"];
+                    $item =  Req::select()->fromItemID($_POST['ID'])->desc()->name()->run();
+                    echo getSpanText(spanTypes::ITEM,$_POST['ID'],$item->Name)."<>".$item->Desc;
                     break;
                 case(spanTypes::KEYWORD):
-                    $info = SharedInterface::getDescKeyword($_POST['ID']);
-                    echo getSpanText(spanTypes::KEYWORD,$_POST['ID'],$_POST['ID'])."<>".$info["Description"];
+                    $kw = Req::select()->fromKeywordID($_POST['ID'])->desc()->run();
+                    echo getSpanText(spanTypes::KEYWORD,$_POST['ID'],$_POST['ID'])."<>".$kw->Desc;
                     break;
                 case(spanTypes::PLAYER):
                     //if no id is set, make it the player
                     $ID = isset($_POST['ID']) ? $_POST['ID'] : $_SESSION['playerID'];
-                    $info = SharedInterface::getDescPlayer($ID);
-                    echo getSpanText(spanTypes::PLAYER,$ID,$info["Name"])."<>".$info["Description"];
+                    $player = Req::select()->fromPlayerID($ID)->name()->desc()->run();
+                    echo getSpanText(spanTypes::PLAYER,$ID,$player->Name)."<>".$player->Description;
                     break;
                 case(spanTypes::NPC):
-                    $info = SharedInterface::getDescNpc($_POST['ID']);
-                    echo getSpanText(spanTypes::NPC,$_POST['ID'],$info['name'])."<>".$info['description'];
+                    $info = Req::select()->fromNpcID($_POST['ID'])->name()->desc()->run();
+                    echo getSpanText(spanTypes::NPC,$_POST['ID'],$info['Name'])."<>".$info['Description'];
                     break;
                 case(spanTypes::SCENE):
                     //if no id set, it's the current scene
@@ -102,7 +100,7 @@ try{
                 sendError("could not find item: ".$_POST['name']);
             }
             GeneralInterface::deleteItem($itemRow['ID']);
-            addAlert(alertTypes::removedItem);
+            Req::insert()->alert($_SESSION['playerID'])->removedItem()->run();
             break;
         
         case('giveItemTo'):
@@ -151,7 +149,7 @@ try{
             //put in
             GeneralInterface::putItemInItem($itemRow['ID'], $containerRow['ID']);
             //add alert
-            addAlert(alertTypes::hiddenItem);
+            Req::insert()->alert($_SESSION['playerID'])->hiddenItem()->run();
             break;
         
         case('takeItemFrom'):

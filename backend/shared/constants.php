@@ -30,26 +30,6 @@ final class maxLength {
 }
 
 /**
- *types of alerts that can show up in the alert box
- */
-final class alertTypes{
-    //the number is it's id in db
-    const newItem = 1;
-    const hiddenItem = 2;
-    const removedItem = 3;
-    const newJob = 4;
-    const fired = 5;
-    const employeeQuit = 6;
-    const newManager = 7;
-    const newLord = 8;
-    const newEmployee = 9;
-    const managerQuit = 10;
-    const employeeFired = 11;
-    const managerFired = 12;
-    //no 13
-    const newSpell = 14;
-}
-/**
  *the possible actions that are visible in chat.
  *duplicated in js
  */

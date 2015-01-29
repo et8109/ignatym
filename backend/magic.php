@@ -1,6 +1,6 @@
 <?php
 
-include_once "phpHelperFunctions.php";
+require_once 'shared/initialize.php';
 
 //books to spells
 $bookToClass = array(
@@ -56,7 +56,7 @@ switch($_POST['function']){
         //give spell to player
         addKeywordToPlayer($bookToClass[$IdRow['ID']],keywordTypes::SPELL,0,$_SESSION['playerID']);
         //add new spell alert
-        addAlert(alertTypes::newSpell);
+        Req::insert()->alert($_SESSION['playerID'])->newSpell()->run();
         break;
     
     case("forgetSpell"):

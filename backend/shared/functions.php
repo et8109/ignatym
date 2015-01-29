@@ -69,20 +69,6 @@ function updateChatTime(){
 }
 
 /**
- *adds an alert to the player's alert list.
- *Does not add it to their page,this list is only checked during setup
- *optional second param is playerID
- */
-function addAlert($alertNum, $optionalPlayerID = -1){
-    if($optionalPlayerID == -1){
-        $optionalPlayerID = $_SESSION['playerID'];
-    }
-    
-    SharedInterface::addPlayerAlert($alertNum,$optionalPlayerID);
-}
-
-
-/**
  *removes the alert from the databse from this player
  */
 function removeAlert($alertNum){
@@ -314,7 +300,7 @@ function addItemIdToPlayer($itemID, $itemName){
     SharedInterface::setItemOwner($itemID, $_SESSION['playerID']);
     addWordToPlayerDesc(spanTypes::ITEM,$itemID,$itemName,$_SESSION['playerID']);
     //add an alert for the player
-    addAlert(alertTypes::newItem);
+    Req::insert()->alert($_SESSION['playerID'])->newItem()->run();
     return true;
 }
 /**
@@ -342,7 +328,7 @@ function checkPlayerCanTakeItem($playerID = null){
  */
 function removeItemIdFromPlayer($itemID){
     $updateRow = SharedInterface::removeItemOwner($itemID, $_SESSION['playerID']);
-    addAlert(alertTypes::removedItem);
+    Req::insert()->alert($_SESSION['playerID'])->removedItem()->run();
     return true;
 }
 

@@ -7,45 +7,33 @@ require_once("interface.php");
 class Req(){
     private function __construct() {}//static only
     
-    public static select(){
-        return new _SelectRequestSplitter();
-    }
-    public static insert(){
-        return new _InsertRequestSplitter();
-    }
-    public static update(){
-        return new _UpdateRequestSplitter();
-    }
-    public static delete(){
-        return new _DeleteRequestSplitter();
-    }
-    
-}
-
-class _SelectRequestSplitter{
-    
     public fromPlayerID($pid){
         $pid = mysqli_real_escape_string($pid);
         return new _SelectPlayerRequest("ID=$pid");
     }
+    
     public fromPlayerName($pname){
         
     }
+    
     public fromSceneID($sid){
         
     }
-    public fromNpcID($nid){
-        
-    }
-}
-
-class _InsertRequestSplitter{
     
-    public alert($aidFromEnum){
-        $aidFromEnum = self::prepVar($aidFromEnum);
-        return new _AddAlertRequest($aidFromEnum);
+    public fromNpcID($nid){
+        $nid = mysqli_real_escape_string($nid);
+        return new _SelectNpcRequest("ID=$nid");
     }
-
+    
+    public fromItemID($nid){
+        $pid = mysqli_real_escape_string($pid);
+        return new _SelectItemRequest("ID=$pid");
+    }
+    
+    public fromKeywordID($kid){
+        $kid = mysqli_real_escape_string($kid);
+        return new _SelectKeywordRequest("ID=$kid");
+    }
 }
 
 class _SelectRequest extends Interface_class{
@@ -58,54 +46,131 @@ class _SelectRequest extends Interface_class{
             this->$columns = [];
         }
         
+        /**
+         *returns an object representation of the resulting array from the db
+         */
         public function run(){
             if(count(this->$columns) < 1){
                 throw new Exception("no cols in request");
             }
             $cols = array_map (self::prepVar, $columns);
             $table = self::prepVar($table);
-            return self::$db->queryMulti("select ".implode(",",$cols)." from ".this->$table." ".$where);
+            $array = self::$db->queryMulti("select ".implode(",",$cols)." from ".this->$table." ".$where);
+            //convert to obj
+            return (object)$array;
+        }
+        
+        protected function addCol($col){
+            if(!in_array($col, this->$columns){
+                this->$columns[] = self::prepVar($col);
+            }
         }
 }
 
-class _InsertRequest extends Interface_class{
-        private $columns;
-        private $values;
-        private $table;
-        public function __construct($table) {
-            this->$table = $table;
+class _SelectNpcRequest extends _SelectRequest{
+
+        public function __construct($where) {
+            parent::__construct("npcs", $where);
         }
         
-        public function run(){
-            if(count(this->$columns) < 1){
-                throw new Exception("no cols in request");
-            }
-            if(count(this->$columns) != count(this->$values)){
-                throw new Exception("val and col count don't match");
-            }
-            $columns = array_map (self::prepVar, $columns);
-            $values = array_map (self::prepVar, $values);
-            $table = self::prepVar($table);
-            self::$db->queryMulti("insert into ".$table." (".implode(",",$columns).") values (".implode(",",$values));
+        /**
+         *The npcs's name
+         */
+        public function name(){
+            this->addCol("Name");
+            return this;
+        }
+        
+        /**
+         *The npcs's decription
+         */
+        public function desc(){
+            this->addCol("Desc");
+            return this;
+        }
+        
+        /**
+         *The npcs's level
+         */
+        public function level(){
+            this->addCol("Level");
+            return this;
+        }
+}
+
+class _SelectKeywordRequest extends _SelectRequest{
+
+        public function __construct($where) {
+            parent::__construct("keywords", $where);
+        }
+        
+        /**
+         *The keyword's description
+         */
+        public function desc(){
+            this->addCol("Desc");
+            return this;
+        }
+}
+
+class _SelectItemRequest extends _SelectRequest{
+
+        public function __construct($where) {
+            parent::__construct("items", $where);
+        }
+        
+        /**
+         *The item's owner's id
+         */
+        public function ownerID(){
+            this->addCol("playerID");
+            return this;
+        }
+        
+        /**
+         *The item's name
+         */
+        public function name(){
+            this->addCol("Name");
+            return this;
+        }
+        
+        /**
+         *The item's description
+         */
+        public function desc(){
+            this->addCol("Desc");
+            return this;
+        }
+        
+        /**
+         *The item's remaining room (space for storage)
+         */
+        public function room(){
+            this->addCol("room");
+            return this;
+        }
+        
+        /**
+         *The item's id which holds this item
+         */
+        public function container(){
+            this->addCol("insideOf");
+            return this;
         }
 }
 
 class _SelectPlayerRequest extends _SelectRequest{
 
-        public function __construct($table, $where) {
+        public function __construct($where) {
             parent::__construct("playerinfo", $where);
         }
         
-        private function addCol($col){
-            if(!in_array($col, this->$columns){
-                this->$columns[] = self::prepVar($col);
-            }
-        }
         /**
          *The player's description
          */
         public function desc(){
-            this->addCol("Description");
+            this->addCol("Desc");
             return this;
         }
         /**
@@ -180,10 +245,12 @@ class _SelectPlayerRequest extends _SelectRequest{
         }
 }
 
+
+
 class _AddAlertRequest extends _InsertRequest{
 
         //need to keep track of multiple insert rows
-        public function __construct($aid, $pid) {
+        public function __construct($pid) {
             parent::__construct("playeralerts");
             this->$columns[] = "playerID";
             this->$values[] = $pid;
@@ -195,11 +262,108 @@ class _AddAlertRequest extends _InsertRequest{
                 this->$values[] = $aid;
             }
         }
+        
         /**
-         *Whent he player gets a new item
+         *When the player gets a new item
          */
         public function newItem(){
-            this->addAlert();//??
+            this->addAlert(1);
+            return this;
+        }
+        
+        /**
+         *When the player gets a new spell
+         */
+        public function newSpell(13){
+            this->addAlert();
+            return this;
+        }
+        
+        /**
+         *When the player gets a new job
+         */
+        public function newJob(){
+            this->addAlert(4);
+            return this;
+        }
+        
+        /**
+         *When the player is fired from their job
+         */
+        public function fired(){
+            this->addAlert(5);
+            return this;
+        }
+        
+        /**
+         *When the player has a new employee
+         */
+        public function newEmployee(){
+            this->addAlert(9);
+            return this;
+        }
+        
+        /**
+         *When the player has a new manager
+         */
+        public function newManager(){
+            this->addAlert(7);
+            return this;
+        }
+        
+        /**
+         *When the player has a new lord
+         */
+        public function newLord(){
+            this->addAlert(8);
+            return this;
+        }
+        
+        /**
+         *When the player's employee quits
+         */
+        public function employeeQuit(){
+            this->addAlert(6);
+            return this;
+        }
+        
+        /**
+         *When the player's manager quits
+         */
+        public function managerQuit(){
+            this->addAlert(10);
+            return this;
+        }
+        
+        /**
+         *When the player's employee is fired
+         */
+        public function employeeFired(){
+            this->addAlert(11);
+            return this;
+        }
+        
+        /**
+         *When the player's manager is fired
+         */
+        public function managerFired(){
+            this->addAlert(12);//??
+            return this;
+        }
+        
+        /**
+         *When the player's item is removed
+         */
+        public function removedItem(){
+            this->addAlert(3);
+            return this;
+        }
+        
+        /**
+         *When the player's item is hidden
+         */
+        public function hiddenItem(){
+            this->addAlert(2);
             return this;
         }
 }

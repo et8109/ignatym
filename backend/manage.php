@@ -141,7 +141,7 @@ switch($function){
         //add keyword
         addKeywordToPlayer(8,keywordTypes::MANAGER,$_SESSION['currentScene'],$_SESSION['playerID']);
         //let employee know
-        addAlert(alertTypes::newJob);
+        Req::insert()->alert($_SESSION['playerID'])->newJob()->run();
         //let above and below know
         alertOfNewPosition(keywordTypes::MANAGER);
         break;
@@ -214,7 +214,7 @@ switch($function){
         //add keyword
         addKeywordToPlayer($startingKeywordID,$position,$location,$employeeID);
         //let employee know
-        addAlert(alertTypes::newJob, $employeeID);
+        Req::insert()->alert($employeeID)->newJob()->run();
         //let above and below know
         alertOfNewPosition($position);
         break;
@@ -269,7 +269,7 @@ switch($function){
         //on success:
         query("delete from playerkeywords where ID=".prepVar($employeeRow['ID'])." and (type=".keywordTypes::APPSHP." or type=".keywordTypes::MANAGER." or type=".keywordTypes::LORD." or type=".keywordTypes::MONARCH.")");
         //give alert to fired employee
-        addAlert(alertTypes::fired,$employeeRow['ID']);
+        Req::insert()->alert($employeeRow['ID'])->fired()->run();
         //alert above and below
         alertOfFiredPosition($managerLevel-1);
         break;
@@ -338,13 +338,13 @@ function alertOfNewPosition($keywordType){
     
     if($keywordType != keywordTypes::APPSHP){
         while($row = mysqli_fetch_array($lowerResult)){
-            addAlert(alertTypes::newManager,$row['ID']);
+            Req::insert()->alert($row['ID'])->newManager()->run();
         }
         mysqli_free_result($lowerResult);
     }
     if($keywordType != keywordTypes::MONARCH){
         while($row = mysqli_fetch_array($higherResult)){
-            addAlert(alertTypes::newEmployee,$row['ID']);
+            Req::insert()->alert($row['ID'])->newEmployee()->run();
         }
         mysqli_free_result($higherResult);
     }   
@@ -359,13 +359,13 @@ function alertOfQuitPosition($keywordType){
     
     if($keywordType != keywordTypes::APPSHP){
         while($row = mysqli_fetch_array($lowerResult)){
-            addAlert(alertTypes::managerQuit,$row['ID']);
+            Req::insert()->alert($row['ID'])->managerQuit()->run();
         }
         mysqli_free_result($lowerResult);
     }
     if($keywordType != keywordTypes::MONARCH){
         while($row = mysqli_fetch_array($higherResult)){
-            addAlert(alertTypes::employeeQuit,$row['ID']);
+            Req::insert()->alert($row['ID'])->employeeQuit()->run();
         }
         mysqli_free_result($higherResult);
     }   
@@ -380,13 +380,13 @@ function alertOfFiredPosition($keywordType){
     
     if($keywordType != keywordTypes::APPSHP){
         while($row = mysqli_fetch_array($lowerResult)){
-            addAlert(alertTypes::managerFired,$row['ID']);
+            Req::insert()->alert($row['ID'])->managerFired()->run();
         }
         mysqli_free_result($lowerResult);
     }
     if($keywordType != keywordTypes::MONARCH){
         while($row = mysqli_fetch_array($higherResult)){
-            addAlert(alertTypes::employeeFired,$row['ID']);
+            Req::insert()->alert($row['ID'])->employeeFired()->run();
         }
         mysqli_free_result($higherResult);
     }   
