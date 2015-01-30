@@ -1,32 +1,33 @@
 <?php
 
-include 'phpHelperFunctions.php';
+require_once 'shared/initialize.php';
+require_once 'interfaces/combatInterface.php';
 
 $function = $_POST['function'];
 switch($function){
     case('attack'):
         //check player health
-        $healthRow = query("select health from playerinfo where ID=".prepVar($_SESSION['playerID']));
+        $healthRow = SharedInterface::getPlayerInfo($_SESSION['playerID']);
         if(!$healthRow || $healthRow['health'] <= 0){
             sendError("Heal yourself first.");
         }
         //check sanctuary
-        $sceneRow = query("select count(1) from scenekeywords where ID=".prepVar($_SESSION['currentScene'])." and keywordID=12");
-        if($sceneRow[0] == 1){
+        $sceneRow = CombatInterface::getSceneKeywordIDs($_SESSION['currentScene']));
+        if(in_array(keywordIDs::SANCTUARY, $sceneRow){
             sendError("You cannot fight in a sanctuary.");
         }
         $targetID;
         $targetSpanType;
         $opponentCombatLevel;
         //see if player is there
-        $row = query("SELECT playerID FROM sceneplayers WHERE SceneID =".prepVar($_SESSION['currentScene'])." AND playerName = ".prepVar($_POST['Name']));
+        $row = CombatInterface::getPlayerFromScene($_SESSION['currentScene'], $_POST['Name']);
         if($row != false){
             $targetID = $row['playerID'];
             $targetSpanType = spanTypes::PLAYER;
             $opponentCombatLevel = getPlayerCombatLevel($targetID);
         }
         else{
-            $row = query("SELECT npcID FROM scenenpcs WHERE SceneID =".prepVar($_SESSION['currentScene'])." AND npcName = ".prepVar($_POST['Name'])." and health>0");
+            $row = CombatInterface::getNpcFromScene($_SESSION['currentScene'], $_POST['Name']);
             if($row != false){
                 $targetID = $row['npcID'];
                 $targetSpanType = spanTypes::NPC;
@@ -45,7 +46,7 @@ switch($function){
             $actionWords = " struck ";
             //lower health
             if($targetSpanType == spanTypes::PLAYER){
-                query("update playerinfo set health=health-1 where ID=".prepVar($targetID)." and health>0");
+                CombatInterface::lowerPlayerHealth($targetID, 1);
             } else if($targetSpanType == spanTypes::NPC){
                 query("update scenenpcs set health=health-1 where sceneID=".prepVar($_SESSION['currentScene'])." and npcID=".prepVar($targetID)." and health>0");
                 $killRow = query("select count(1) from scenenpcs where sceneID=".prepVar($_SESSION['currentScene'])." and npcID=".prepVar($targetID)." and health=0");

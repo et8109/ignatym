@@ -9,7 +9,7 @@ class GeneralInterface extends Interface_class{
         $r = self::$db->querySingle("select playerID,playerName from sceneplayers where sceneID=$sid");
         return $r;
     }
-
+    
     public static function getNpcsInScene($sid){
         $sid = self::prepVar($sid);
         $r = self::$db->querySingle("select npcID,npcName from scenenpcs where sceneID=$sid and health>0");
@@ -71,13 +71,6 @@ class GeneralInterface extends Interface_class{
     }
     
     //needed?
-    public static function getPlayerStats($pid){
-        $pid = self::prepVar($pid);
-        $r = self::$db->querySingle("select Name,craftSkill,health from playerinfo where ID=$pid");
-        return $r;
-    }
-    
-    //needed?
     public static function getPlayerKeywords($pid){
         $pid = self::prepVar($pid);
         $r = self::$db->queryMulti("select P.keywordID,P.locationID,P.type,first(W.Word) from playerkeywords P, keywordwords W where P.ID=$pid and W.ID = P.keywordID");
@@ -119,6 +112,9 @@ class GeneralInterface extends Interface_class{
         return $r;
     }
     
+    /**
+     *returns the words and IDs of the scene's keywords of the given type
+     */
     public static function sceneKeywordsOfType($sid, $type){
         $sid = self::prepVar($sid);
         $type = self::prepVar($type);

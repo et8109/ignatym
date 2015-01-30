@@ -101,6 +101,16 @@ class SharedInterface extends Interface_class{
     }
     
     /**
+     *returns general player info
+     *NOT the player's desc
+     */
+    public static function getPlayerInfo($pid){
+        $pid = self::prepVar($pid);
+        $r = self::$db->querySingle("select Name,craftSkill,health from playerinfo where ID=$pid");
+        return $r;
+    }
+    
+    /**
      *returns the name and description of the given npc id
      */
     public static function getDescNpc($nid){

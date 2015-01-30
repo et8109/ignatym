@@ -56,7 +56,7 @@ switch($_POST['function']){
         //give spell to player
         addKeywordToPlayer($bookToClass[$IdRow['ID']],keywordTypes::SPELL,0,$_SESSION['playerID']);
         //add new spell alert
-        Req::insert()->alert($_SESSION['playerID'])->newSpell()->run();
+        addAlert(alertTypes::newSpell);
         break;
     
     case("forgetSpell"):

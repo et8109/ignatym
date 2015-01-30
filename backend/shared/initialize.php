@@ -1,7 +1,6 @@
 <?php
 require_once 'constants.php';
 require_once 'functions.php';
-require_once '../interfaces/DataRequest.php';
 
 error_reporting(0);
 session_start();

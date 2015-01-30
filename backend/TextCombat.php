@@ -1,5 +1,6 @@
 <?php
 require_once 'shared/initialize.php';
+require_once 'interfaces/generalInterface.php';
 
 try{
     $function = $_POST['function'];
@@ -193,7 +194,7 @@ try{
         //used for /self
         case('getPlayerInfo'):
             //info
-            $playerRow = GeneralInterface::getPlayerStats($_SESSION['playerID']);
+            $playerRow = SharedInterface::getPlayerInfo($_SESSION['playerID']);
             if($playerRow == false){
                 sendError("Error finding your stats.");
             }

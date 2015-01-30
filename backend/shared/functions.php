@@ -25,6 +25,8 @@ sql db backups
  *prints the input string to the debug file.
  *adds a new line
  */
+require_once 'interfaces/sharedInterface.php';
+ 
 function printDebug($word){
     $debugFile = fopen("debug.txt", "a");
     fwrite($debugFile,$word. "\r\n");
@@ -66,6 +68,19 @@ function _addChatText($text, $sceneID){
 function updateChatTime(){
     //if subtracting, watch out for the walk line when moving scenes
     $_SESSION['lastChatTime'] = date_timestamp_get(new DateTime());
+}
+
+/**
+ *adds an alert to the player's alert list.
+ *Does not add it to their page,this list is only checked during setup
+ *optional second param is playerID
+ */
+function addAlert($alertNum, $optionalPlayerID = -1){
+    if($optionalPlayerID == -1){
+        $optionalPlayerID = $_SESSION['playerID'];
+    }
+    
+    SharedInterface::addPlayerAlert($alertNum,$optionalPlayerID);
 }
 
 /**

@@ -1,5 +1,7 @@
 <?php
 require_once 'shared/initialize.php';
+require_once 'shared/functions.php';
+require_once 'interfaces/chatInterface.php';
 
 try{
     $fileName = "chats/".$_SESSION['currentScene']."Chat.txt";
