@@ -31,7 +31,7 @@ switch($function){
             if($row != false){
                 $targetID = $row['npcID'];
                 $targetSpanType = spanTypes::NPC;
-                $opponentCombatLevel = getNpcCombatLevel($targetID);
+                $opponentCombatLevel = SharedInterface::getNpcInfo($targetID);
             } else{
                 sendError($_POST['Name']." is not nearby");
             } 
@@ -48,23 +48,22 @@ switch($function){
             if($targetSpanType == spanTypes::PLAYER){
                 CombatInterface::lowerPlayerHealth($targetID, 1);
             } else if($targetSpanType == spanTypes::NPC){
-                query("update scenenpcs set health=health-1 where sceneID=".prepVar($_SESSION['currentScene'])." and npcID=".prepVar($targetID)." and health>0");
-                $killRow = query("select count(1) from scenenpcs where sceneID=".prepVar($_SESSION['currentScene'])." and npcID=".prepVar($targetID)." and health=0");
-                if($killRow[0] > 0){
+                $killRow = CombatInterface::lowerNpcHealth($targetID, 1, $_SESSION['currentScene']);
+                if($killRow['health'] == 0){
                     $actionWords = " defeated ";
                     //if a killing blow, check for npc material
-                    $materialRow = query("select keywordID from npckeywords where ID=".prepVar($targetID)." and sceneID=".prepVar($_SESSION['currentScene'])." and type=1");
+                    $materialRow = CombatInterface::sceneKeywordsOfType($targetID, keywordTypes::MATERIAL, $_SESSION['currentScene']);
                     if($materialRow){
                         //if a material is available, check for job in craft scene
-                        $locationQuery = query("select locationID from playerkeywords where ID=".prepVar($_SESSION['playerID'])." and (type=".keywordTypes::APPSHP." or type=".keywordTypes::MANAGER.")");
-                        if($locationQuery){
+                        $jobLoc = SharedInterface::getJobType($_SESSION['playerID']);
+                        if($jobLoc['type'] == keywordTypes::APPSHP || $jobLoc['type'] == keywordTypes::MANAGER){
                             //if a crafter, check amount of materials
-                            $numMatRow = query("select count(1) from scenekeywords where ID=".prepVar($locationQuery['locationID']));
+                            $numMatRow = CombatInterface::getSceneTotalResources($jobLoc['locationID']);
                             if($numMatRow < constants::maxSceneItems){
-                                $matName = query("select Word from keywordwords where ID=".prepVar($materialRow['keywordID'])." limit 1");
+                                $matName = SharedInterface::getSingleKeywordFromID($materialRow['keywordID']);
                                 $actionWords = " looted ".$matName['Word']." from ";
                                 //add material to craft job scene
-                                query("insert into scenekeywords (ID,keywordID,type) values (".$locationRow.",".$materialRow['keywordID'].",".keywordTypes::MATERIAL.")");
+                                CombatInterface::addSceneKeyword($jobLoc['locationID'],$materialRow['keywordID'],keywordTypes::MATERIAL);
                             }
                         }
                     }
@@ -74,7 +73,7 @@ switch($function){
         else{
             $actionWords = " was blocked by ";
             //lower health
-            query("update playerinfo set health=health-1 where ID=".prepVar($_SESSION['playerID'])." and health>0");
+            lowerPlayerHealth($_SESSION['playerID'], 1);
         }
         $actionWords .= $playerCombatLevel." -> ".$opponentCombatLevel." ";
         speakActionAttack($targetSpanType,$targetID,$_POST['Name'],$actionWords);
@@ -82,12 +81,12 @@ switch($function){
     
     case('regen'):
         //check if in sanctuary
-        $sceneRow = query("select count(1) from scenekeywords where ID=".prepVar($_SESSION['currentScene'])." and keywordID=12");
-        if($sceneRow[0] != 1){
+        $sceneRow = CombatInterface::getSceneKeywordIDs($_SESSION['currentScene']));
+        if(!in_array(keywordIDs::SANCTUARY, $sceneRow){
             sendError("You can only regenerate in a sanctuary.");
         }
         //set health to max
-        query("update playerinfo set health=".prepVar(constants::maxHealth)." where ID=".prepVar($_SESSION['playerID']));
+        CombatInterface::setPlayerHealth($_SESSION['playerID'], constants::maxHealth);
         break;
 }
 
@@ -106,40 +105,12 @@ function getPlayerCombatLevel($playerID){
     //set initial
     $combatLevel = 1;
     //get player item ids
-    $rowItemIds = queryMulti("select ID from items where playerID=".prepVar($playerID)." and insideOf=0");
-    //if player has no items
-    if(is_bool($rowItemIds)){
-        //nothing
-    }
-    else{
-        //get keywords from items
-        $itemRow = mysqli_fetch_array($rowItemIds);
-        $multiQuery = "select keywordID from itemKeywords where ID=".prepVar($itemRow['ID']);
-        while($itemRow = mysqli_fetch_array($rowItemIds)){
-            $multiQuery .= " or ID=".prepVar($itemRow['ID']);
-        }
-        mysqli_free_result($rowItemIds);
-        $keywordIdRows = queryMulti($multiQuery);
-        //if items have no keywords
-        if(is_bool($keywordIdRows)){
-            //nothing
-        }
-        else{
-            //combat math, items
-            while($keywordRow = mysqli_fetch_array($keywordIdRows)){
-                if(isset( $combatItemKeywords[$keywordRow['keywordID']])){
-                    $combatLevel += $combatItemKeywords[$keywordRow['keywordID']];
-                }
-            }
+    $keywordIdRows = SharedInterface::getVisibleItemKeywords($playerID);
+    foreach($keywordIdRows as $kw){
+        if(isset( $combatItemKeywords[$kw['keywordID']])){
+            $combatLevel += $combatItemKeywords[$kw['keywordID']];
         }
     }
     return $combatLevel;
-}
-/**
- *returns the combat level of an npc
- */
-function getNpcCombatLevel($npcID){
-    $row = query("select level from npcs where ID=".prepVar($npcID));
-    return $row['level'];
 }
 ?>

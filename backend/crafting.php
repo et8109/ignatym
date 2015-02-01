@@ -1,6 +1,7 @@
 <?php
 
-include 'phpHelperFunctions.php';
+require_once 'shared/initialize.php';
+require_once 'interfaces/combatInterface.php';
 
 /**
  *the keyword types required in all items
@@ -51,50 +52,46 @@ switch($function){
         }
         //remove materials from scene
         foreach ($itemKeywordTypes as $t){
-            query("remove from scenekeywords where ID=".prepVar($_SESSION['currentScene'])." and keywordID=".$keywordIDs[$t]." limit 1");
+            CraftingInterface::removeSceneKeyword($_SESSION['currentScene'], $keywordIDs[$t]);
         }
         //make sure desc length is less than max
         checkDescIsUnderMaxLength($desc, spanTypes::ITEM);
         //add the item into db
-        $lastID = lastIDquery("insert into items (playerID, Name, Description) values (".prepVar($_SESSION['playerID']).",".prepVar($_POST['Name']).",".prepVar($desc).")");
-        //if item is a container, give it room
-        if($isContainer){
-            query("Update items set room=2 where ID=".$lastID);
-        }
+        $lastID = createItem($_SESSION['playerID'], $_POST['Name'], $desc, $isContainer);
         //add the item to itemKeywords with it's keywords
         foreach ($itemKeywordTypes as $t){
-            query("insert into itemkeywords (ID, keywordID, type) values (".$lastID.",".$keywordIDs[$t].",".$t.")");
+            CraftingInterface::createItemKeywords($lastID, $keywordIDs[$t], $t);
         }
         addItemIdToPlayer($lastID, $_POST['Name']);
         break;
     
     case('getCraftInfo'):
-        $row = query("SELECT `craftSkill` FROM `playerinfo` WHERE ID = ".prepVar($_SESSION['playerID']));
+        $row = SharedInterface::getPlayerInfo($_SESSION['playerID']);
         echo $row['craftSkill'];
         break;
 }
 
 /**
- *replaces the first keyword of the given type.
+ *replaces the first keyword of the given type in the given desc
  *returns error on insufficient materials
  *returns false on not type not found
  *should work for scene actions if corrent kwt is given
  */
 function replaceKeywordType($desc, $keywordType, &$IdOut){
     //find prerequisites
-    $prerequisite = "";
+    $minID = 0;
     switch($keywordType){
         case(keywordTypes::QUALITY):
-            $row = query("select craftSkill from playerinfo where ID = ".prepVar($_SESSION['playerID']));
+            $row = SharedInterface::getPlayerInfo($_SESSION['playerID']);
             if($row == false){
                 sendError("error finding craft level");
             }
             switch($row['craftSkill']){
                 case(0):
-                    $prerequisite = "ID<=3";
+                    $minID = 3;
                     break;
                 case(1):
-                    $prerequisite = "ID<=4";
+                    $minID = 4;
                     break;
             }
             break;
@@ -104,15 +101,11 @@ function replaceKeywordType($desc, $keywordType, &$IdOut){
     $descArrayLength = count($descArray);
     for($i=0; $i<$descArrayLength; $i++){
         $word = $descArray[$i];
-        $query = "select ID from keywordwords where Word=".prepVar(strtolower($word))." and Type=".prepVar($keywordType);
-        if($prerequisite != ""){
-            $query.=" and ".$prerequisite;
-        }
-        $keywordRow = query($query);
+        $keywordRow = CraftingInterface::getKeywordID(strtolower($word), $keywordType, $minID);
         if(isset($keywordRow['ID'])){
             //if a material, make sure it is available
             if($keywordType == keywordTypes::MATERIAL){
-                $numMatRow = query("select count(1) from scenekeywords where ID=".prepVar($_SESSION['currentScene'])." and keywordID=".prepVar($keywordRow['ID']));
+                $numMatRow = CraftingInterface::checkSceneKeyword($_SESSION['currentScene'], $keywordRow['ID']);
                 if($numMatRow[0] < 1){
                     sendError("You don't have enough material for: ".$word);
                 }

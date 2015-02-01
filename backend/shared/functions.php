@@ -198,7 +198,6 @@ function _replaceKeywordID($desc, $ID){
 function _replacePlayerItems($description){
     //find item names
     $itemNamesResult = SharedInterface::getVisibleItems($_SESSION['playerID']);
-    Req::select->fromPlayerID($_SESSION['playerID'])->visibleItems()->run();
     //if failed in query
     if(is_bool($itemNamesResult)){
         sendError("could not find item names");

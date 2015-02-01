@@ -120,6 +120,15 @@ class SharedInterface extends Interface_class{
     }
     
     /**
+     *returns the non-description npcs info
+     */
+    public static function getNpcInfo($nid){
+        $nid = self::prepVar($nid);
+        $r = self::$db->querySingle("select level from npcs where ID=$nid");
+        return $r;
+    }
+    
+    /**
      *returns the name and description of the given scene id
      */
     public static function getDescScene($sid){
@@ -170,7 +179,7 @@ class SharedInterface extends Interface_class{
     /**
      *returns the name and id of all the player's visible items
      */
-    public static getVisiableItems($pid){
+    public static getVisibleItems($pid){
         $pid = self::prepVar($pid);
         $r = self::$db->queryMulti("select Name,ID from items where playerID=$pid and insideOf=0");
         return $r;
