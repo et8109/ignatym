@@ -1,5 +1,7 @@
 <?php
-include 'phpHelperFunctions.php';
+
+require_once 'shared/initialize.php';
+require_once 'interfaces/manageInterface.php';
 
 $function = $_POST['function'];
 switch($function){
@@ -12,24 +14,24 @@ switch($function){
             sendError("Items cannot be stored here.");
         }
         //get item id
-        $idRow = query("select ID from items where playerID=".prepVar($_SESSION['playerID'])." and Name=".prepVar($_POST['Name']));
+        $idRow = SharedInterface::getPlayersItemInfo($_SESSION['playerID'], $_POST['Name']);
         if(is_bool($idRow)){
             sendError("You do not have a ".$_POST['Name']);
         }
         //make sure it's not a container
-        $itemIsBagRow = query("select count(1) from itemkeywords where ID=".prepVar($idRow['ID'])." and type=".keywordTypes::CONTAINER);
+        $itemIsBagRow = SharedInterface::checkItemHasKeywordType($idRow['ID'], keywordTypes::CONTAINER);
         if($itemIsBagRow[0] > 0){
             sendError("You can't put a container into a location.");
         }
         //make sure scene has less than max items
-        $numItems = query("select count(1) from itemsinscenes where sceneID=".prepVar($_SESSION['currentScene']));
+        $numItems = ManageInterface::countItemsInScene($_SESSION['currentScene']);
         if($numItems[0] >= constants::maxSceneItems){
             sendError("This location is full already");
         }
         //remove item from player
         removeItemIdFromPlayer($idRow['ID']);
         //add item to items in scenes, along with note
-        query("insert into itemsinscenes (sceneID,itemID,note) values (".prepVar($_SESSION['currentScene']).",".prepVar($idRow['ID']).",".prepVar($_POST['Note']).")");
+        ManageInterface::addItemToScene($_SESSION['currentScene'], $idRow['ID'], $_POST['Note']);
         break;
     
     case('removeItemFromScene'):
@@ -41,14 +43,14 @@ switch($function){
             sendError("Items cannot be removed from here.");
         }
         //get item id
-        $idRow = query("select ID from items where Name=".prepVar($_POST['Name']));
+        $idRow = SharedInterface::getItemName($_POST['Name']);
         if(is_bool($idRow)){
             sendError("That item does not exist");
         }
         //make sure the player can take an item
         checkPlayerCanTakeItem();
         //remove item from scene list
-        $removeRow = query("delete from itemsInScenes where sceneID=".prepVar($_SESSION['currentScene'])." and itemID=".prepVar($idRow['ID']));
+        ManageInterface::removeItemFromScene($_SESSION['currentScene'], $idRow['ID']);
         addItemIdToPlayer($idRow['ID'], $_POST['Name']);
         break;
     
@@ -60,16 +62,16 @@ switch($function){
         if(itemTypeInScene() == -1){
             sendError("Item notes cannot be changed here.");
         }
-        $idRow = query("select ID from items where Name=".prepVar($_POST['Name']));
+        $idRow = SharedInterface::getItemName($_POST['Name']);
         if($idRow == false){
             sendError($_POST['Name']." does not exist.");
         }
         //get item id
-        $itemRow = query("select count(1) from itemsinscenes where sceneID=".prepVar($_SESSION['currentScene'])." and itemID=".prepVar($idRow['ID']));
+        $itemRow = ManageInterface::checkItemInScene($_SESSION['currentScene'], $idRow['ID']);
         if($itemRow[0] != 1){
             sendError($_POST['Name']." not found in this location.");
         }
-        query("update itemsinscenes set note=".prepVar($_POST['Note'])." where itemID=".$idRow['ID']);
+        ManageInterface::changeItemNote($idRow['ID'], $_POST['Note']);
         break;
     
     case('changeSceneDesc'):

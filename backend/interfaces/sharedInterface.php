@@ -88,6 +88,19 @@ class SharedInterface extends Interface_class{
         self::$db->querySingle("insert into playerkeywords (ID,keywordID,locationID,type) values ($pid,$kid,$loc,$kwtype)");
     }
     
+    public static function getPlayersItemInfo($pid, $iname){
+        $pid = self::prepVar($pid);
+        $iname = self::prepVar($iname);
+        $r = self::$db->querySingle("select room,ID,insideOf from items where playerID=$pid and Name=$iname");
+        return $r;
+    }
+    
+    public static function getItemID($iname){
+        $iname = self::prepVar($iname);
+        $r = self::$db->querySingle("select ID from items where Name=$iname");
+        return $r;
+    }
+    
     /**
      *removes the given alert id from the player id
      */
@@ -122,6 +135,16 @@ class SharedInterface extends Interface_class{
     public static getTotalItems($pid){
         $pid = self::prepVar($pid);
         $r = self::$db->queryMulti("select name,ID from items where playerID=$pid");
+        return $r;
+    }
+    
+    /**
+     *returns the count for item id and type
+     */
+    public static function checkItemHasKeywordType($iid, $kwtype){
+        $kwtype = self::prepVar($kwtype);
+        $iid = self::prepVar($iid);
+        $r = self::$db->queryMulti("select count(1) from itemkeywords where ID=$iid and type=$kwtype");
         return $r;
     }
     

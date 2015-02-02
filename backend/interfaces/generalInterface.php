@@ -57,13 +57,6 @@ class GeneralInterface extends Interface_class{
     }
     
     //needed?
-    public static function getItemName($iid){
-        $iid = self::prepVar($iid);
-        $r = self::$db->querySingle("select ID from items where Name=$iid");
-        return $r;
-    }
-    
-    //needed?
     public static function getPlayerID($pid){
         $pid = self::prepVar($pid);
         $r = self::$db->querySingle("select ID from playerinfo where Name=$pid");
@@ -74,21 +67,6 @@ class GeneralInterface extends Interface_class{
     public static function getPlayerKeywords($pid){
         $pid = self::prepVar($pid);
         $r = self::$db->queryMulti("select P.keywordID,P.locationID,P.type,first(W.Word) from playerkeywords P, keywordwords W where P.ID=$pid and W.ID = P.keywordID");
-        return $r;
-    }
-    
-    //needed?
-    public static function getPlayersItemInfo($pid, $iname){
-        $pid = self::prepVar($pid);
-        $iname = self::prepVar($iname);
-        $r = self::$db->querySingle("select room,ID,insideOf from items where playerID=$pid and Name=$iname");
-        return $r;
-    }
-    
-    public static function checkItemHasKeywordType($iid, $kwtype){
-        $kwtype = self::prepVar($kwtype);
-        $iid = self::prepVar($iid);
-        $r = self::$db->queryMulti("select count(1) from itemkeywords where ID=$iid and type=$kwtype");
         return $r;
     }
     

@@ -96,7 +96,7 @@ try{
         
         case('destroyItem'):
             //make sure player has item
-            $itemRow = GeneralInterface::getItemName($_POST['name']);
+            $itemRow = SharedInterface::getItemID($_POST['name']);
             if($itemRow == false){
                 sendError("could not find item: ".$_POST['name']);
             }
@@ -111,7 +111,7 @@ try{
                 sendError("Could not find ".$_POST['playerName']." nearby.");
             }
             //find id of item
-            $itemRow = GeneralInterface::getPlayersItemInfo($_SESSION['playerID'], $_POST['itemName']);
+            $itemRow = SharedInterface::getPlayersItemInfo($_SESSION['playerID'], $_POST['itemName']);
             if($itemRow == false){
                 sendError("Could not find ".$_POST['itemName']);
             }
@@ -124,8 +124,8 @@ try{
             $itemName = prepVar($_POST['itemName']);
             $containerName = prepVar($_POST['containerName']);
             //get item and container info
-            $itemRow = GeneralInterface::getPlayersItemInfo($_SESSION['playerID'], $itemName);
-            $containerRow = GeneralInterface::getPlayersItemInfo($_SESSION['playerID'], $containerName);
+            $itemRow = SharedInterface::getPlayersItemInfo($_SESSION['playerID'], $itemName);
+            $containerRow = SharedInterface::getPlayersItemInfo($_SESSION['playerID'], $containerName);
             //make sure item was found
             if(!isset($itemRow['ID'])){
                 sendError("the ".$itemName." was not found");
@@ -143,7 +143,7 @@ try{
                 sendError($itemName." is inside of something else. Remove it first.");
             }
             //make sure the item is not a bag
-            $itemIsBagRow = GeneralInterface::checkItemHasKeywordType($itemRow['ID'], keywordTypes::CONTAINER);
+            $itemIsBagRow = SharedInterface::checkItemHasKeywordType($itemRow['ID'], keywordTypes::CONTAINER);
             if($itemIsBagRow[0] > 0){
                 sendError("You can't put a container into another container.");
             }
@@ -154,8 +154,8 @@ try{
             break;
         
         case('takeItemFrom'):
-            $itemRow = GeneralInterface::getPlayersItemInfo($_SESSION['playerID'], $_POST['itemName']);
-            $containerRow = GeneralInterface::getPlayersItemInfo($_SESSION['playerID'], $_POST['containerName']);
+            $itemRow = SharedInterface::getPlayersItemInfo($_SESSION['playerID'], $_POST['itemName']);
+            $containerRow = SharedInterface::getPlayersItemInfo($_SESSION['playerID'], $_POST['containerName']);
             if($itemRow == false){
                 sendError("could not find ".$_POST['itemName']);
             }
