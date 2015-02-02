@@ -1,6 +1,7 @@
 <?php
 
 require_once 'shared/initialize.php';
+require_once 'interfaces/magicInterface.php';
 
 //books to spells
 $bookToClass = array(
@@ -17,12 +18,12 @@ switch($_POST['function']){
     
     case('readBook')://see book contents
         //make sure book exists
-        $IdRow = query("select ID from keywordwords where Word=".prepVar(strtolower($_POST['bookName']))." and type=".prepVar(keywordTypes::SPELLBOOK));
+        $IdRow = MagicInterface::getKeywordID($_POST['bookName'], keywordTypes::SPELLBOOK);
         if($IdRow == false){
             sendError("Could not find the ".$_POST['bookName']." here.");
         }
         //make sure scene has spellbook
-        $bookRow = query("select count(1) from scenekeywords where ID=".prepVar($_SESSION['currentScene'])." and type=".prepVar(keywordTypes::SPELLBOOK)." and keywordID=".prepVar($IdRow['ID']));
+        $bookRow = SharedInterface::checkSceneKeyword($_SESSION['currentScene'], $IdRow['ID'], keywordTypes::SPELLBOOK);
         if($bookRow[0] != 1){
             sendError("Could not find the ".$_POST['bookName']." here.");
         }
@@ -40,16 +41,16 @@ switch($_POST['function']){
     
     case('learnSpell')://learn book contents
         //make sure scene has spellbook
-        $IdRow = query("select ID from keywordwords where Word=".prepVar(strtolower($_POST['bookName']))." and type=".prepVar(keywordTypes::SPELLBOOK));
+        $IdRow = MagicInterface::getKeywordID($_POST['bookName'], keywordTypes::SPELLBOOK);
         if($IdRow == false){
-            sendError("Could not find the ".$_POST['bookName']);
+            sendError("Could not find the ".$_POST['bookName']." here.");
         }
-        $bookRow = query("select count(1) from scenekeywords where ID=".prepVar($_SESSION['currentScene'])." and type=".prepVar(keywordTypes::SPELLBOOK)." and keywordID=".prepVar($IdRow['ID']));
+        $bookRow = SharedInterface::checkSceneKeyword($_SESSION['currentScene'], $IdRow['ID'], keywordTypes::SPELLBOOK);
         if($bookRow[0] != 1){
             sendError("Could not find the ".$_POST['bookName']." here.");
         }
         //make sure player does not have a spell
-        $spellRow = query("select count(1) from playerkeywords where ID=".prepVar($_SESSION['playerID'])." and type=".prepVar(keywordTypes::SPELL));
+        $spellRow = MagicInterface::checkPlayerKeywordType($_SESSION['playerID'], keywordTypes::SPELL);
         if($spellRow[0] == 1){
             sendError("You already know a spell. You would have to forget that one first.");
         }
@@ -60,7 +61,7 @@ switch($_POST['function']){
         break;
     
     case("forgetSpell"):
-        $forgetRow = query("delete from playerkeywords where ID=".prepVar($_SESSION['playerID'])." and type=".prepVar(keywordTypes::SPELL));
+        $forgetRow = MagicInterface::removePlayerKeywordType($_SESSION['playerID'], keywordTypes::SPELL);
         break;
     
     case("castSpell"):
@@ -68,7 +69,7 @@ switch($_POST['function']){
             sendError($_POST['name']." is not a spell.");
         }
         //make sure they have the spell
-        $spellRow = query("select count(1) from playerkeywords where ID=".prepVar($_SESSION['playerID'])." and type=".prepVar(keywordTypes::SPELL)." and keywordID=".prepVar($spellToClass[$_POST['name']]));
+        $spellRow = MagicInterface::checkPlayerKeyword($_SESSION['playerID'], $spellToClass[$_POST['name']], keywordTypes::SPELL);
         if($spellRow[0] != 1){
             sendError("You can't cast ".$_POST['name']);
         }
@@ -76,8 +77,7 @@ switch($_POST['function']){
         switch($_POST['name']){
             case('reanimate'):
                 //revive nearby enemies
-                $resRow = query("update scenenpcs set health=".prepVar(constants::maxHealth)." where health=0 and sceneID=".prepVar($_SESSION['currentScene'])." and type=".prepVar(npcTypes::CREATURE));
-                $numRisen = lastQueryNumRows();
+                $numRisen = MagicInterface::regenNpcType($_SESSION['currentScene'], npcTypes::CREATURE, constants::maxHealth);
                 if($numRisen > 0){
                     echo "You give new life to ".$numRisen." dead creatures nearby.";
                 } else{
@@ -85,18 +85,18 @@ switch($_POST['function']){
                 }
                 break;
             case('summon boss'):
-                $resRow = query("update scenenpcs set health=".prepVar(constants::maxHealth)." where health=0 and sceneID=".prepVar($_SESSION['currentScene'])." and type=".prepVar(npcTypes::BOSS));
+                $resRow = MagicInterface::regenNpcType($_SESSION['currentScene'], npcTypes::BOSS, constants::maxHealth);
                 if(lastQueryNumRows() == 0){
                     sendError("Could not summon the boss here.");
                 }
                 //create hear effect nearby
-                $posQuery = query("select posx, posy from scenes where ID=".prepVar($_SESSION['currentScene']));
+                $posQuery = MagicInterface::getSceneCoords($_SESSION['currentScene']);
                 $currentX = $posQuery['posx'];
                 $currentY = $posQuery['posy'];
                 $scenes = nearbyScenes(3);
                 foreach($scenes as $sceneID){
                     //get direction
-                    $posQuery = query("select posx, posy from scenes where ID=".prepVar($sceneID));
+                    $posQuery = MagicInterface::getSceneCoords($sceneID);
                     $dir = getSceneDir($currentX,$currentY,$posQuery['posx'],$posQuery['posy']);
                     speakActionMessage($sceneID,"You hear the roar of a boss to the ".$dir);
                 }
@@ -105,12 +105,10 @@ switch($_POST['function']){
             
             case("rainfall"):
                 //set raining constant in db
-                $rainQuery = query("update constants set raining=1 where raining=0");
+                $rainQuery = setRaining(1);
                 if(lastQueryNumRows() == 1){
                     //speakaction that it is raining to all scenes
-                    for($i=100,$n = 100+constants::numScenes; $i<$n; $i++){
-                        speakActionMessage($i,"It starts raining..");
-                    }
+                    globalMessage("It starts raining..");
                     echo "You call down the rain from the sky";
                 } else{
                     echo "It's already raining";
@@ -119,12 +117,10 @@ switch($_POST['function']){
             
             case("sunshine"):
                 //set raining constant in db
-                $rainQuery = query("update constants set raining=0 where raining=1");
+                $rainQuery = setRaining(0);
                 if(lastQueryNumRows() == 1){
                     //speakaction that it is raining to all scenes
-                    for($i=100,$n = 100+constants::numScenes; $i<$n; $i++){
-                        speakActionMessage($i,"The sun begins to shine though the clouds..");
-                    }
+                        globalMessage("The sun begins to shine though the clouds..");
                     echo "You call forth the sun to shine";
                 } else{
                     echo "The sun is already out";

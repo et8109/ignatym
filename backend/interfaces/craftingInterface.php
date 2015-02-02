@@ -45,11 +45,5 @@ class CraftingInterface extends Interface_class{
         }
         return $r;
     }
-    
-    public static function checkSceneKeyword($sid, $kid){
-        $sid = self::prepVar($sid);
-        $kid = self::prepVar($kid);
-        self::$db->querySingle("select count(1) from scenekeywords where ID=$sid and keywordID=$kid");
-    }
 }
 ?>

@@ -418,6 +418,15 @@ function getMonarchId(){
 }
 
 /**
+ *writes a message to every scene
+ */
+function globalMessage($msg){
+    for($i=100,$n = 100+constants::numScenes; $i<$n; $i++){
+        speakActionMessage($i,$msg);
+    }
+}
+
+/**
  *returns an array of scenes in the radius
  *first index is null, was curernt scene
  */

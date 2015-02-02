@@ -1,75 +1,6 @@
 <?php
 require_once("interface.php");
 
-class DataRequest{
-    private function __construct() {}//static only
-    
-    public static fromPlayerID($pid){
-        $pid = self::prepVar($pid);
-        return new PlayerRequest("playerinfo", "ID=$pid");
-    }
-    public static fromPlayerName($pname){
-        
-    }
-    public static fromSceneID($sid){
-        
-    }
-    public static fromNpcID($nid){
-        
-    }
-    
-    private static function prepVar($var){
-        $var = Interface_class::$db->escapeString($var);
-        //replace ' with ''
-        //$var = str_replace("'", "''", $var);
-        //if not a number, surround in quotes
-        if(!is_numeric($var)){
-            $var = "'".$var."'";
-        }
-        return $var;
-    }
-}
-
-class _Request extends Interface_class{
-        private $columns;
-        private $table;
-        private $where;
-        public function __construct($table, $where) {
-            this->$where = $where;
-            this->$table = $table;
-            this->$columns = [];
-        }
-        
-        public function run(){
-            if(count(this->$columns) < 1){
-                throw new Exception("no cols in request");
-            }
-            return self::$db->queryMulti("select ".implode(",",this->$columns)." from ".this->$table." ".$where);
-        }
-}
-
-class _PlayerRequest extends _Request{
-
-        public function __construct($table, $where) {
-            parent::__construct($table, $where);
-        }
-        
-        private function addCol($col){
-            if(!in_array($col, this->$columns){
-                this->$columns[] = $col;
-            }
-        }
-        
-        public function desc(){
-            this->addCol("Description");
-            return this;
-        }
-}
-
-
-
-
-
 class SharedInterface extends Interface_class{
     private function __construct() {}//static only
     
@@ -275,6 +206,17 @@ class SharedInterface extends Interface_class{
     public static getMonarchID($sid){
         $sid = self::prepVar($sid);
         $r = self::$db->querySingle("select P.ID from playerkeywords P, scenes S where S.ID=$sid and P.type =".keywordTypes::MONARCH." and P.locationID = S.ID");
+        return $r;
+    }
+    
+    /**
+     *returns count(1) of matching keyword
+     */
+    public static function checkSceneKeyword($sid, $kid, $ktype){
+        $sid = self::prepVar($sid);
+        $kid = self::prepVar($kid);
+        $ktype = self::prepVar($ktype);
+        $r = self::$db->querySingle("select count(1) from scenekeywords where ID=$sid and keywordID=$kid and type=$ktype");
         return $r;
     }
     

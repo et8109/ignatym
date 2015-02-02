@@ -105,7 +105,7 @@ function replaceKeywordType($desc, $keywordType, &$IdOut){
         if(isset($keywordRow['ID'])){
             //if a material, make sure it is available
             if($keywordType == keywordTypes::MATERIAL){
-                $numMatRow = CraftingInterface::checkSceneKeyword($_SESSION['currentScene'], $keywordRow['ID']);
+                $numMatRow = SharedInterface::checkSceneKeyword($_SESSION['currentScene'], $keywordRow['ID'], keywordTypes::MATERIAL);
                 if($numMatRow[0] < 1){
                     sendError("You don't have enough material for: ".$word);
                 }
