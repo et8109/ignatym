@@ -35,5 +35,23 @@ class ManageInterface extends Interface_class{
         $note = self::prepVar($note);
         self::$db->querySingle("update itemsinscenes set note=$note where itemID=$iid");
     }
+    
+    public static function getPlayerIDFromSceneJob($sid, $ktype){
+        $ktype = self::prepVar($ktype);
+        $sid = self::prepVar($sid);
+        $r = self::$db->querySingle("select count(1) from playerkeywords where type=$ktype and locationID=$sid");
+        return $r;
+    }
+    
+    public static function removePlayerJob($pid){
+        $pid = self::prepVar($pid);
+        self::$db->querySingle("delete from playerkeywords where ID=$pid and (type=".keywordTypes::APPSHP." or type=".keywordTypes::MANAGER." or type=".keywordTypes::LORD." or type=".keywordTypes::MONARCH.")");
+    }
+    
+    public static function checkLocationAcceptsApprentice($sid){
+        $sid = self::prepVar($sid);
+        $r = self::$db->querySingle(("select count(1) from scenes where ID=$sid and appshp=1");
+        return $r;
+    }
 }
 ?>

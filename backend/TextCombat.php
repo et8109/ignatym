@@ -106,7 +106,7 @@ try{
         
         case('giveItemTo'):
             //find id of reciever
-            $playerRow = GeneralInterface::getPlayerID($_POST['playerName']);
+            $playerRow = SharedInterface::getPlayerID($_POST['playerName']);
             if($playerRow == false){
                 sendError("Could not find ".$_POST['playerName']." nearby.");
             }
@@ -328,7 +328,7 @@ try{
                 sendError("Your passwords don't match");
             }
             //check players for name
-            $sharedNameRow = getPlayerID($uname);
+            $sharedNameRow = SharedInterface::getPlayerID($uname);
             if($sharedNameRow != false){
                 sendError("Someone already has that name");
             }

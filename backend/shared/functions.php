@@ -410,7 +410,7 @@ function getPlayerManageLevel(){
  *returns false on fail.
  */
 function getMonarchId(){
-    $monarchRow = SharedInterface::getMonarchID($_SESSION['currentScene']);
+    $monarchRow = SharedInterface::getPlayerIDFromSceneJob($_SESSION['currentScene'], keywordTypes::MONARCH);
     if($monarchRow == false){
         return false;
     }

@@ -57,13 +57,6 @@ class GeneralInterface extends Interface_class{
     }
     
     //needed?
-    public static function getPlayerID($pid){
-        $pid = self::prepVar($pid);
-        $r = self::$db->querySingle("select ID from playerinfo where Name=$pid");
-        return $r;
-    }
-    
-    //needed?
     public static function getPlayerKeywords($pid){
         $pid = self::prepVar($pid);
         $r = self::$db->queryMulti("select P.keywordID,P.locationID,P.type,first(W.Word) from playerkeywords P, keywordwords W where P.ID=$pid and W.ID = P.keywordID");

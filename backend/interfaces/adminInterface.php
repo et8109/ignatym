@@ -148,7 +148,6 @@ class AdminInterface extends Interface_class{
                             "ID int(3) AUTO_INCREMENT,".
                             "Name char(20) ,".
                             "Desc varchar(1000) ,".
-                            "DescDraft varchar(1000) ,".
                             "Appshp tinyint(1) ,".
                             "Town int(3) ,".
                             "Land int(3) ,".

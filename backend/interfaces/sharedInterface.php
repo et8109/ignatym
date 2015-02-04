@@ -42,6 +42,15 @@ class SharedInterface extends Interface_class{
     }
     
     /**
+     *returns the player's id from thier name
+     */
+    public static function getPlayerID($name){
+        $name = self::prepVar($pname);
+        $r = self::$db->querySingle("select ID from playerinfo where Name=$pname");
+        return $r;
+    }
+    
+    /**
      *returns the name and description of the given npc id
      */
     public static function getDescNpc($nid){
@@ -223,12 +232,10 @@ class SharedInterface extends Interface_class{
         return $r;
     }
     
-    /**
-     *returns the id of the scene's monarch
-     */
-    public static getMonarchID($sid){
+    public static function getPlayerIDFromSceneJob($sid, $ktype){
+        $ktype = self::prepVar($ktype);
         $sid = self::prepVar($sid);
-        $r = self::$db->querySingle("select P.ID from playerkeywords P, scenes S where S.ID=$sid and P.type =".keywordTypes::MONARCH." and P.locationID = S.ID");
+        $r = self::$db->querySingle("select ID from playerkeywords where type=$ktype and locationID=$sid");
         return $r;
     }
     
