@@ -133,7 +133,8 @@ switch($function){
         //let employee know
         addAlert(alertTypes::newJob);
         //let above and below know
-        alertOfNewPosition(keywordTypes::MANAGER);
+        ManageInterface::alertManagersApprentaces(alertTypes::newManager, keywordTypes::APPSHP, $_SESSION['currentScene']);
+        ManageInterface::alertManagersLord(alertTypes::newEmployee, keywordTypes::LORD, $_SESSION['currentScene']);
         break;
     
     case("hireEmployee"):
@@ -181,6 +182,8 @@ switch($function){
             if(isset($positionRow['ID'])){
                 sendError("Someone already has that position");
             }
+            //let thier new employees know
+            ManageInterface::alertManagersApprentaces(alertTypes::newManager, keywordTypes::APPSHP, $_SESSION['currentScene']);
             $startingKeywordID = 8;
             $position = keywordTypes::MANAGER;
             $location = $_SESSION['currentScene'];
@@ -197,6 +200,8 @@ switch($function){
             if($positionRow[0] == 1){
                 sendError("Someone already has that position");
             }
+            ///let their new manager's know
+            ManageInterface::alertLordsManagers(alertTypes::newLord, keywordTypes::MANAGER, $_SESSION['currentScene']);
             $startingKeywordID = 9;
             $position = keywordTypes::LORD;
             $location = $townRow['town'];
@@ -205,8 +210,6 @@ switch($function){
         addKeywordToPlayer($startingKeywordID,$position,$location,$employeeID);
         //let employee know
         addAlert(alertTypes::newJob, $employeeID);
-        //let above and below know
-        alertOfNewPosition($position);
         break;
     
     case("fireEmployee"):
@@ -221,9 +224,11 @@ switch($function){
         }
         $managerLevel = intval($managerRow['type']);
         switch($managerLevel){
+            //apprentace has no one to fire
             case(keywordTypes::APPSHP):
                 sendError("You don't have any employees");
                 break;
+            //manager fires apprentice
             case(keywordTypes::MANAGER):
                 //make sure they work for you
                 $jobRow = SharedInterface::getJobType($employeeRow['ID']);
@@ -231,6 +236,7 @@ switch($function){
                     sendError("Player does not work for you");
                 }
                 break;
+            //lord fires manager
             case(keywordTypes::LORD):
                 //find the location ID of the manager
                 $locationRow = SharedInterface::getJobType($employeeRow['ID']);
@@ -242,7 +248,9 @@ switch($function){
                 if(intval($jobRow['town']) != $managerRow['locationID']){
                     sendError("Player does not work for you");
                 }
+                ManageInterface::alertManagersApprentaces(alertTypes::managerFired, keywordTypes::APPSHP, $_SESSION['currentScene']);
                 break;
+            //monarch fires lord
             case(keywordTypes::MONARCH):
                 //find the location ID of the lord
                 $locationRow = SharedInterface::getJobType($employeeRow['ID']);
@@ -254,14 +262,13 @@ switch($function){
                 if(intval($jobRow['land']) != $managerRow['locationID']){
                     sendError("Player does not work for you");
                 }
+                ManageInterface::alertLordsManagers(alertTypes::lordFired, keywordTypes::MANAGER, $_SESSION['currentScene']);
                 break;
         }
         //on success:
         ManageInterface::removePlayerJob($employeeRow['ID']);
         //give alert to fired employee
         addAlert(alertTypes::fired,$employeeRow['ID']);
-        //alert above and below
-        alertOfFiredPosition($managerLevel-1);
         break;
     
     case('quitJob'):
@@ -275,7 +282,20 @@ switch($function){
         //remove job
         ManageInterface::removePlayerJob($_SESSION['playerID']);
         //let above and below know
-        alertOfQuitPosition($jobType);
+        if($jobType == keywordTypes::APPSHP){
+            ManageInterface::alertalertApprentacesManager(alertTypes::employeeQuit, keywordTypes::MANAGER, $_SESSION['currentScene']);
+        }
+        elseif($jobType == keywordTypes::MANAGER){
+            ManageInterface::alertManagersApprentaces(alertTypes::managerQuit, keywordTypes::APPSHP, $_SESSION['currentScene']);
+            ManageInterface::alertManagersLord(alertTypes::managerQuit, keywordTypes::LORD, $_SESSION['currentScene']);
+        }
+        elseif($jobType == keywordTypes::LORD){
+            ManageInterface::alertLordsManagers(alertTypes::lordQuit, keywordTypes::MANAGER, $_SESSION['currentScene']);
+            ManageInterface::alertLordsMonarch(alertTypes::lordQuit, keywordTypes::MONARCH, $_SESSION['currentScene']);
+        }
+        elseif($jobType == keywordTypes::LORD){
+            ManageInterface::alertMonarchsLords(alertTypes::monarchQuit, keywordTypes::MANAGER, $_SESSION['currentScene']);
+        }
         break;
 }
 
@@ -319,105 +339,12 @@ function sendEmail($playerID, $header, $body){
 }
 
 /**
- *lets those above and below the new worker know of the change
- */
-function alertOfNewPosition($keywordType){
-    $lowerResult;
-    $higherResult;
-    setLadderPositions($keywordType,$lowerResult,$higherResult);
-    
-    if($keywordType != keywordTypes::APPSHP){
-        foreach($lowerResult as $row){
-            addAlert(alertTypes::newManager,$row['ID']);
-        }
-    }
-    if($keywordType != keywordTypes::MONARCH){
-        foreach($higherResult as $row){
-            addAlert(alertTypes::newEmployee,$row['ID']);
-        }
-    }   
-}
-/**
- *lets those above and below the quit worker know of the change
- */
-function alertOfQuitPosition($keywordType){
-    $lowerResult;
-    $higherResult;
-    setLadderPositions($keywordType,$lowerResult,$higherResult);
-    
-    if($keywordType != keywordTypes::APPSHP){
-        foreach($lowerResult as $row){
-            addAlert(alertTypes::managerQuit,$row['ID']);
-        }
-    }
-    if($keywordType != keywordTypes::MONARCH){
-        foreach($higherResult as $row){
-            addAlert(alertTypes::employeeQuit,$row['ID']);
-        }
-    }   
-}
-/**
- *lets those above and below the fired worker know of the change
- */
-function alertOfFiredPosition($keywordType){
-    $lowerResult;
-    $higherResult;
-    setLadderPositions($keywordType,$lowerResult,$higherResult);
-    
-    if($keywordType != keywordTypes::APPSHP){
-        foreach($lowerResult as $row){
-            addAlert(alertTypes::managerFired,$row['ID']);
-        }
-    }
-    if($keywordType != keywordTypes::MONARCH){
-        foreach($higherResult as $row){
-            addAlert(alertTypes::employeeFired,$row['ID']);
-        }
-    }
-}
-/**
- *sets the params as the two lists of playerIDs above and below the player
- */
-function setLadderPositions($keywordType,&$lowerResult,&$higherResult){
-    $townQuery = "(select town from scenes where ID=".prepVar($_SESSION['currentScene']);
-    switch($keywordType){
-        case(keywordTypes::APPSHP):
-            $higherResult = queryMulti("select ID from playerkeywords where type =".keywordTypes::MANAGER." and locationID=".prepVar($_SESSION['currentScene']));
-            break;
-        case(keywordTypes::MANAGER):
-            $lowerResult = queryMulti("select ID from playerkeywords where type=".keywordTypes::APPSHP." and locationID=".prepVar($_SESSION['currentScene']));
-            
-            $higherResult = queryMulti("select ID from playerkeywords where type =".keywordTypes::LORD." and locationID=".$townQuery);
-            break;
-        case(keywordTypes::LORD):
-            $IdFromTownQuery = "(select ID from scenes where town=".$townQuery.")";
-            $lowerResult = queryMulti("select ID from playerkeywords where type=".keywordTypes::MANAGER." and locationID=".$IdFromTownQuery);
-            
-            //same as getMonarchId function in helpers
-            $landQuery = "(select land from scenes where ID=".prepVar($_SESSION['currentScene']).")";
-            $higherResult = queryMulti("select ID from playerkeywords where type =".keywordTypes::MONARCH." and locationID=".$landQuery);
-            break;
-        case(keywordTypes::MONARCH):
-            $lowerResult = queryMulti("select ID from playerkeywords where type=".keywordTypes::LORD." and locationID=".$townQuery);
-            break;
-    }
-    
-}
-
-/**
  *returns the keyword type that items need to be placed in this scene
  *-1 means no items accepted
  *0 means all items accepted
  */
 function itemTypeInScene(){
     //check scene keywords
-    $sceneRow = queryMulti("select keywordID from scenekeywords where ID=".prepVar($_SESSION['currentScene']));
-    while($row = mysqli_fetch_array($sceneRow)){
-        if($row['keywordID'] == 11){
-            //pub
-            return 0;
-        }
-    }
-    return -1;
+    return checkSceneKeyword($_SESSION['currentScene'], 11, keywordTypes::ECT) ? 0, -1;
 }
 ?>

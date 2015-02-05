@@ -53,5 +53,58 @@ class ManageInterface extends Interface_class{
         $r = self::$db->querySingle(("select count(1) from scenes where ID=$sid and appshp=1");
         return $r;
     }
+    
+    public static function alertApprentacesManager($alertNum, $mangerTypeNum, $sceneID){
+        $alertNum = self::prepVar($alertNum);
+        $mangerTypeNum = self::prepVar($mangerTypeNum);
+        $sceneID = self::prepVar($sceneID);
+        self::$db->querySingle("insert into alerts (playeralerts, playerID) ".
+                            "select $alertNum, ID from playerkeywords where type=$mangerTypeNum and locationID=$sceneID");
+        
+    }
+    
+    public static function alertManagersApprentaces($alertNum, $apprenticeTypeNum, $sceneID){
+        $alertNum = self::prepVar($alertNum);
+        $apprenticeTypeNum = self::prepVar($apprenticeTypeNum);
+        $sceneID = self::prepVar($sceneID);
+        self::$db->querySingle("insert into alerts (playeralerts, playerID) ".
+                            "select $alertNum, ID from playerkeywords where type=$apprenticeTypeNum and locationID=$sceneID");
+        
+    }
+    
+    public static function alertManagersLord($alertNum, $lordTypeNum, $sceneID){
+        $alertNum = self::prepVar($alertNum);
+        $lordTypeNum = self::prepVar($lordTypeNum);
+        $sceneID = self::prepVar($sceneID);
+        self::$db->querySingle("insert into alerts (playeralerts, playerID) ".
+                    "select $alertNum, P.ID from playerkeywords P, scenes S where P.type=$lordTypeNum and S.ID=$sceneID and S.town=P.locationID");
+        
+    }
+    
+    public static function alertLordsManagers($alertNum, $managerTypeNum, $sceneID){
+        $alertNum = self::prepVar($alertNum);
+        $managerTypeNum = self::prepVar($managerTypeNum);
+        $sceneID = self::prepVar($sceneID);
+        self::$db->querySingle("insert into alerts (playeralerts, playerID) ".
+            "select $alertNum, P.ID from playerkeywords P where P.type=$managerTypeNum and P.locationID=(select ID from scenes where town=(select town from scenes where ID=$sceneID))");
+        
+    }
+    
+    public static function alertLordsMonarch($alertNum, $monarchTypeNum, $sceneID){
+        $alertNum = self::prepVar($alertNum);
+        $monarchTypeNum = self::prepVar($monarchTypeNum);
+        $sceneID = self::prepVar($sceneID);
+        self::$db->querySingle("insert into alerts (playeralerts, playerID) ".
+            "select $alertNum, P.ID from playerkeywords P, scenes S where P.type=$monarchTypeNum and P.locationID=S.land and S.ID=$sceneID");
+    }
+    
+    public static function alertMonarchsLords($alertNum, $lordTypeNum, $sceneID){
+        $alertNum = self::prepVar($alertNum);
+        $lordTypeNum = self::prepVar($lordTypeNum);
+        $sceneID = self::prepVar($sceneID);
+        self::$db->querySingle("insert into alerts (playeralerts, playerID) ".
+            "select $alertNum, P.ID from playerkeywords P, scenes S where P.type=$lordTypeNum and P.locationID=S.town and S.ID=$sceneID");
+    }
+    
 }
 ?>
