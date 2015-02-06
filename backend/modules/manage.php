@@ -1,6 +1,5 @@
 <?php
 
-require_once 'shared/initialize.php';
 require_once 'interfaces/manageInterface.php';
 
 $function = $_POST['function'];

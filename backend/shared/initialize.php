@@ -1,6 +1,4 @@
 <?php
-require_once 'constants.php';
-require_once 'functions.php';
 
 error_reporting(0);
 session_start();
@@ -8,6 +6,13 @@ session_start();
 _checkInputIsClean();
 //check if logged in
 _checkIfLoggedIn();
+
+class responseBuilder{
+    /**
+    *holds the info to return to the client
+    */
+    public static $responseArray = [];
+}
 
 /**
  *makes sure an input is clean
@@ -50,7 +55,7 @@ function _checkIfLoggedIn(){
             session_destroy();
             sendError("Your session was lost. Please log in again.");
         }
-        $loginRow = Req::select->fromPlayerID($_SESSION['playerID'])->loggedIn()->run();
+        $loginRow = SharedInterface::getPlayerInfo($_SESSION['playerID']);
         //check login id
         if($loginRow['loggedIn'] != $_SESSION['loginID']){
             session_destroy();

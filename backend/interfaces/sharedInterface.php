@@ -37,7 +37,7 @@ class SharedInterface extends Interface_class{
      */
     public static function getPlayerInfo($pid){
         $pid = self::prepVar($pid);
-        $r = self::$db->querySingle("select Name,craftSkill,health from playerinfo where ID=$pid");
+        $r = self::$db->querySingle("select Name,craftSkill,health,loggedIn from playerinfo where ID=$pid");
         return $r;
     }
     
@@ -80,7 +80,7 @@ class SharedInterface extends Interface_class{
     /**
      *adds the given alert id to the player id
      */
-    public static addPlayerAlert($pid, $aid){
+    public static function addPlayerAlert($pid, $aid){
         $pid = self::prepVar($pid);
         $aid = self::prepVar($aid);
         self::$db->querySingle("insert into playeralerts (alertID, playerID) values ($aid,$pid)");
@@ -89,7 +89,7 @@ class SharedInterface extends Interface_class{
     /**
      *adds the given keyword info id to the player id
      */
-    public static addPlayerKeyword($pid, $kid, $loc, $kwtype){
+    public static function addPlayerKeyword($pid, $kid, $loc, $kwtype){
         $pid = self::prepVar($pid);
         $kid = self::prepVar($kid);
         $loc = self::prepVar($loc);
@@ -113,7 +113,7 @@ class SharedInterface extends Interface_class{
     /**
      *removes the given alert id from the player id
      */
-    public static removePlayerAlert($pid, $aid){
+    public static function removePlayerAlert($pid, $aid){
         $pid = self::prepVar($pid);
         $aid = self::prepVar($aid);
         self::$db->querySingle("delete from playeralerts where playerID=$pid and alertID=$aid");
@@ -122,7 +122,7 @@ class SharedInterface extends Interface_class{
     /**
      *returns the id and type of the given keyword word and id
      */
-    public static getKeywordFromWord($word, $kid){
+    public static function getKeywordFromWord($word, $kid){
         $word = self::prepVar($word);
         $kid = self::prepVar($kid);
         $r = self::$db->querySingle("select ID,Type from keywordwords where Word=$word and ID=$kid");
@@ -132,7 +132,7 @@ class SharedInterface extends Interface_class{
     /**
      *returns the name and id of all the player's visible items
      */
-    public static getVisibleItems($pid){
+    public static function getVisibleItems($pid){
         $pid = self::prepVar($pid);
         $r = self::$db->queryMulti("select Name,ID from items where playerID=$pid and insideOf=0");
         return $r;
@@ -141,7 +141,7 @@ class SharedInterface extends Interface_class{
     /**
      *returns the name and id of all the player's items
      */
-    public static getTotalItems($pid){
+    public static function getTotalItems($pid){
         $pid = self::prepVar($pid);
         $r = self::$db->queryMulti("select name,ID from items where playerID=$pid");
         return $r;
@@ -160,7 +160,7 @@ class SharedInterface extends Interface_class{
     /**
      *returns the scenes IDs and names connected to the given scene
      */
-    public static getPaths($sid){
+    public static function getPaths($sid){
         $sid = self::prepVar($sid);
         $r = self::$db->queryMulti("select P.startID, S.Name from scenepaths P, scenes S where P.startID=$sid and P.startID = S.ID");
         return $r;
@@ -170,7 +170,7 @@ class SharedInterface extends Interface_class{
      *returns the id and type of the given keyword if from the given table
      *type is a span types type
      */
-    public static getKeywordFromID($type, $kid){
+    public static function getKeywordFromID($type, $kid){
         $table = self::prepVar(self::getTableKeywords($type));
         $kid = self::prepVar($kid);
         $r = self::$db->querySingle("select keywordID,Type from $table where ID=$kid");
@@ -180,7 +180,7 @@ class SharedInterface extends Interface_class{
     /**
      *returns the first keyword word with the given id
      */
-    public static getSingleKeywordFromID($kid){
+    public static function getSingleKeywordFromID($kid){
         $kid = self::prepVar($kid);
         $r = self::$db->querySingle("select Word from keywordwords where ID=$kid limit 1");
         return $r;
@@ -189,7 +189,7 @@ class SharedInterface extends Interface_class{
     /**
      *sets the given description to the given id for the given type
      */
-    public static setDescription($desc, $id, $type){
+    public static function setDescription($desc, $id, $type){
         $table = self::prepVar(self::getTable($type));
         $id = self::prepVar($id);
         $desc = self::prepVar($desc);
@@ -199,7 +199,7 @@ class SharedInterface extends Interface_class{
     /**
      *sets the owner of the item to the given player
      */
-    public static setItemOwner($iid, $pid){
+    public static function setItemOwner($iid, $pid){
         $iid = self::prepVar($iid);
         $pid = self::prepVar($pid);
         self::$db->querySingle("update items set playerID=$pid where ID=$iid");
@@ -208,7 +208,7 @@ class SharedInterface extends Interface_class{
     /**
      *sets the owner of the item to the given player
      */
-    public static removeItemOwner($iid, $pid){
+    public static function removeItemOwner($iid, $pid){
         $iid = self::prepVar($iid);
         $pid = self::prepVar($pid);
         self::$db->querySingle("update items set playerID=0 where playerID=$pid and ID=$iid");
@@ -217,7 +217,7 @@ class SharedInterface extends Interface_class{
     /**
      *returns the type and locationID of the player's job
      */
-    public static getJobType($pid){
+    public static function getJobType($pid){
         $pid = self::prepVar($pid);
         $r = self::$db->querySingle("select type, locationID from playerkeywords where ID=$pid and (type=".keywordTypes::APPSHP." or type=".keywordTypes::MANAGER." or type=".keywordTypes::LORD." or type=".keywordTypes::MONARCH.")");
         return $r;
@@ -226,7 +226,7 @@ class SharedInterface extends Interface_class{
     /**
      *returns the town and land of the given scene id
      */
-    public static getSceneLandInfo($sid){
+    public static function getSceneLandInfo($sid){
         $sid = self::prepVar($sid);
         $r = self::$db->querySingle("select town, land from scenes where ID=$sid");
         return $r;

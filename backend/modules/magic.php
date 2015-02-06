@@ -1,6 +1,5 @@
 <?php
 
-require_once 'shared/initialize.php';
 require_once 'interfaces/magicInterface.php';
 
 //books to spells
@@ -20,20 +19,24 @@ switch($_POST['function']){
         //make sure book exists
         $IdRow = MagicInterface::getKeywordID($_POST['bookName'], keywordTypes::SPELLBOOK);
         if($IdRow == false){
-            sendError("Could not find the ".$_POST['bookName']." here.");
+            throw new Exception("Could not find the ".$_POST['bookName']." here.");
         }
         //make sure scene has spellbook
         $bookRow = SharedInterface::checkSceneKeyword($_SESSION['currentScene'], $IdRow['ID'], keywordTypes::SPELLBOOK);
         if($bookRow[0] != 1){
-            sendError("Could not find the ".$_POST['bookName']." here.");
+            throw new Exception("Could not find the ".$_POST['bookName']." here.");
         }
         //display spellbook text
         switch($_POST['bookName']){
             case("animatome"):
-                echo "You open the frail pages of the leatherbound book. The first line reads: How to <b>reanimate</b> the dead or <b>summon a boss</b>. Following is a strange sequence of instructions and illustrations.";
+                sendInfo(array(
+                "text" => "You open the frail pages of the leatherbound book. The first line reads: How to <b>reanimate</b> the dead or <b>summon a boss</b>. Following is a strange sequence of instructions and illustrations."
+                ));
                 break;
             case("zephytome"):
-                echo "The pages of the ancient book feel damp, but they must be dry. The first line reads: How to call forth <b>rainfall</b> and other weather conditions. Following is a strange sequence of instructions and illustrations.";
+                sendInfo(array(
+                "text" => "The pages of the ancient book feel damp, but they must be dry. The first line reads: How to call forth <b>rainfall</b> and other weather conditions. Following is a strange sequence of instructions and illustrations."
+                ));
                 break;
         }
         
@@ -43,16 +46,16 @@ switch($_POST['function']){
         //make sure scene has spellbook
         $IdRow = MagicInterface::getKeywordID($_POST['bookName'], keywordTypes::SPELLBOOK);
         if($IdRow == false){
-            sendError("Could not find the ".$_POST['bookName']." here.");
+            throw new Exception("Could not find the ".$_POST['bookName']." here.");
         }
         $bookRow = SharedInterface::checkSceneKeyword($_SESSION['currentScene'], $IdRow['ID'], keywordTypes::SPELLBOOK);
         if($bookRow[0] != 1){
-            sendError("Could not find the ".$_POST['bookName']." here.");
+            throw new Exception("Could not find the ".$_POST['bookName']." here.");
         }
         //make sure player does not have a spell
         $spellRow = MagicInterface::checkPlayerKeywordType($_SESSION['playerID'], keywordTypes::SPELL);
         if($spellRow[0] == 1){
-            sendError("You already know a spell. You would have to forget that one first.");
+            throw new Exception("You already know a spell. You would have to forget that one first.");
         }
         //give spell to player
         addKeywordToPlayer($bookToClass[$IdRow['ID']],keywordTypes::SPELL,0,$_SESSION['playerID']);
@@ -66,12 +69,12 @@ switch($_POST['function']){
     
     case("castSpell"):
         if(!isset($spellToClass[$_POST['name']])){
-            sendError($_POST['name']." is not a spell.");
+            throw new Exception($_POST['name']." is not a spell.");
         }
         //make sure they have the spell
         $spellRow = MagicInterface::checkPlayerKeyword($_SESSION['playerID'], $spellToClass[$_POST['name']], keywordTypes::SPELL);
         if($spellRow[0] != 1){
-            sendError("You can't cast ".$_POST['name']);
+            throw new Exception("You can't cast ".$_POST['name']);
         }
         //cast
         switch($_POST['name']){
@@ -79,15 +82,19 @@ switch($_POST['function']){
                 //revive nearby enemies
                 $numRisen = MagicInterface::regenNpcType($_SESSION['currentScene'], npcTypes::CREATURE, constants::maxHealth);
                 if($numRisen > 0){
-                    echo "You give new life to ".$numRisen." dead creatures nearby.";
+                    sendInfo(array(
+                    "text" => "You give new life to ".$numRisen." dead creatures nearby."
+                    ));
                 } else{
-                    echo "Your spell fizzles, no effect.";
+                    sendInfo(array(
+                    "text" => "Your spell fizzles, no effect."
+                    ));
                 }
                 break;
             case('summon boss'):
                 $resRow = MagicInterface::regenNpcType($_SESSION['currentScene'], npcTypes::BOSS, constants::maxHealth);
                 if(lastQueryNumRows() == 0){
-                    sendError("Could not summon the boss here.");
+                    throw new Exception("Could not summon the boss here.");
                 }
                 //create hear effect nearby
                 $posQuery = MagicInterface::getSceneCoords($_SESSION['currentScene']);
@@ -100,7 +107,9 @@ switch($_POST['function']){
                     $dir = getSceneDir($currentX,$currentY,$posQuery['posx'],$posQuery['posy']);
                     speakActionMessage($sceneID,"You hear the roar of a boss to the ".$dir);
                 }
-                echo "A boss risies to your challenge.";
+                sendInfo(array(
+                    "text" => "A boss risies to your challenge."
+                    ));
                 break;
             
             case("rainfall"):
@@ -109,9 +118,13 @@ switch($_POST['function']){
                 if(lastQueryNumRows() == 1){
                     //speakaction that it is raining to all scenes
                     globalMessage("It starts raining..");
-                    echo "You call down the rain from the sky";
+                    sendInfo(array(
+                    "text" => "You call down the rain from the sky"
+                    ));
                 } else{
-                    echo "It's already raining";
+                    sendInfo(array(
+                    "text" => "It's already raining"
+                    ));
                 }
                 break;
             
@@ -121,9 +134,9 @@ switch($_POST['function']){
                 if(lastQueryNumRows() == 1){
                     //speakaction that it is raining to all scenes
                         globalMessage("The sun begins to shine though the clouds..");
-                    echo "You call forth the sun to shine";
+                    sendText("You call forth the sun to shine");
                 } else{
-                    echo "The sun is already out";
+                    sendText("The sun is already out");
                 }
                 break;
         }

@@ -37,9 +37,31 @@ function printDebug($word){
  *sends the error to the client
  *terminates all php
  */
-function sendError($message){
-    echo constants::errorSymbol.$message;
-    die();
+function sendError($msg){
+    responseBuilder::$responseArray [] = (array(
+            "error" => true,
+            "msg" => $msg
+        ));
+}
+/**
+ *adds the array to the info to send to the client
+ */
+function sendInfo($array){
+    //echo "in send info";
+    responseBuilder::$responseArray [] = $array;
+}
+
+/**
+ *wrapper for sendInfo for just text
+ */
+function sendText($text){
+    sendInfo(array(
+    "text" => $text
+    ));
+}
+
+function sendResponse(){
+    return json_encode(responseBuilder::$responseArray);
 }
 
 /**
@@ -440,7 +462,7 @@ function nearbyScenes($radius){
     while($currentRadius <= $radius){//for each radius
         while($index < $numScenesAfterLastCycle){//for each scene in last radius
             $checkID = $sceneIds[$index];
-            $IdQuery = SharedInterface::getPaths(($checkID);
+            $IdQuery = SharedInterface::getPaths($checkID);
             foreach($IdQuery as $sid){
                 if(!in_array($sid,$sceneIds)){
                     $sceneIds[] = $sid;

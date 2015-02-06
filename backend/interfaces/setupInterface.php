@@ -1,4 +1,5 @@
 <?php
+
 require_once("interface.php");
 
 class SetupInterface extends Interface_class{
@@ -13,7 +14,8 @@ class SetupInterface extends Interface_class{
     public static function putPlayerInScene($pid, $sid, $pname){
         $pid = self::prepVar($pid);
         $sid = self::prepVar($sid);
-        self::$db->querySingle("insert into sceneplayers (sceneID,playerID,playerName) values(".prepVar($_SESSION['currentScene']).",".prepVar($_SESSION['playerID']).",".prepVar($_SESSION['playerName']).")");
+        $pname = self::prepVar($pname);
+        self::$db->querySingle("insert into sceneplayers (sceneID,playerID,playerName) values($sid,$pid,$pname)");
     }
     
     public static function getSceneInfo(){

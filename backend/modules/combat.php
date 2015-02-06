@@ -1,6 +1,5 @@
 <?php
 
-require_once 'shared/initialize.php';
 require_once 'interfaces/combatInterface.php';
 
 $function = $_POST['function'];
@@ -9,12 +8,12 @@ switch($function){
         //check player health
         $healthRow = SharedInterface::getPlayerInfo($_SESSION['playerID']);
         if(!$healthRow || $healthRow['health'] <= 0){
-            sendError("Heal yourself first.");
+            throw new Exception("Heal yourself first.");
         }
         //check sanctuary
         $sceneRow = CombatInterface::getSceneKeywordIDs($_SESSION['currentScene']));
         if(in_array(keywordIDs::SANCTUARY, $sceneRow){
-            sendError("You cannot fight in a sanctuary.");
+            throw new Exception("You cannot fight in a sanctuary.");
         }
         $targetID;
         $targetSpanType;
@@ -33,7 +32,7 @@ switch($function){
                 $targetSpanType = spanTypes::NPC;
                 $opponentCombatLevel = SharedInterface::getNpcInfo($targetID);
             } else{
-                sendError($_POST['Name']." is not nearby");
+                throw new Exception($_POST['Name']." is not nearby");
             } 
         }
         //determine outcome
@@ -83,7 +82,7 @@ switch($function){
         //check if in sanctuary
         $sceneRow = CombatInterface::getSceneKeywordIDs($_SESSION['currentScene']));
         if(!in_array(keywordIDs::SANCTUARY, $sceneRow){
-            sendError("You can only regenerate in a sanctuary.");
+            throw new Exception("You can only regenerate in a sanctuary.");
         }
         //set health to max
         CombatInterface::setPlayerHealth($_SESSION['playerID'], constants::maxHealth);

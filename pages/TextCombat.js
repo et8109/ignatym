@@ -17,8 +17,7 @@ var frontLoadKeywords;
  */
 (function(){
    sendRequest(
-        "../backend/setup.php",
-        "function=setUp&version="+version,
+        "mod=setup&function=setUp&version="+version,
         function(response){
             alert(response);
             response = response.split("<>");
@@ -38,8 +37,7 @@ var frontLoadKeywords;
 var sceneText={};
 if (frontLoadSceneText) {
     sendRequest(
-        "../backend/setup.php",
-        "function=frontLoadScenes",
+        "mod=setup&function=frontLoadScenes",
         function(response){
             var sceneTextsAndIDs = response.split("<>");
             for(var i=1; i<sceneTextsAndIDs.length; i+=3){
@@ -53,8 +51,7 @@ if (frontLoadSceneText) {
 var keywordText={};
 if (frontLoadKeywords) {
     sendRequest(
-        "../backend/setup.php",
-        "function=frontLoadKeywords",
+        "mod=setup&function=frontLoadKeywords",
         function(response) {
             var keywordTextAndDesc = response.split("<>");
             for(var i=1; i<keywordTextAndDesc.length; i+=3){
@@ -369,7 +366,7 @@ function textTyped(e){
 *adds the lines to the text box
 */
 function updateChat(){
-    sendRequest("chat.php","function=updateChat",
+    sendRequest("mod=chat&function=updateChat",
         function(response){
             response = response.split("<<<");
             var numAlerts = response[1];
@@ -435,7 +432,7 @@ function addDesc(spanType, id) {
             }
             break;
     }
-    sendRequest("TextCombat.php","function=getDesc&type="+spanType+"&ID="+id,
+    sendRequest("mod=general&function=getDesc&type="+spanType+"&ID="+id,
         function(response) {
             response = response.split("<>");
             for(var i=0; i<response.length; i++){
@@ -449,7 +446,7 @@ function addDesc(spanType, id) {
 *Sets the player's new description
 */
 function setNewDescription(desc) {
-    sendRequest("TextCombat.php","function=updateDescription&Description="+desc,
+    sendRequest("mod=general&function=updateDescription&Description="+desc,
         function(response) {
             closeTextArea();
             endListening();
@@ -469,7 +466,7 @@ function walk(newSceneId) {
     if (frontLoadSceneText) {
         addDesc(spanTypes.SCENE, newSceneId);
     }
-    sendRequest("TextCombat.php","function=moveScenes&newScene="+newSceneId,
+    sendRequest("mod=general&function=moveScenes&newScene="+newSceneId,
         function(response){
             if (!frontLoadSceneText) {
                 addDesc(spanTypes.SCENE, newSceneId);
@@ -485,7 +482,7 @@ function walk(newSceneId) {
 */
 function displayMyDesc() {
     openTextArea();
-    sendRequest("TextCombat.php","function=getDesc&type="+spanTypes.PLAYER,
+    sendRequest("mod=general&function=getDesc&type="+spanTypes.PLAYER,
         function(response){
             //first is name, second id desc
             response = response.split("<>");
@@ -516,7 +513,7 @@ setTextLineListener(listener_item_name);
 function addCraftName(name){
     targetName = name;
     //has a name, need a description
-    sendRequest("crafting.php","function=getCraftInfo",
+    sendRequest("mod=crafting&function=getCraftInfo",
         function(response){
             endListening();
             addText("Your craftSkill is "+response+ ". enter the "+targetName+"'s description below. Your tags are: tags not done yet");
@@ -534,7 +531,7 @@ function addCraftDescription(desc){
         return;
     }
     //input into database
-    sendRequest("crafting.php","function=craftItem&Name="+targetName+"&Description="+desc,
+    sendRequest("mod=crafting&function=craftItem&Name="+targetName+"&Description="+desc,
         function(response){
             addText("You make a "+targetName);
             closeTextArea();
@@ -566,7 +563,7 @@ function startWaiter(){
  *prints empty text if nothing was found
  */
 function getItemsInScene(onEmptyText){
-    sendRequest("TextCombat.php","function=getItemsInScene",
+    sendRequest("mod=general&function=getItemsInScene",
         function(response) {
             if (response == "") {
                 onEmptyText ? addText(onEmptyText) : addText('Nothing here.');
@@ -609,7 +606,7 @@ function removeItemFromScenePrompt() {
  */
 function addItemToScene(note){
     endListening();
-    sendRequest("manage.php","function=addItemToScene&Name="+targetName+"&Note="+note,
+    sendRequest("mod=manage&function=addItemToScene&Name="+targetName+"&Note="+note,
         function(response){
             addText("added "+targetName);
             return;
@@ -621,7 +618,7 @@ function addItemToScene(note){
  */
 function removeItemFromScene(name){
     endListening();
-    sendRequest("manage.php","function=removeItemFromScene&Name="+name,
+    sendRequest("mod=manage&function=removeItemFromScene&Name="+name,
         function(response){
             addText("you take the "+name);
             return;
@@ -651,7 +648,7 @@ function newSceneDescPrompt(){
     addText("Edit the description below.");
     endListening();
     //get scene desc
-    sendRequest("TextCombat.php","function=getDesc&type="+spanTypes.SCENE,
+    sendRequest("mod=general&function=getDesc&type="+spanTypes.SCENE,
         function(response){
             setTextAreaListener(listener_new_scene_desc);
             //first is name, second is desc
@@ -665,7 +662,7 @@ function newSceneDescPrompt(){
  */
 function changeItemNote(note){
     endListening();
-    sendRequest("manage.php","function=changeItemNote&Name="+targetName+"&Note="+note,
+    sendRequest("mod=manage&function=changeItemNote&Name="+targetName+"&Note="+note,
         function(response){
             addText("changed note for "+targetName);
             return;
@@ -677,7 +674,7 @@ function changeItemNote(note){
  */
 function editSceneDesc(desc){
     endListening();
-    sendRequest("manage.php","function=changeSceneDesc&desc="+desc,
+    sendRequest("mod=manage&function=changeSceneDesc&desc="+desc,
         function(response){
            addText("changed scene description"); 
         }
@@ -689,8 +686,7 @@ function editSceneDesc(desc){
 function newSceneDrafts(){
     openMenu();
     setMenuText("Loading..");
-    sendRequest("manage.php",
-                "function=getNewSceneDescDrafts", 
+    sendRequest("mod=manage&function=getNewSceneDescDrafts", 
                 function(response){
                     if (response == "") {
                         setMenuText("No description drafts.");
@@ -706,7 +702,7 @@ function newSceneDrafts(){
  */
 function reviewSceneDesc(sceneID){
     setMenuText("Loading..");
-    sendRequest("function=getDesc&type="+spanTypes.SCENE+"&ID="+sceneID,
+    sendRequest("mod=general&function=getDesc&type="+spanTypes.SCENE+"&ID="+sceneID,
                 function(response){
                     response = response.split("<>");
                     setMenuText("[You might want to copy this somewhere else to compare]</br>"+removeHtmlStyling(response[0])+"</br>"+removeHtmlStyling(response[1]));
@@ -728,7 +724,7 @@ function attack(name) {
     } else{
         targetName = name;
     }
-    sendRequest("combat.php","function=attack&Name="+name,
+    sendRequest("mod=combat&function=attack&Name="+name,
         function(response){}
     );
 }
@@ -737,8 +733,7 @@ function attack(name) {
  */
 function clearAlerts(){
     closeMenu();
-    sendRequest("TextCombat.php",
-                "function=clearAlerts",
+    sendRequest("mod=general&function=clearAlerts",
         function(){}
     );
 }
@@ -762,8 +757,7 @@ function openAlerts(){
     var inside = document.getElementById("menuMainInside");
     inside.innerHTML = "Loading..";
     sendRequest(
-        "TextCombat.php",
-        "function=getAlertMessages",
+        "mod=general&function=getAlertMessages",
         function(response){
             inside.innerHTML = "Alerts:";
             inside.innerHTML += response;
@@ -819,7 +813,7 @@ function openOptions(){
  *puts an item into a container item
  */
 function putItemIn(itemName, containerName) {
-    sendRequest("TextCombat.php","function=putItemIn&itemName="+itemName+"&containerName="+containerName,
+    sendRequest("mod=general&function=putItemIn&itemName="+itemName+"&containerName="+containerName,
         function(response){
         }
     );
@@ -828,7 +822,7 @@ function putItemIn(itemName, containerName) {
  *removes an item from a container
  */
 function takeItemFrom(itemName, containerName){
-    sendRequest("TextCombat.php","function=takeItemFrom&itemName="+itemName+"&containerName="+containerName,
+    sendRequest("mod=general&function=takeItemFrom&itemName="+itemName+"&containerName="+containerName,
         function(response){
         }
     );
@@ -837,7 +831,7 @@ function takeItemFrom(itemName, containerName){
  *pulls up the options to manage a scene if player has the rights
  */
 function getManageSceneText() {
-    sendRequest("manage.php","function=getManageSceneText",
+    sendRequest("mod=manage&function=getManageSceneText",
         function(response){
             response = response.split("<>");
             for(var i=0; i<response.length; i++){
@@ -863,7 +857,7 @@ function quitJob(input) {
     if (input != "quit") {
         return;
     }
-    sendRequest("manage.php","function=quitJob",
+    sendRequest("mod=manage&function=quitJob",
         function(response){
             addText("You have quit your job");
         }
@@ -873,7 +867,7 @@ function quitJob(input) {
  *hires someone to the rank below you with the given name
  */
 function hireEmployee(name){
-    sendRequest("manage.php","function=hireEmployee&name="+name,
+    sendRequest("mod=manage&function=hireEmployee&name="+name,
         function(response){
             addText(name+" has been hired");
         }
@@ -883,8 +877,7 @@ function hireEmployee(name){
  *fires someone who works for you so they loose thier job
  */
 function fireEmployee(name){
-    sendRequest("manage.php",
-                 "function=fireEmployee&name="+name,
+    sendRequest("mod=manage&function=fireEmployee&name="+name,
         function(response){
             addText(name+" has been fired");
         }
@@ -894,7 +887,7 @@ function fireEmployee(name){
  *displays some info about the player
  */
 function addPlayerInfo(){
-    sendRequest("TextCombat.php","function=getPlayerInfo",
+    sendRequest("mod=general&function=getPlayerInfo",
         function(response){
             response = response.split("<>");
             for(var i=0; i<response.length; i++){
@@ -908,8 +901,7 @@ function addPlayerInfo(){
  *removes an item from the player's inventory
  */
 function destroyItem(itemName){
-    sendRequest("TextCombat.php",
-                "function=destroyItem&name="+itemName,
+    sendRequest("mod=general&function=destroyItem&name="+itemName,
                 function(response){
                     addText(itemName+" has been destroyed");
                 }
@@ -921,8 +913,7 @@ function destroyItem(itemName){
  */
 function closeLook() {
     sendRequest(
-        "TextCombat.php",
-        "function=closeLook",
+        "mod=general&function=closeLook",
         function(response){
             response = response.split("<>");
             for(var i=0; i<response.length; i++){
@@ -938,8 +929,7 @@ function closeLook() {
  */
 function beManager(){
     sendRequest(
-        "manage.php",
-        "function=becomeManager",
+        "mod=manage&function=becomeManager",
         function(response){
             addText("Success, you are now the manager here!");
         }
@@ -950,8 +940,7 @@ function beManager(){
  *gives an item to another player in the same location
  */
 function giveItemTo(item, playerName){
-    sendRequest("TextCombat.php",
-                "function=giveItemTo&itemName="+item+"&playerName="+playerName,
+    sendRequest("mod=general&function=giveItemTo&itemName="+item+"&playerName="+playerName,
                 function(response) {
                     addText(item+" was given to "+playerName);
                 }
@@ -962,8 +951,7 @@ function giveItemTo(item, playerName){
  *restores the players health if they are in a sanctuary.
  */
 function regenerate() {
-    sendRequest("combat.php", 
-                "function=regen",
+    sendRequest("mod=combat&function=regen",
                 function(response){
                     addText("Your health has been restored.");
                 }
@@ -976,8 +964,7 @@ function regenerate() {
  */
 function readBook(bookName) {
     addText("You open the "+bookName+"...");
-    sendRequest("magic.php",
-                "function=readBook&bookName="+bookName,
+    sendRequest("mod=magic&function=readBook&bookName="+bookName,
                 function(response){
                     targetName = bookName; //remember for learning the spell
                     startPaper();
@@ -996,8 +983,7 @@ function learnSpell(input) {
         endListening();
         return;
     }
-    sendRequest("magic.php",
-                "function=learnSpell&bookName="+targetName,
+    sendRequest("mod=magic&function=learnSpell&bookName="+targetName,
                 function(){
                     addText("A warm glow emits from the "+targetName+" as its spell power magically seeps into your hands.");
                     targetName = "";
@@ -1010,8 +996,7 @@ function learnSpell(input) {
  *removes a spell from the player
  */
 function forgetSpell(kwname) {
-    sendRequest("magic.php",
-                "function=forgetSpell",
+    sendRequest("mod=magic&function=forgetSpell",
                 function(response){
                     addText("You clear your mind of previous spells.");
                     });
@@ -1021,8 +1006,7 @@ function forgetSpell(kwname) {
  *casts a spell
  */
 function castSpell(spellname) {
-    sendRequest("magic.php",
-                "function=castSpell&name="+spellname,
+    sendRequest("mod=magic&function=castSpell&name="+spellname,
                 function(response){addText(response);}
                 );
 }
@@ -1094,7 +1078,7 @@ function deactivateActiveLinks(){
  *adds to the chat file
  */
 function speak(inputText){
-    sendRequest("FilesBack.php","function=speak&inputText="+inputText,
+    sendRequest("mod=chat&function=speak&inputText="+inputText,
         function() {}
     );
 }
@@ -1214,7 +1198,7 @@ function toggleFrontLoadSceneText(){
     else{
         frontLoad = 0;
     }
-    sendRequest("TextCombat.php","function=setFrontLoadScenes&load="+frontLoad,
+    sendRequest("mod=general&function=setFrontLoadScenes&load="+frontLoad,
         function(){}
     );
 }
@@ -1231,7 +1215,7 @@ function toggleFrontLoadKeywords(){
     else{
         frontLoad = 0;
     }
-    sendRequest("TextCombat.php","function=setFrontLoadKeywords&load="+frontLoad,
+    sendRequest("mod=general&function=setFrontLoadKeywords&load="+frontLoad,
         function(){}
     );
 }
@@ -1258,7 +1242,7 @@ function endPaper(){
  *prints the 24 hour time and time of day
  */
 function getTime() {
-    sendRequest("TextCombat.php","function=getTime",
+    sendRequest("mod=general&function=getTime",
         function(response){addText(response);}
     );
 }
@@ -1285,31 +1269,28 @@ function validateInput(text){
 function logout() {
     clearInterval(updater);
     disableInput();
-    sendRequest("TextCombat.php",
-                "function=logout",
+    sendRequest("mod=general&function=logout",
                 function(){}
     );
 }
 /**
  *sends a request to the server
  */
-function sendRequest(url,params,returnFunction){
+function sendRequest(params,returnFunction){
+    alert("sending: "+params);
     var request = new XMLHttpRequest();
-    request.open("POST",url);
+    request.open("POST","../backend/server.php");
     request.setRequestHeader("Content-type", "application/x-www-form-urlencoded");
     request.setRequestHeader("Content-length", params.length);
     request.setRequestHeader("Connection", "close");
     request.onreadystatechange = function(){
         if (this.readyState==4 && this.status==200) {
+            //build info
             var response = this.responseText;
-            //if an error
-            if (response.indexOf("<<-<<") == 0) {
-                setErrorMessage(response.replace("<<-<<",""));
-            }
-            else{
-                //success, call function
-                returnFunction(response);
-            }
+            //var info = JSON.parse(json);
+            alert("response: "+response);
+            //success, call function
+            //returnFunction(info);
             if (requestSpeedChecker) {
                 var date = new Date();
                 addText("b "+date.getSeconds());

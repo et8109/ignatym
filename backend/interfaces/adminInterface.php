@@ -13,7 +13,7 @@ class AdminInterface extends Interface_class{
         //alert ID -> alert message
         self::$db->querySingle("CREATE TABLE alerts (".
                             "ID int(3) AUTO_INCREMENT,".
-                            "Desc varchar(100),".
+                            "Description varchar(100),".
                             "Perm tinyint(1),". //if the alert requires something to be removed
                             "PRIMARY KEY (ID)".
                             ")");
@@ -31,7 +31,7 @@ class AdminInterface extends Interface_class{
                             "ID int(3) AUTO_INCREMENT,".
                             "playerID int(3) ,".
                             "Name char(20) ,".
-                            "Desc varchar(500) ,".
+                            "Description varchar(500) ,".
                             "room int(3) ,".
                             "insideOf int(3) ,".
                             "PRIMARY KEY (ID)".
@@ -48,7 +48,7 @@ class AdminInterface extends Interface_class{
         //keyword ID -> keyword description
         self::$db->querySingle("CREATE TABLE keywords (".
                             "ID int(3) AUTO_INCREMENT,".
-                            "Desc varchar(255) ,".
+                            "Description varchar(255) ,".
                             "PRIMARY KEY (ID)".
                             ")");
         
@@ -72,7 +72,7 @@ class AdminInterface extends Interface_class{
         self::$db->querySingle("CREATE TABLE npcs (".
                             "ID int(3) ,".
                             "Name char(20) ,".
-                            "Desc varchar(1000) ,".
+                            "Description varchar(1000) ,".
                             "Level int(3) ,".
                             "PRIMARY KEY (ID)".
                             ")");
@@ -89,7 +89,7 @@ class AdminInterface extends Interface_class{
                             "ID int(3) AUTO_INCREMENT,".
                             "Name char(20) ,".
                             "Password char(20) ,".
-                            "Desc varchar(1000) ,".
+                            "Description varchar(1000) ,".
                             "Scene int(3) ,".
                             "CraftSkill int(1) ,".
                             "Health int(1) ,".
@@ -147,7 +147,7 @@ class AdminInterface extends Interface_class{
         self::$db->querySingle("CREATE TABLE scenes (".
                             "ID int(3) AUTO_INCREMENT,".
                             "Name char(20) ,".
-                            "Desc varchar(1000) ,".
+                            "Description varchar(1000) ,".
                             "Appshp tinyint(1) ,".
                             "Town int(3) ,".
                             "Land int(3) ,".

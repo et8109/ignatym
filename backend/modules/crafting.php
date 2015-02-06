@@ -1,6 +1,5 @@
 <?php
 
-require_once 'shared/initialize.php';
 require_once 'interfaces/combatInterface.php';
 
 /**
@@ -23,7 +22,7 @@ switch($function){
         //make sure the player is a blacksmith
         $level = getPlayerManageLevel();
         if($level != keywordTypes::APPSHP && $level != keywordTypes::MANAGER){
-            sendError("You don't have permission to craft here.");
+            throw new Exception("You don't have permission to craft here.");
         }
         //make sure the player can take an item
         checkPlayerCanTakeItem();
@@ -37,7 +36,7 @@ switch($function){
             $desc = replaceKeywordType($desc, $type, $IdOut);
             $keywordIDs[$type] = $IdOut;
             if($desc == false){
-                sendError("type ".$keywordTypeNames[$type]." keyword was not found");
+                throw new Exception("type ".$keywordTypeNames[$type]." keyword was not found");
             }
         }
         //check for optional keywords
@@ -67,7 +66,10 @@ switch($function){
     
     case('getCraftInfo'):
         $row = SharedInterface::getPlayerInfo($_SESSION['playerID']);
-        echo $row['craftSkill'];
+        sendInfo(array(
+            "craftInfo" => true,
+            "info" => $row['craftSkill'];
+        ));
         break;
 }
 
@@ -84,7 +86,7 @@ function replaceKeywordType($desc, $keywordType, &$IdOut){
         case(keywordTypes::QUALITY):
             $row = SharedInterface::getPlayerInfo($_SESSION['playerID']);
             if($row == false){
-                sendError("error finding craft level");
+                throw new Exception("error finding craft level");
             }
             switch($row['craftSkill']){
                 case(0):
@@ -107,7 +109,7 @@ function replaceKeywordType($desc, $keywordType, &$IdOut){
             if($keywordType == keywordTypes::MATERIAL){
                 $numMatRow = SharedInterface::checkSceneKeyword($_SESSION['currentScene'], $keywordRow['ID'], keywordTypes::MATERIAL);
                 if($numMatRow[0] < 1){
-                    sendError("You don't have enough material for: ".$word);
+                    throw new Exception("You don't have enough material for: ".$word);
                 }
             }
             //find correct span to replace with
