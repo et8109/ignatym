@@ -34,14 +34,13 @@ function printDebug($word){
 }
 
 /**
- *sends the error to the client
- *terminates all php
+ *prepends the error array to the front of the json msg
  */
 function sendError($msg){
-    responseBuilder::$responseArray [] = (array(
+    array_unshift(responseBuilder::$responseArray, (array(
             "error" => true,
             "msg" => $msg
-        ));
+        )));
 }
 /**
  *adds the array to the info to send to the client

@@ -95,6 +95,7 @@ class AdminInterface extends Interface_class{
                             "Health int(1) ,".
                             "FrontLoadScenes tinyint(1) DEFAULT '0',".
                             "FrontLoadKeywords tinyint(1) DEFAULT '0',".
+                            "FrontLoadAlerts tinyint(1) DEFAULT '0',".
                             "Email varchar(35) ,".
                             "LoggedIn int(1) DEFAULT '0',".
                             "LastLoginTime timestamp ,".

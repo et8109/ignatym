@@ -121,7 +121,7 @@ class GeneralInterface extends Interface_class{
     public static function logoutPlayer($pid){
         $pid = self::prepVar($pid);
         self::removePlayerFromScene($pid);
-        self::$db->queryMulti("update playerinfo set loggedIn=0 where ID=$pid");
+        self::$db->querySingle("update playerinfo set loggedIn=0 where ID=$pid");
     }
 }
 ?>

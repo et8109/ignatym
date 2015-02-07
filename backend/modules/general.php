@@ -208,7 +208,7 @@ switch($function){
             "ID" => $_SESSION['playerID'],
             "craftSkill" => $playerRow['craftSkill'],
             "health" => $playerRow['health']
-            ));
+            );
         //keywords
         $keywordsResult = GeneralInterface::getPlayerKeywords($_SESSION['playerID']);
         if(count($keywordsResult) < 1){
@@ -234,7 +234,7 @@ switch($function){
             }
         }
         //items
-        $itemsResult = SharedInterface::getTotalItems($_SESSION['playerID']));
+        $itemsResult = SharedInterface::getTotalItems($_SESSION['playerID']);
         if(count($itemsResult) < 1){
             //no items
             $info["items"] = "No items";

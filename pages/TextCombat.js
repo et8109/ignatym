@@ -1287,7 +1287,7 @@ function sendRequest(params,returnFunction){
         if (this.readyState==4 && this.status==200) {
             //build info
             var response = this.responseText;
-            //var info = JSON.parse(json);
+            var info = JSON.parse(json);
             alert("response: "+response);
             //success, call function
             //returnFunction(info);
