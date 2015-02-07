@@ -22,21 +22,38 @@ if(isset($_SESSION['playerID'])){
 ------------------------------------>
 <?php
 try{
-    //logging in
     if(isset($_POST['uname'])){
+        //sanitize
         $uname = $_POST['uname'];
         $pass = $_POST['pass'];
-        if($uname == "" || $pass == ""){
-            throw new Exception("please enter a valid username and password");
+        if($uname == null || $uname == ""){
+            throw new Exception("Enter a valid username");
         }
-        include("../backend/interfaces/loginInterface.php");
-        $playerRow = LoginInterface::loginPlayer($uname, $pass);
-        
-        //set session
-        $_SESSION['playerID'] = $playerRow['id'];
+        if($pass == null || $pass == ""){
+            throw new Exception("Enter a valid password");
+        }
+        //get username, password
+        require_once("../backend/interfaces/loginInterface.php");
+        $playerRow = LoginInterface::getLogin($uname, $pass);
+        if($playerRow == false){
+            throw new Exception("Incorrect username or password");
+        }
+        if($playerRow['loggedIn'] == false){
+            require_once("../backend/interfaces/generalInterface.php");
+            GeneralInterface::changePlayerScene($playerRow['ID'], $playerRow['Scene'], $playerRow['Name']);
+
+        }
+        //find next login id
+        $lastLogin = intval($playerRow['loggedIn']);
+        $nextLogin = $lastLogin < 9 ? $lastLogin+1 : 1;
+        LoginInterface::setLoggedIn($playerRow['ID'], $nextLogin);
+        //select needed info from playerinfo
+        $_SESSION['playerID'] = $playerRow['ID'];
         $_SESSION['playerName'] = $playerRow['Name'];
         $_SESSION['currentScene'] = $playerRow['Scene'];
-        $_SESSION['lastChatTime'] = 0;
+        $_SESSION['loginID'] = $nextLogin;
+        //updateChatTime();
+        $_SESSION['lastChatTime'] = date_timestamp_get(new DateTime());
         header("Location: index.php");
     }
 } catch(Exception $e){

@@ -45,8 +45,8 @@ class SharedInterface extends Interface_class{
      *returns the player's id from thier name
      */
     public static function getPlayerID($name){
-        $name = self::prepVar($pname);
-        $r = self::$db->querySingle("select ID from playerinfo where Name=$pname");
+        $name = self::prepVar($name);
+        $r = self::$db->querySingle("select ID from playerinfo where Name=$name");
         return $r;
     }
     

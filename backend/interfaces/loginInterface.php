@@ -13,5 +13,18 @@ class LoginInterface extends Interface_class{
         }
         return $r;
     }
+    
+    public static function getLogin($uname, $pass){
+        $uname = self::prepVar($uname);
+        $pass = self::prepVar($pass);
+        $r = self::$db->querySingle("select ID,Name,Scene,loggedIn from playerinfo where Name=$uname and password=$pass");
+        return $r;
+    }
+    
+    public static function setLoggedIn($pid, $loginID){
+        $pid = self::prepVar($pid);
+        $loginID = self::prepVar($loginID);
+        self::$db->querySingle("update playerinfo set loggedIn=$loginID, lastLoginTime=CURRENT_TIMESTAMP where ID=$pid");
+    }
 }
 ?>

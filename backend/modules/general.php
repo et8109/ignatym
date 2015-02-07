@@ -1,7 +1,5 @@
 <?php
-
 require_once 'interfaces/generalInterface.php';
-
 $function = $_POST['function'];
 switch($function){
     case('getDesc'):
@@ -284,68 +282,6 @@ switch($function){
         "time" => getTime(),
         "tod" => getTimeOfDayWord()
         ));
-        break;
-    
-    case('login'):
-        //make sure they are not logged in
-        if(isset($_SESSION['playerID'])){
-            throw new Exception("You already logged in. Try refreshing the page.");
-        }
-        //sanitize
-        $uname = $_POST['uname'];
-        $pass = $_POST['pass'];
-        if($uname == null || $uname == ""){
-            throw new Exception("Enter a valid username");
-        }
-        if($pass == null || $pass == ""){
-            throw new Exception("Enter a valid password");
-        }
-        //get username, password
-        $playerRow = GeneralInterface::getLogin($uname, $pass);
-        if($playerRow == false){
-            throw new Exception("Incorrect username or password");
-        }
-        if($playerRow['loggedIn'] == false){
-            GeneralInterface::changePlayerScene($playerRow['ID'], $playerRow['Scene'], $playerRow['Name']);
-
-        }
-        //find next login id
-        $lastLogin = intval($playerRow['loggedIn']);
-        $nextLogin = $lastLogin < 9 ? $lastLogin+1 : 1;
-        GeneralInterface::setLoggedIn($playerRow['ID'], $nextLogin);
-        //select needed info from playerinfo
-        $_SESSION['playerID'] = $playerRow['ID'];
-        $_SESSION['playerName'] = $playerRow['Name'];
-        $_SESSION['currentScene'] = $playerRow['Scene'];
-        $_SESSION['loginID'] = $nextLogin;
-        updateChatTime();
-        break;
-    
-    case('register'):
-        //make sure they are not logged in
-        if(isset($_SESSION['playerID'])){
-            throw new Exception("You already logged in. Try refreshing the page.");
-        }
-        //check amount of players
-        $numPlayers = query("select count(1) from playerinfo");
-        if($numPlayers[0] > 2){
-            throw new Exception("Sorry, max amount of players reached. Check the updates for when we can let more in.");
-        }
-        //sanitize
-        $uname = $_POST['uname'];
-        $pass = $_POST['pass'];
-        $pass2 = $_POST['pass2'];
-        //check password similarity
-        if($pass != $pass2){
-            throw new Exception("Your passwords don't match");
-        }
-        //check players for name
-        $sharedNameRow = SharedInterface::getPlayerID($uname);
-        if($sharedNameRow != false){
-            throw new Exception("Someone already has that name");
-        }
-        //add player
-        $playerID = GeneralInterface::addNewUser($uname, $pass, constants::initDesc, constants::startSceneID);
         break;
     
     case('logout'):

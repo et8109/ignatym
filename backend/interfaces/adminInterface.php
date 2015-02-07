@@ -91,12 +91,12 @@ class AdminInterface extends Interface_class{
                             "Password char(20) ,".
                             "Description varchar(1000) ,".
                             "Scene int(3) ,".
-                            "CraftSkill int(1) ,".
+                            "CraftSkill int(1) DEFAULT '0',".
                             "Health int(1) ,".
-                            "FrontLoadScenes tinyint(1) ,".
-                            "FrontLoadKeywords tinyint(1) ,".
+                            "FrontLoadScenes tinyint(1) DEFAULT '0',".
+                            "FrontLoadKeywords tinyint(1) DEFAULT '0',".
                             "Email varchar(35) ,".
-                            "LoggedIn int(1) ,".
+                            "LoggedIn int(1) DEFAULT '0',".
                             "LastLoginTime timestamp ,".
                             "PRIMARY KEY (ID)".
                             ")");
@@ -153,6 +153,9 @@ class AdminInterface extends Interface_class{
                             "Land int(3) ,".
                             "PRIMARY KEY (ID)".
                             ")");
+        
+        require_once("registerInterface.php");
+        RegisterInterface::registerPlayer("guest", "guest");
     }
 }
 ?>
