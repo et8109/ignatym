@@ -28,6 +28,13 @@ switch($function){
     
     //finds the last line not yet seen, and begins to echo from there
     case ('updateChat'):
+        //send alert on/off info
+        $alertRow = ChatInterface::getNumAlerts($_SESSION['playerID']);
+        sendInfo(array(
+            "numAlerts" => true,
+            "num" => $alertRow["count(1)"]
+        ));
+        //setup chat file
         $lines = array();
         $lines = file($GLOBALS['fileName']);
         $i=0;
@@ -37,18 +44,16 @@ switch($function){
         }
         //new lines
         while($i<=36 && isset($lines[$i])){
-            echo $lines[++$i]." ".$lines[++$i]." ".$lines[++$i];
+            sendInfo(array(
+                "pid" => $lines[++$i],
+                "pname" => $lines[++$i],
+                "text" => $lines[++$i]
+            ));
             $i++;
         }
         if(intval($lines[36]) > $_SESSION['lastChatTime']){
             $_SESSION['lastChatTime'] = intval($lines[36]);
         }
-        //send alert on/off info
-        $alertRow = ChatInterface::getNumAlerts($_SESSION['playerID']);
-        sendInfo(array(
-            "numAlerts" => true,
-            "num" => $alertRow[0];
-        ));
         break;
     
     //when entering a new scene

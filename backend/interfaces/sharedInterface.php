@@ -23,6 +23,15 @@ class SharedInterface extends Interface_class{
     }
     
     /**
+     *returns the description of the given keyword word
+     */
+    public static function getDescKeywordFromID($kid){
+        $kid = self::prepVar($kid);
+        $r = self::$db->querySingle("select Description from keywords where ID=$kid");
+        return $r;
+    }
+    
+    /**
      *returns the name and description of the given player id
      */
     public static function getDescPlayer($pid){

@@ -91,25 +91,24 @@ switch($function){
         if($manageLevel == 0){
             sendError("You cannot manage this location");
         }
-        echo "<span class='active action' onclick='quitJobPrompt()'>quit job</span>";
-        echo "<><span class='active action' onclick='getItemsInScene()'>view items</span>";
+        addText("<span class='active action' onclick='quitJobPrompt()'>quit job</span>");
+        addText("<span class='active action' onclick='getItemsInScene()'>view items</span>");
         //if items are accepted
         if(itemTypeInScene() != -1){
-            echo "<><span class='active action' onclick='addItemToScenePrompt()'>add item</span>";
-            echo "<><span class='active action' onclick='changeItemNotePrompt()'>change an items note</span>";
+            addText("<span class='active action' onclick='addItemToScenePrompt()'>add item</span>");
+            addText("<span class='active action' onclick='changeItemNotePrompt()'>change an items note</span>");
             if ($manageLevel >= keywordTypes::MANAGER) {
                 //at least manager
-                echo "<><span class='active action' onclick='removeItemFromScenePrompt()'>take item</span>";
+                addText("<span class='active action' onclick='removeItemFromScenePrompt()'>take item</span>");
             }
         }
         if ($manageLevel >= keywordTypes::LORD) {
             //at least lord
-            //echo "";
         }
         if ($manageLevel >= keywordTypes::MONARCH) {
             //at least monarch
-            echo "<><span class='active action' onclick='newSceneDescPrompt()'>edit scene desc</span>";
-            echo "<>can't edit scene title yet";
+            addText("<span class='active action' onclick='newSceneDescPrompt()'>edit scene desc</span>");
+            addText("can't edit scene title yet");
         }
         break;
     

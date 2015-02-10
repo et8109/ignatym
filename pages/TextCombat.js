@@ -19,12 +19,12 @@ var frontLoadKeywords;
    sendRequest(
         "mod=setup&function=setUp&version="+version,
         function(response){
-            alert(response);
-            response = response.split("<>");
-            playerID = parseInt(response[1]);
-            currentScene = parseInt(response[2]);
-            frontLoadSceneText = parseInt(response[3]);
-            frontLoadKeywords = parseInt(response[4]);
+            var info = response[0];
+            alert("setup response recieved: "+info.pid);
+            playerID = parseInt(info.pid);
+            currentScene = parseInt(info.sceneID);
+            frontLoadSceneText = parseInt(info.fls);
+            frontLoadKeywords = parseInt(info.flkw);
             enableInput();
             addText("Welcome!");
             addText("'/look' to look around.");
@@ -38,10 +38,9 @@ var sceneText={};
 if (frontLoadSceneText) {
     sendRequest(
         "mod=setup&function=frontLoadScenes",
-        function(response){
-            var sceneTextsAndIDs = response.split("<>");
-            for(var i=1; i<sceneTextsAndIDs.length; i+=3){
-                sceneText[parseInt(sceneTextsAndIDs[i])] = [sceneTextsAndIDs[i+1],sceneTextsAndIDs[i+2]];
+        function(scenes){
+            for(key in scenes){
+                sceneText[scenes[key].sid] = [scenes[key].spanText,scenes[key].desc];
             }
         }
     );
@@ -52,12 +51,9 @@ var keywordText={};
 if (frontLoadKeywords) {
     sendRequest(
         "mod=setup&function=frontLoadKeywords",
-        function(response) {
-            var keywordTextAndDesc = response.split("<>");
-            for(var i=1; i<keywordTextAndDesc.length; i+=3){
-                keywordText[keywordTextAndDesc[i]] = [keywordTextAndDesc[i+1], keywordTextAndDesc[i+2]];
-                //keywordText[keywordTextAndDesc[i]][0] = keywordTextAndDesc[i+1];
-                //keywordText[keywordTextAndDesc[i]][1] = keywordTextAndDesc[i+2];
+        function(keywords) {
+            for(key in keywords){
+                sceneText[keywords[key].word] = [keywords[key].spanText,keywords[key].desc];
             }
         }
     );
@@ -367,46 +363,45 @@ function textTyped(e){
 */
 function updateChat(){
     sendRequest("mod=chat&function=updateChat",
-        function(response){
-            response = response.split("<<<");
-            var numAlerts = response[1];
-            var text = response[0].split("\r\n");
-	    if (text.length>1) {
-		for(var i=0; i<text.length; i+=3){//id,name,text
-                    var chatLine = text[i+2];
-                    //if an action, not a chat
-                    if (chatLine.indexOf("<") == 1) {
-                        var type = parseInt(chatLine.charAt(2));
-                        chatLine = chatLine.split("<>");
-                        chatLine = chatLine[1];
-                        switch(type){
-                            case(actionTypes.ATTACK):
-                                //let the player know somehow that there is combat, sound maybe
-                                addText(chatLine);
-                                //ask player to attack again
-                                var id = text[i];
-                                if (id == playerID) {
-                                    setTextLineListener(listener_attack_again);
-                                }
-                                break;
-                            case(actionTypes.WALKING):
-                                //footsteps sound
-                                addText(chatLine);
-                                break;
-                            case(actionTypes.MESSAGE):
-                                //currently only roars from bosses
-                                addText(chatLine);
-                                break;
-                        }
-                    }
-                    //if a chat
-                    else{
-                        addText(text[1]+":"+chatLine);
+        function(info){
+            //alerts.alerts should always come first
+            if (info[0].numAlerts == true) {
+                var numAlerts = info[0].num;
+                setAlertButton(parseInt(numAlerts));
+                info.shift(); //removes the first item from the array
+            }
+            //chat. info array should just be chat info now   
+            for(lineInfo in info){
+                var chatLine = info.text;
+                //if an action, not a chat
+                if (chatLine.indexOf("<") == 1) {
+                    var type = parseInt(chatLine.charAt(2));
+                    chatLine = chatLine.split("<>");
+                    chatLine = chatLine[1];
+                    switch(type){
+                        case(actionTypes.ATTACK):
+                            //let the player know somehow that there is combat, sound maybe
+                            addText(chatLine);
+                            //ask player to attack again
+                            if (info.pid == playerID) {
+                                setTextLineListener(listener_attack_again);
+                            }
+                            break;
+                        case(actionTypes.WALKING):
+                            //footsteps sound
+                            addText(chatLine);
+                            break;
+                        case(actionTypes.MESSAGE):
+                            //currently only roars from bosses
+                            addText(chatLine);
+                            break;
                     }
                 }
+                //if a chat
+                else{
+                    addText(info.pname+":"+chatLine);
+                }
             }
-            //alerts
-            setAlertButton(parseInt(numAlerts));
         }
     );
 }
@@ -433,10 +428,9 @@ function addDesc(spanType, id) {
             break;
     }
     sendRequest("mod=general&function=getDesc&type="+spanType+"&ID="+id,
-        function(response) {
-            response = response.split("<>");
-            for(var i=0; i<response.length; i++){
-                addText(response[i]);
+        function(lines) {
+            for(line in lines){
+                addText(line.text);
             }
         }
     );
@@ -485,9 +479,8 @@ function displayMyDesc() {
     sendRequest("mod=general&function=getDesc&type="+spanTypes.PLAYER,
         function(response){
             //first is name, second id desc
-            response = response.split("<>");
             //remove styling, not visible in text area
-            setTextAreaText(removeHtmlStyling(response[1]));
+            setTextAreaText(removeHtmlStyling(response[1].text));
         }
     );
     endListening();
@@ -516,7 +509,7 @@ function addCraftName(name){
     sendRequest("mod=crafting&function=getCraftInfo",
         function(response){
             endListening();
-            addText("Your craftSkill is "+response+ ". enter the "+targetName+"'s description below. Your tags are: tags not done yet");
+            addText("Your craftSkill is "+response[0].text+ ". enter the "+targetName+"'s description below. Your tags are: tags not done yet");
             setTextAreaListener(listener_item_desc);
         }
     );
@@ -565,15 +558,19 @@ function startWaiter(){
 function getItemsInScene(onEmptyText){
     sendRequest("mod=general&function=getItemsInScene",
         function(response) {
-            if (response == "") {
+            if (response.length == 0) {
                 onEmptyText ? addText(onEmptyText) : addText('Nothing here.');
                 return;
             }
             //success
             startPaper();
-            response = response.split("<>");
-            for(var i=0; i<response.length; i++){
-                addText(response[i]);
+            for(obj in response){
+                if (obj.item) {
+                    addText(obj.spanText);
+                    addText(obj.note);
+                } else if (obj.material) {
+                    addText(obj.spanText);
+                }
             }
             endPaper();
         }
@@ -652,8 +649,7 @@ function newSceneDescPrompt(){
         function(response){
             setTextAreaListener(listener_new_scene_desc);
             //first is name, second is desc
-            response=response.split("<>");
-            setTextAreaText(removeHtmlStyling(response[1]));
+            setTextAreaText(removeHtmlStyling(response[1].text));
         }
     );
 }
@@ -680,37 +676,10 @@ function editSceneDesc(desc){
         }
     );
 }
-/**
- *displays a list of scene descrptions for the monarch to review in the alerts box.
- */
-function newSceneDrafts(){
-    openMenu();
-    setMenuText("Loading..");
-    sendRequest("mod=manage&function=getNewSceneDescDrafts", 
-                function(response){
-                    if (response == "") {
-                        setMenuText("No description drafts.");
-                        return;
-                    }
-                    setMenuText("Locations:"+response);
-                }
-    );
-}
+
 
 /**
- *displays a location's desc draft in the menu
- */
-function reviewSceneDesc(sceneID){
-    setMenuText("Loading..");
-    sendRequest("mod=general&function=getDesc&type="+spanTypes.SCENE+"&ID="+sceneID,
-                function(response){
-                    response = response.split("<>");
-                    setMenuText("[You might want to copy this somewhere else to compare]</br>"+removeHtmlStyling(response[0])+"</br>"+removeHtmlStyling(response[1]));
-                }
-                );
-}
-/**
-*find who the player want to attack, after /attack
+*find who the player wants to attack, after /attack
 */
 function attack(name) {
     //if already attacked once
@@ -758,10 +727,12 @@ function openAlerts(){
     inside.innerHTML = "Loading..";
     sendRequest(
         "mod=general&function=getAlertMessages",
-        function(response){
+        function(alerts){
             inside.innerHTML = "Alerts:";
-            inside.innerHTML += response;
-            addAlertsEnding(response!="");
+            for(alert in alerts){
+                inside.innerHTML += alert.text;
+            }
+            addAlertsEnding(alerts.length!=0);
         }
     );
 }
@@ -832,10 +803,9 @@ function takeItemFrom(itemName, containerName){
  */
 function getManageSceneText() {
     sendRequest("mod=manage&function=getManageSceneText",
-        function(response){
-            response = response.split("<>");
-            for(var i=0; i<response.length; i++){
-                addText(response[i]);
+        function(lines){
+            for(line in lines){
+                addText(line.text);
             }
         }
     );
@@ -888,10 +858,9 @@ function fireEmployee(name){
  */
 function addPlayerInfo(){
     sendRequest("mod=general&function=getPlayerInfo",
-        function(response){
-            response = response.split("<>");
-            for(var i=0; i<response.length; i++){
-                addText(response[i]);
+        function(lines){
+            for(line in lines){
+                addText(line.text);
             }
         }
     );
@@ -914,10 +883,9 @@ function destroyItem(itemName){
 function closeLook() {
     sendRequest(
         "mod=general&function=closeLook",
-        function(response){
-            response = response.split("<>");
-            for(var i=0; i<response.length; i++){
-                addText(response[i]);
+        function(lines){
+            for(line in lines){
+                addText(line.text);
             }
         }
     );
@@ -968,7 +936,7 @@ function readBook(bookName) {
                 function(response){
                     targetName = bookName; //remember for learning the spell
                     startPaper();
-                    addText(response);
+                    addText(response[0].text);
                     endPaper();
                     setTextLineListener(listener_learn_spell);
                 }
@@ -1007,7 +975,7 @@ function forgetSpell(kwname) {
  */
 function castSpell(spellname) {
     sendRequest("mod=magic&function=castSpell&name="+spellname,
-                function(response){addText(response);}
+                function(response){addText(response[0].text);}
                 );
 }
 ////////////////////////////////////////////////////
@@ -1287,10 +1255,15 @@ function sendRequest(params,returnFunction){
         if (this.readyState==4 && this.status==200) {
             //build info
             var response = this.responseText;
-            var info = JSON.parse(json);
+            var info = JSON.parse(response);
             alert("response: "+response);
-            //success, call function
-            //returnFunction(info);
+            //error should always be the first response
+            if (info[0].error == true) {
+                setErrorMessage(info[0].msg);
+            } else{
+                //success, call function
+                returnFunction(info);
+            }
             if (requestSpeedChecker) {
                 var date = new Date();
                 addText("b "+date.getSeconds());

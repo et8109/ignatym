@@ -46,7 +46,6 @@ function sendError($msg){
  *adds the array to the info to send to the client
  */
 function sendInfo($array){
-    //echo "in send info";
     responseBuilder::$responseArray [] = $array;
 }
 

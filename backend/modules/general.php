@@ -5,28 +5,33 @@ switch($function){
     case('getDesc'):
         switch($_POST['type']){
             case(spanTypes::ITEM):
-                $item =  Req::select()->fromItemID($_POST['ID'])->desc()->name()->run();
-                sendText(getSpanText(spanTypes::ITEM,$_POST['ID'],$item->Name)."<>".$item->Desc);
+                $item =  SharedInterface::getDescItem($_POST['ID']);
+                sendText(getSpanText(spanTypes::ITEM,$_POST['ID'],$item["Name"]));
+                sendText($item["Description"]);
                 break;
             case(spanTypes::KEYWORD):
-                $kw = Req::select()->fromKeywordID($_POST['ID'])->desc()->run();
-                sendText(getSpanText(spanTypes::KEYWORD,$_POST['ID'],$_POST['ID'])."<>".$kw->Desc);
+                $kw = SharedInterface::getDescKeywordFromID($_POST['ID']);
+                sendText(getSpanText(spanTypes::KEYWORD,$_POST['ID'],$_POST['ID']));
+                sendText($kw["Description"]);
                 break;
             case(spanTypes::PLAYER):
                 //if no id is set, make it the player
                 $ID = isset($_POST['ID']) ? $_POST['ID'] : $_SESSION['playerID'];
-                $player = Req::select()->fromPlayerID($ID)->name()->desc()->run();
-                sendText(getSpanText(spanTypes::PLAYER,$ID,$player->Name)."<>".$player->Description);
+                $player = SharedInterface::getDescPlayer($_POST['ID']);
+                sendText(getSpanText(spanTypes::PLAYER,$ID,$player["Name"]));
+                sendText($player["Description"]);
                 break;
             case(spanTypes::NPC):
-                $info = Req::select()->fromNpcID($_POST['ID'])->name()->desc()->run();
-                sendText(getSpanText(spanTypes::NPC,$_POST['ID'],$info['Name'])."<>".$info['Description']);
+                $info = SharedInterface::getDescNpc($_POST['ID']);
+                sendText(getSpanText(spanTypes::NPC,$_POST['ID'],$info['Name']));
+                sendText($info['Description']);
                 break;
             case(spanTypes::SCENE):
                 //if no id set, it's the current scene
                 $ID = is_numeric($_POST['ID']) ? $_POST['ID'] : $_SESSION['currentScene'];
-                $info = SharedInterface::getDescScene($ID));
-                sendText(getSpanText(spanTypes::SCENE,$ID,$info["Name"])."<>".$info["Description"]);
+                $info = SharedInterface::getDescScene($ID);
+                sendText(getSpanText(spanTypes::SCENE,$ID,$info["Name"]));
+                sendText($info["Description"]);
                 //players
                 $playersResult = GeneralInterface::getPlayersInScene($_SESSION['currentScene']);
                 foreach($playersResult as $player){

@@ -31,7 +31,7 @@ try{
     }
 }
 catch(Exception $e){
-    sendError("chat error: ".$e->getMessage());
+    sendError($e->getMessage());
 }
 finally{
     echo sendResponse();
