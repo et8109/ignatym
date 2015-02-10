@@ -6,7 +6,7 @@ class GeneralInterface extends Interface_class{
     
     public static function getPlayersInScene($sid){
         $sid = self::prepVar($sid);
-        $r = self::$db->querySingle("select playerID,playerName from sceneplayers where sceneID=$sid");
+        $r = self::$db->queryMulti("select playerID, playerName from sceneplayers where sceneID=$sid");
         return $r;
     }
     

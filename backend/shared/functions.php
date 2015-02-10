@@ -157,7 +157,7 @@ function getSpanText($spanType, $id, $name){
             break;
         case(spanTypes::PLAYER):
             //find health value
-            $healthRow = query("select health from playerinfo where ID=".prepVar($_SESSION['playerID']));
+            $healthRow = SharedInterface::getPlayerInfo($_SESSION['playerID']);
             $health = intval($healthRow['health']);
             return "<span class='name b".$health."' onclick='addDesc(".spanTypes::PLAYER.",".$id.")'>".$name."</span>";
             break;

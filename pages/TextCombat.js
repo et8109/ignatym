@@ -1255,8 +1255,8 @@ function sendRequest(params,returnFunction){
         if (this.readyState==4 && this.status==200) {
             //build info
             var response = this.responseText;
-            var info = JSON.parse(response);
             alert("response: "+response);
+            var info = JSON.parse(response);
             //error should always be the first response
             if (info[0].error == true) {
                 setErrorMessage(info[0].msg);
