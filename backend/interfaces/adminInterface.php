@@ -213,9 +213,51 @@ class AdminInterface extends Interface_class{
                                );
         //npcs
         self::$db->querySingle("insert into npcs (name, description, level) values".
-                               "(dustball, A clump of dust floating around with the wind., 2),".
-                               "(wanderer, They cover their face and body with large brown cloaks., 5)"
+                               "(dustball, 'A clump of dust floating around with the wind.', 2),".
+                               "(wanderer, 'They cover their face and body with large brown cloaks.', 5)"
                               );
+        //scenes
+        self::$db->querySingle("insert into scenes (ID, Name, Description, appshp, town, land) values".
+                               "(100, 'Pub',".
+                               self::prepVar("A pub, you know. To the south is the <span class='active path' onclick='walk(101)'>Town Square</span>. browse the <span onclick='startWaiter()' class='active action'>pub</span> ? For the brave, the <span class='active path' onclick='walk(103)'>Wilderness</span> lies ahead.").
+                                ",1,1,1),".
+                                "(101, 'Town Square',".
+                               self::prepVar("There are people walking around, you can go north to the <span class='active path' onclick='walk(100)'>Pub</span>, or south to the  <span class='active path' onclick='walk(102)'>Blacksmith</span>. Off to the side is the <span class='active path' onclick='walk(104)'>Library</span>. Also a <span onclick='' class='active action'>sanctuary</span>").
+                                ",0,1,1),".
+                                "(102, 'Blacksmith',".
+                               self::prepVar("crafting place. North is the <span class='active path' onclick='walk(101)'>Town Square</span>. There is an <span onclick='startCraft()' class='active action'>anvil</span> here. test.").
+                                ",1,1,1),".
+                                "(103, 'Wilderness',".
+                               self::prepVar("Sparse trees decorate the otherwise barren landscape. The town's <span class='active path' onclick='walk(100)'>Pub</span> lies to the south.").
+                                ",0,0,1),".
+                                "(104, 'Library',".
+                               self::prepVar("An old building, with lines of wooden shelves. Most are empty, but a few books are held here for the public to read. On the closest shelf you see a copy of the <span class='keyword' onclick='addDesc(4,&apos;animatome&apos;)'>animatome</span> .The exit leads to the <span class='active path' onclick='walk(101)'>Town Square</span>.").
+                                ",0,1,1)".
+                              );
+        //scene keywords
+        self::$db->querySingle("insert into scenekeywords (ID, keywordID, type) values".
+                               "(102, 6, 3),".
+                               "(100, 11, 3),".
+                               "(101, 12, 3),".
+                               "(104, 13, 8)".
+                              );
+        //scene npcs
+        self::$db->querySingle("insert into scenenpcs (sceneID, npcID, npcName, health) values".
+                               "(103, 1,'dustball', 5),".
+                               "(103, 2,'wanderer', 5)".
+                              );
+        //scene paths
+        self::$db->querySingle("insert into scenepaths (startID, endID) values".
+                               "(100, 101),".
+                               "(101, 100),".
+                               "(100, 103),".
+                               "(103, 100),".
+                               "(101, 102),".
+                               "(102, 101),".
+                               "(101, 104),".
+                               "(104, 101)".
+                              );
+        
     }
 }
 ?>
