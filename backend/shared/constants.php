@@ -56,8 +56,8 @@ final class alertTypes{
     const managerQuit = 10;
     const employeeFired = 11;
     const managerFired = 12;
-    //no 13
-    const newSpell = 14;
+    const newSpell = 13;
+    //not yet added:
     const lordFired = 15;
     const lordQuit = 16;
     const monarchQuit = 17;

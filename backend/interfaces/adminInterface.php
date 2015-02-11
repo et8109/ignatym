@@ -157,6 +157,65 @@ class AdminInterface extends Interface_class{
         
         require_once("registerInterface.php");
         RegisterInterface::registerPlayer("guest", "guest");
+        //alerts
+        self::$db->querySingle("insert into alerts (Description) values".
+                               "(An item has been added to your description. You should edit it soon.),".
+                               "(An item of yours has been hidden, you can change your description so it it no longer highlighted.),".
+                               "(An item of yours was removed, you should change your description to reflect that.),".
+                               "(A new job has been added to your description. You should update it soon.),".
+                               "(You have been fired from your job. You should change your description to reflect that.),".
+                               "(An employee of yours has quit.),".
+                               "(You have a new manager at your job.),".
+                               "(There is a new lord of your town.),".
+                               "(You have a new employee at your job.),".
+                               "(Your manager has quit.),".
+                               "(An employee of yours has been fired.),".
+                               "(Your manager has been fired.),".
+                               "(A new spell has been added to your description. You should update it soon.)"
+                               );
+        //keywords
+        self::$db->querySingle("insert into keywords (Description) values".
+                               "(Not very strong, it is usually used for the handles of things. The useful ends of object should have a stronger material.),".
+                               "(A strong material, but it must be mined and then smelted into a practical shape.),".
+                               "(It does what it's supposed to.),".
+                               "(Very fancy. Whoever made this is a skilled craftsman.),".
+                               "(This item can hold other items.),".
+                                "(You can craft items here.),".
+                                "(Apprentice at a shop.),".
+                                "(Manager of a shop.),".
+                                "(The lord of a town.),".
+                                "(The monarch of a land.),".
+                                "(Food and drinks are sold here.),".
+                                "(There is a calming aura here, and combat is not allowed.),".
+                                "(This spellbook explains how to reanimate fallen creatures.),".
+                                "(Has the ability to raise fallen creatures.)"
+                                );
+        //keyword words
+        self::$db->querySingle("insert into keywordwords (Word, ID, Type) values".
+                               "(animatome, 13, 8),".
+                               "(anvil, 6, 3),".
+                               "(apprentice, 7, 4),".
+                               "(bag, 5, 0),".
+                               "(beautiful, 4, 2),".
+                               "(exquisite, 4, 2),".
+                               "(lord, 9, 6),".
+                               "(manager, 8, 5),".
+                               "(metal, 2, 1),".
+                               "(metallic, 2, 1),".
+                               "(monarch, 10, 7),".
+                               "(necromancer, 14, 9),".
+                               "(plain, 3, 2),".
+                               "(pub, 11, 3),".
+                               "(sanctuary, 12, 3),".
+                               "(simple, 3, 2),".
+                               "(wood, 1, 1),".
+                               "(wooden, 1, 1)"
+                               );
+        //npcs
+        self::$db->querySingle("insert into npcs (name, description, level) values".
+                               "(dustball, A clump of dust floating around with the wind., 2),".
+                               "(wanderer, They cover their face and body with large brown cloaks., 5)"
+                              );
     }
 }
 ?>
