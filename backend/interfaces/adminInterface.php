@@ -232,19 +232,19 @@ class AdminInterface extends Interface_class{
                                 ",0,0,1),".
                                 "(104, 'Library',".
                                self::prepVar("An old building, with lines of wooden shelves. Most are empty, but a few books are held here for the public to read. On the closest shelf you see a copy of the <span class='keyword' onclick='addDesc(4,&apos;animatome&apos;)'>animatome</span> .The exit leads to the <span class='active path' onclick='walk(101)'>Town Square</span>.").
-                                ",0,1,1)".
+                                ",0,1,1)"
                               );
         //scene keywords
         self::$db->querySingle("insert into scenekeywords (ID, keywordID, type) values".
                                "(102, 6, 3),".
                                "(100, 11, 3),".
                                "(101, 12, 3),".
-                               "(104, 13, 8)".
+                               "(104, 13, 8)"
                               );
         //scene npcs
         self::$db->querySingle("insert into scenenpcs (sceneID, npcID, npcName, health) values".
                                "(103, 1,'dustball', 5),".
-                               "(103, 2,'wanderer', 5)".
+                               "(103, 2,'wanderer', 5)"
                               );
         //scene paths
         self::$db->querySingle("insert into scenepaths (startID, endID) values".
@@ -255,7 +255,7 @@ class AdminInterface extends Interface_class{
                                "(101, 102),".
                                "(102, 101),".
                                "(101, 104),".
-                               "(104, 101)".
+                               "(104, 101)"
                               );
         
     }

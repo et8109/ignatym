@@ -371,8 +371,8 @@ function updateChat(){
                 info.shift(); //removes the first item from the array
             }
             //chat. info array should just be chat info now   
-            for(lineInfo in info){
-                var chatLine = info.text;
+            for(l in info){
+                var chatLine = info[l].text;
                 //if an action, not a chat
                 if (chatLine.indexOf("<") == 1) {
                     var type = parseInt(chatLine.charAt(2));
@@ -383,7 +383,7 @@ function updateChat(){
                             //let the player know somehow that there is combat, sound maybe
                             addText(chatLine);
                             //ask player to attack again
-                            if (info.pid == playerID) {
+                            if (info[l].pid == playerID) {
                                 setTextLineListener(listener_attack_again);
                             }
                             break;
@@ -399,7 +399,7 @@ function updateChat(){
                 }
                 //if a chat
                 else{
-                    addText(info.pname+":"+chatLine);
+                    addText(info[l].pname+":"+chatLine);
                 }
             }
         }
@@ -429,8 +429,8 @@ function addDesc(spanType, id) {
     }
     sendRequest("mod=general&function=getDesc&type="+spanType+"&ID="+id,
         function(lines) {
-            for(line in lines){
-                addText(line.text);
+            for(l in lines){
+                addText(lines[l].text);
             }
         }
     );
@@ -557,19 +557,19 @@ function startWaiter(){
  */
 function getItemsInScene(onEmptyText){
     sendRequest("mod=general&function=getItemsInScene",
-        function(response) {
+        function(items) {
             if (response.length == 0) {
                 onEmptyText ? addText(onEmptyText) : addText('Nothing here.');
                 return;
             }
             //success
             startPaper();
-            for(obj in response){
-                if (obj.item) {
-                    addText(obj.spanText);
-                    addText(obj.note);
-                } else if (obj.material) {
-                    addText(obj.spanText);
+            for(i in items){
+                if (items[i].item) {
+                    addText(items[i].spanText);
+                    addText(items[i].note);
+                } else if (items[i].material) {
+                    addText(items[i].spanText);
                 }
             }
             endPaper();
@@ -729,8 +729,8 @@ function openAlerts(){
         "mod=general&function=getAlertMessages",
         function(alerts){
             inside.innerHTML = "Alerts:";
-            for(alert in alerts){
-                inside.innerHTML += alert.text;
+            for(a in alerts){
+                inside.innerHTML += alerts[a].text;
             }
             addAlertsEnding(alerts.length!=0);
         }
@@ -804,8 +804,8 @@ function takeItemFrom(itemName, containerName){
 function getManageSceneText() {
     sendRequest("mod=manage&function=getManageSceneText",
         function(lines){
-            for(line in lines){
-                addText(line.text);
+            for(l in lines){
+                addText(lines[l].text);
             }
         }
     );
@@ -859,8 +859,8 @@ function fireEmployee(name){
 function addPlayerInfo(){
     sendRequest("mod=general&function=getPlayerInfo",
         function(lines){
-            for(line in lines){
-                addText(line.text);
+            for(l in lines){
+                addText(lines[l].text);
             }
         }
     );
@@ -884,8 +884,8 @@ function closeLook() {
     sendRequest(
         "mod=general&function=closeLook",
         function(lines){
-            for(line in lines){
-                addText(line.text);
+            for(l in lines){
+                addText(lines[l].text);
             }
         }
     );
