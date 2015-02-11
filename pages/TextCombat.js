@@ -253,6 +253,7 @@ function textTyped(e){
     }
     //listener check
     if (textLineListener != null) {
+        alert("using listener yolo");
         textLineListener.onInput(inputText);
     }
     //command check
@@ -1258,7 +1259,7 @@ function sendRequest(params,returnFunction){
             alert("response: "+response);
             var info = JSON.parse(response);
             //error should always be the first response
-            if (info[0].error == true) {
+            if (info.length > 0 && info[0].error == true) {
                 setErrorMessage(info[0].msg);
             } else{
                 //success, call function

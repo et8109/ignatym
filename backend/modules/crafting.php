@@ -1,6 +1,6 @@
 <?php
 
-require_once 'interfaces/combatInterface.php';
+require_once 'interfaces/craftingInterface.php';
 
 /**
  *the keyword types required in all items
@@ -68,7 +68,7 @@ switch($function){
         $row = SharedInterface::getPlayerInfo($_SESSION['playerID']);
         sendInfo(array(
             "craftInfo" => true,
-            "info" => $row['craftSkill'];
+            "info" => $row['craftSkill']
         ));
         break;
 }
