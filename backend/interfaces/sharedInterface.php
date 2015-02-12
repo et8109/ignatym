@@ -18,7 +18,7 @@ class SharedInterface extends Interface_class{
      */
     public static function getDescKeyword($word){
         $word = self::prepVar($word);
-        $r = self::$db->querySingle("select K.Description from keywordwords W, keywords K where W.Word=$word");
+        $r = self::$db->querySingle("select K.Description from keywordwords W, keywords K where W.Word=$word and K.ID = W.ID limit 1");
         return $r;
     }
     

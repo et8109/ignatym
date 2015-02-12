@@ -23,7 +23,7 @@ switch($_POST['function']){
         }
         //make sure scene has spellbook
         $bookRow = SharedInterface::checkSceneKeyword($_SESSION['currentScene'], $IdRow['ID'], keywordTypes::SPELLBOOK);
-        if($bookRow[0] != 1){
+        if($bookRow["count(1)"] != 1){
             throw new Exception("Could not find the ".$_POST['bookName']." here.");
         }
         //display spellbook text
@@ -49,12 +49,12 @@ switch($_POST['function']){
             throw new Exception("Could not find the ".$_POST['bookName']." here.");
         }
         $bookRow = SharedInterface::checkSceneKeyword($_SESSION['currentScene'], $IdRow['ID'], keywordTypes::SPELLBOOK);
-        if($bookRow[0] != 1){
+        if($bookRow["count(1)"] != 1){
             throw new Exception("Could not find the ".$_POST['bookName']." here.");
         }
         //make sure player does not have a spell
         $spellRow = MagicInterface::checkPlayerKeywordType($_SESSION['playerID'], keywordTypes::SPELL);
-        if($spellRow[0] == 1){
+        if($spellRow["count(1)"] == 1){
             throw new Exception("You already know a spell. You would have to forget that one first.");
         }
         //give spell to player

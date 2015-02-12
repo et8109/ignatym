@@ -510,7 +510,7 @@ function addCraftName(name){
     sendRequest("mod=crafting&function=getCraftInfo",
         function(response){
             endListening();
-            addText("Your craftSkill is "+response[0].text+ ". enter the "+targetName+"'s description below. Your tags are: tags not done yet");
+            addText("Your craftSkill is "+response[0].info+ ". enter the "+targetName+"'s description below. Your tags are: tags not done yet");
             setTextAreaListener(listener_item_desc);
         }
     );

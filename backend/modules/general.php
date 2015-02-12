@@ -10,7 +10,7 @@ switch($function){
                 sendText($item["Description"]);
                 break;
             case(spanTypes::KEYWORD):
-                $kw = SharedInterface::getDescKeywordFromID($_POST['ID']);
+                $kw = SharedInterface::getDescKeyword($_POST['ID']);//currently searches by kw name, not id
                 sendText(getSpanText(spanTypes::KEYWORD,$_POST['ID'],$_POST['ID']));
                 sendText($kw["Description"]);
                 break;

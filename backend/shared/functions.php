@@ -376,7 +376,7 @@ function addKeywordToPlayer($keywordID,$keywordType,$location,$playerID = -1){
     if($playerID == -1){
         $playerID = $_SESSION['playerID'];
     }
-    SharedInterfac::addPlayerKeyword($playerID, $keywordID, $location. $keywordType);
+    SharedInterface::addPlayerKeyword($playerID, $keywordID, $location, $keywordType);
     $wordRow = SharedInterface::getSingleKeywordFromID($keywordID);
     _addWordToPlayerDesc(spanTypes::KEYWORD,$keywordID,$wordRow['Word'],$playerID);
 }
