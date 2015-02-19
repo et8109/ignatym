@@ -520,7 +520,7 @@ function addCraftName(name){
  */
 function addCraftDescription(desc){
     if (targetName == "") {
-        addText("[Something wierd happened. Woops! Please let me know what you did. Thanks.]");
+        addText("[Something weird happened. Woops! Please let me know what you did. Thanks.]");
         endListening();
         return;
     }

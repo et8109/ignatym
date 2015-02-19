@@ -63,24 +63,279 @@ function sendResponse(){
 }
 
 /**
- *adds the given text to the current chat file
- *returns if scene id is not numeric
+ *adds text to chat files
  */
-function _addChatText($text, $sceneID){
-    if(!is_numeric($sceneID)){
-        return;
-    }
-    $fileName = "chats/".$sceneID."Chat.txt";
-    $time=date_timestamp_get(new DateTime());
-    $lines = array();
-    $lines = file($fileName);
-    $chatFile = fopen($fileName, "w");
-    for($i=4; $i<40; $i++){
-        fwrite($chatFile,$lines[$i]);
-    }
-    fwrite($chatFile,"\r\n".$time."\r\n".$_SESSION['playerID']."\r\n".getSpanText(spanTypes::PLAYER,$_SESSION['playerID'],$_SESSION['playerName'])."\r\n".$text);
-    fclose($chatFile);
+class TextGenerator {
+    
+    /**
+    *adds the given text to the current chat file
+    *returns if scene id is not numeric
+    */
+   private static function addChatText($text, $sceneID){
+       if(!is_numeric($sceneID)){
+           return;
+       }
+       $fileName = "chats/".$sceneID."Chat.txt";
+       $time=date_timestamp_get(new DateTime());
+       $lines = array();
+       $lines = file($fileName);
+       $chatFile = fopen($fileName, "w");
+       for($i=4; $i<40; $i++){
+           fwrite($chatFile,$lines[$i]);
+       }
+       fwrite($chatFile,"\r\n".$time."\r\n".$_SESSION['playerID']."\r\n".getSpanText(spanTypes::PLAYER,$_SESSION['playerID'],$_SESSION['playerName'])."\r\n".$text);
+       fclose($chatFile);
+   }
+   
+   /**
+    *when a player attacks something.
+    *sent to chat.
+    *attacker - text - target
+    */
+   static function speakActionAttack($targetSpanType, $targetID, $targetName, $text){
+       $text = getSpanText(spanTypes::PLAYER,$_SESSION['playerID'],$_SESSION['playerName']).$text.getSpanText($targetSpanType,$targetID,$targetName);
+       self::speakAction(actionTypes::ATTACK,$text, $_SESSION['currentScene']);
+   }
+   /**
+    *when a player walks from one scene to another
+    *sent to chat.
+    */
+   static function speakActionWalk($nextSceneID, $sceneName){
+       $text = getSpanText(spanTypes::PLAYER,$_SESSION['playerID'],$_SESSION['playerName'])." walked to ".getSpanText(spanTypes::SCENE,$sceneID,$sceneName);
+       self::speakAction(actionTypes::WALKING, $text,$_SESSION['currentScene']);
+   }
+   /**
+    *adds the text to the chat, with no player name
+    */
+   static function speakActionMessage($sceneID, $message){
+       self::speakAction(actionTypes::MESSAGE,$message,$sceneID);
+   }
+   
+   /**
+    *only to use by other speak action functions.
+    *sends the type and text to chat.
+    */
+   private static function speakAction($saType, $text, $sceneID){
+       self::addChatText("<".$saType."><>".$text, $sceneID);
+   }
+    
+    /**
+    *returns the span text for the given object.
+    *the span text is for the title/name, not description
+    *Note: id for keywords is the actual word, not number
+    *action: id is keyword id
+    */
+   function getSpanText($spanType, $id, $name){
+       switch($spanType){
+           case(spanTypes::ITEM):
+               return "<span class='item' onclick='addDesc(".spanTypes::ITEM.",".$id.")'>".$name."</span>";
+               break;
+           case(spanTypes::KEYWORD):
+               return "<span class='keyword' onclick='addDesc(".spanTypes::KEYWORD.",&apos;".$name."&apos;)'>".$name."</span>";
+               break;
+           case(spanTypes::PLAYER):
+               //find health value
+               $healthRow = SharedInterface::getPlayerInfo($_SESSION['playerID']);
+               $health = intval($healthRow['health']);
+               return "<span class='name b".$health."' onclick='addDesc(".spanTypes::PLAYER.",".$id.")'>".$name."</span>";
+               break;
+           case(spanTypes::SCENE):
+               return "<span class='sceneName'>".$name."</span>";
+               //return "<span class='sceneName' onclick='addDesc(".spanTypes::SCENE.",".$id.")'>".$name."</span>";
+               break;
+           case(spanTypes::NPC):
+               //find health value
+               $healthRow = query("select health from scenenpcs where npcID=".prepVar($id));
+               $health = intval($healthRow['health']);
+               return "<span class='npc b".$health."' onclick='addDesc(".spanTypes::NPC.",".$id.")'>".$name."</span>";
+               break;
+           case(spanTypes::PATH):
+               return "<span class='active path' onclick='walk(".$id.")'>".$name."</span>";
+               break;
+           case(spanTypes::ACTION):
+               final class actionIDs {
+                   const crafting = 6;
+                   const pub = 11;
+               }
+               $actionFunctions = array(
+                   actionIDs::crafting => "startCraft()",
+                   actionIDs::pub => "startWaiter()"
+               );
+               return "<span onclick='".$actionFunctions[$id]."' class='active action'>".$name."</span>";
+               break;
+       }
+   }
+    
 }
+
+
+
+/**
+ *edits and returns descriptions
+ */
+class DescEditor {
+    
+    class DescEditorException extends Exception{
+        const CODE_NO_DATA_RETRIEVED = 0;
+        const CODE_DESC_DOES_NOT_CONTAIN = 1;
+        private $msg;
+        
+        function __construct($msg, $code){
+            parent::__construct($msg,$code);
+        }
+    }
+    
+    /**
+    *replaces the first keyword/scene action of the given ID.
+    *returns false if not found
+    */
+   private static function replaceKeywordID($desc, $ID){
+       $descArray = explode(" ",$desc);
+       $descArrayLength = count($descArray);
+       //loop through all words in desc
+       for($i=0; $i<$descArrayLength; $i++){
+           $keywordRow = SharedInterface::getKeywordFromWord($descArray[$i], $ID);
+           //if word corresponds to a keyword
+           if(isset($keywordRow['ID'])){
+                //assign keyword type
+               $spanType = spanTypes::KEYWORD;
+               if(intval($keywordRow['Type']) == keywordTypes::SCENE_ACTION){
+                   $spanType = spanTypes::ACTION;
+               }
+               //edit description and return
+               $descArray[$i] = getSpanText($spanType,$keywordRow['ID'],$descArray[$i]);
+               return implode(" ",$descArray);
+           }
+       }
+       return false;
+   }
+   
+   /**
+    *returns the new description with the first instance of the given word replaced by newWord
+    *returns false if the word was not found
+    */
+   private static function replaceSingleWord($desc, $word, $newWord){
+        $pos = strpos($desc, $word);
+        if($pos == false){
+            return false;
+        }
+        else{
+            //the item was found
+            return substr_replace($description, $newWord,$pos,strlen($word));
+        }
+   }
+   
+   /**
+    *replaces all items in the player's description
+    *sends error if not found
+    *returns the new description
+    */
+   private static function replacePlayerItems($desc){
+       //find item names
+       $itemNamesResult = SharedInterface::getVisibleItems($_SESSION['playerID']);
+       //if failed in query
+       if(is_bool($itemNamesResult)){
+           throw new DescEditorException("could not find item names", DescEditorException::CODE_NO_DATA_RETRIEVED);
+       }
+       foreach($itemNamesResult as $itemRow){
+            $desc = replaceSingleWord($desc, $itemRow['Name'], getSpanText(spanTypes::ITEM,$itemRow['ID'],$itemRow['Name']));
+            //if item not found
+            if($desc == false){
+                throw new DescEditorException("description does not contain ".$itemRow['Name'], DescEditorException::CODE_DESC_DOES_NOT_CONTAIN);
+            }
+       }
+       return $desc;
+   }
+   
+   /**
+    *replaces all the paths of a scene with spans
+    *sends error if not found
+    *returns the new description
+    */
+   private static function replaceScenePaths($desc){
+       $pathResult = $pathResult = SharedInterface::getPaths($_SESSION['currentScene']);
+       if($pathResult == false){
+           throw new DescEditorException("Error finding paths", DescEditorException::CODE_NO_DATA_RETRIEVED);
+        }
+        foreach($pathResult as $path){
+            $desc = replaceSingleWord($desc, $path['Name'], getSpanText(spanTypes::PATH,$path['ID'],$path['Name']));
+            //if path not found
+            if($desc == false){
+                throw new DescEditorException("Path not found: ".$path['Name'], DescEditorException::CODE_DESC_DOES_NOT_CONTAIN);
+            }
+       }
+       return $desc;
+   }
+   /**
+    *updates a description in the db
+    *sends error on fail
+    */
+   function updateDescription($ID, $description, $spanTypesType, $keywordTypeNames){
+       $table = _getTable($spanTypesType);
+       if($table == null){
+           sendError("unfindeable type");
+       }
+       //if a player, make sure items are there. items first so they don't replace span stuff.
+       if($spanTypesType == spanTypes::PLAYER){
+           $description = self::replacePlayerItems($description);
+       }
+       //if a scene, make sure paths are there
+       if($spanTypesType == spanTypes::SCENE){
+           $description = self::replaceScenePaths($description);
+       }
+       //get IDs of keywords
+       $keywordsResult = $keywordsResult = SharedInterface::getKeywordFromID($spanTypesType, $ID);
+       if(is_bool($keywordsResult)){
+           sendError("can't find the required keywords");
+       }
+       //replace one of each keyword ID
+       foreach($keywordsResult as $kw){
+           $description = self::replaceKeywordID($description,$kw['keywordID']);
+           //if ID not found
+           if($description == false){
+               sendError("could not find keyword type: ".$keywordTypeNames[intval($kw['Type'])]);
+           }
+       }
+       //make sure its under max length
+       self::checkDescIsUnderMaxLength($description,$spanTypesType);
+       if($spanTypesType == spanTypes::SCENE){//second scene check in this method
+           //log scene
+       }
+       SharedInterface::setDescription($description, $ID, $spanTypesType);
+       return true;
+   }
+   
+   /**
+    *sends error if too short,
+    *return num left if ok
+    *scene is scene desc
+    */
+   private static function checkDescIsUnderMaxLength($desc, $spanType){
+       $resultNum = 0;
+       switch($spanType){
+           case(spanTypes::ITEM):
+               $resultNum = maxLength::itemDesc - strlen($desc);
+               break;
+           case(spanTypes::KEYWORD):
+               $resultNum = maxLength::keywordDesc - strlen($desc);
+               break;
+           case(spanTypes::PLAYER):
+               $resultNum = maxLength::playerDesc - strlen($desc);
+               break;
+           case(spanTypes::SCENE):
+               $resultNum = maxLength::sceneDesc - strlen($desc);
+               break;
+       }
+       if($resultNum < 0){
+           sendError("Your description is ".(-1*$status)." chars too long");
+       }
+       else{
+           return $resultNum;
+       }
+   }
+    
+}
+
 
 /**
  *updates the player's chat time so it is right now.
@@ -109,219 +364,6 @@ function addAlert($alertNum, $optionalPlayerID = -1){
 function removeAlert($alertNum){
     SharedInterface::removePlayerAlert($_SESSION['playerID'], $alertNum);
 }
-
-/**
- *when a player attacks something.
- *sent to chat.
- *attacker - text - target
- */
-function speakActionAttack($targetSpanType, $targetID, $targetName, $text){
-    $text = getSpanText(spanTypes::PLAYER,$_SESSION['playerID'],$_SESSION['playerName']).$text.getSpanText($targetSpanType,$targetID,$targetName);
-    _speakAction(actionTypes::ATTACK,$text, $_SESSION['currentScene']);
-}
-/**
- *when a player walks from one scene to another
- *sent to chat.
- */
-function speakActionWalk($nextSceneID, $sceneName){
-    $text = getSpanText(spanTypes::PLAYER,$_SESSION['playerID'],$_SESSION['playerName'])." walked to ".getSpanText(spanTypes::SCENE,$sceneID,$sceneName);
-    _speakAction(actionTypes::WALKING, $text,$_SESSION['currentScene']);
-}
-/**
- *adds the text to the chat, with no player name
- */
-function speakActionMessage($sceneID, $message){
-    _speakAction(actionTypes::MESSAGE,$message,$sceneID);
-}
-
-/**
- *only to use by other speak action functions.
- *sends the type and text to chat.
- */
-function _speakAction($saType, $text, $sceneID){
-    _addChatText("<".$saType."><>".$text, $sceneID);
-}
-/**
- *returns the span text for the given object.
- *the span text is for the title/name, not description
- *Note: id for keywords is the actual word, not number
- *action: id is keyword id
- */
-function getSpanText($spanType, $id, $name){
-    switch($spanType){
-        case(spanTypes::ITEM):
-            return "<span class='item' onclick='addDesc(".spanTypes::ITEM.",".$id.")'>".$name."</span>";
-            break;
-        case(spanTypes::KEYWORD):
-            return "<span class='keyword' onclick='addDesc(".spanTypes::KEYWORD.",&apos;".$name."&apos;)'>".$name."</span>";
-            break;
-        case(spanTypes::PLAYER):
-            //find health value
-            $healthRow = SharedInterface::getPlayerInfo($_SESSION['playerID']);
-            $health = intval($healthRow['health']);
-            return "<span class='name b".$health."' onclick='addDesc(".spanTypes::PLAYER.",".$id.")'>".$name."</span>";
-            break;
-        case(spanTypes::SCENE):
-            return "<span class='sceneName'>".$name."</span>";
-            //return "<span class='sceneName' onclick='addDesc(".spanTypes::SCENE.",".$id.")'>".$name."</span>";
-            break;
-        case(spanTypes::NPC):
-            //find health value
-            $healthRow = query("select health from scenenpcs where npcID=".prepVar($id));
-            $health = intval($healthRow['health']);
-            return "<span class='npc b".$health."' onclick='addDesc(".spanTypes::NPC.",".$id.")'>".$name."</span>";
-            break;
-        case(spanTypes::PATH):
-            return "<span class='active path' onclick='walk(".$id.")'>".$name."</span>";
-            break;
-        case(spanTypes::ACTION):
-            final class actionIDs {
-                const crafting = 6;
-                const pub = 11;
-            }
-            $actionFunctions = array(
-                actionIDs::crafting => "startCraft()",
-                actionIDs::pub => "startWaiter()"
-            );
-            return "<span onclick='".$actionFunctions[$id]."' class='active action'>".$name."</span>";
-            break;
-    }
-}
-
-/**
- *replaces the first keyword/scene action of the given ID.
- *returns false if not found
- */
-function _replaceKeywordID($desc, $ID){
-    $descArray = explode(" ",$desc);
-    $descArrayLength = count($descArray);
-    for($i=0; $i<$descArrayLength; $i++){
-        $keywordRow = SharedInterface::getKeywordFromWord($descArray[$i], $ID);
-        if(isset($keywordRow['ID'])){
-            //found, success
-            $spanType = spanTypes::KEYWORD;
-            if(intval($keywordRow['Type']) == keywordTypes::SCENE_ACTION){
-                $spanType = spanTypes::ACTION;
-            }
-            $descArray[$i] = getSpanText($spanType,$keywordRow['ID'],$descArray[$i]);
-            return implode(" ",$descArray);
-        }
-    }
-    return false;
-}
-
-/**
- *replaces all items in the player's description
- *sends error if not found
- *returns the new description
- */
-function _replacePlayerItems($description){
-    //find item names
-    $itemNamesResult = SharedInterface::getVisibleItems($_SESSION['playerID']);
-    //if failed in query
-    if(is_bool($itemNamesResult)){
-        sendError("could not find item names");
-    }
-    foreach($itemNamesResult as $itemRow){
-        //if an item is not found
-        $pos = strpos($description, $itemRow['Name']);
-        if($pos == false){
-            sendError("description does not contain ".$itemRow['Name']);
-        }
-        else{
-            //the item was found
-            $description = substr_replace($description,getSpanText(spanTypes::ITEM,$itemRow['ID'],$itemRow['Name']),$pos,strlen($itemRow['Name']));
-        }
-    }
-    return $description;
-}
-
-/**
- *replaces all the paths of a scene with spans
- *sends error if not found
- */
-function _replaceScenePaths($description){
-    $pathResult = $pathResult = SharedInterface::getPaths($_SESSION['currentScene']);
-    if($pathResult == false){
-        sendError("Error finding paths");
-    }
-    foreach($pathResult as $path){
-        $pos = strpos($description, $path['Name']);
-        if($pos == false){
-            sendError("Path not found: ".$path['Name']);
-        }
-         $description = substr_replace($description,getSpanText(spanTypes::PATH,$path['ID'],$path['Name']),$pos,strlen($path['Name']));
-    }
-    return $description;
-}
-/**
- *updates a description in the db
- *sends error on fail
- */
-function updateDescription($ID, $description, $spanTypesType, $keywordTypeNames){
-    $table = _getTable($spanTypesType);
-    if($table == null){
-        sendError("unfindeable type");
-    }
-    //if a player, make sure items are there. items first so they don't replace span stuff.
-    if($spanTypesType == spanTypes::PLAYER){
-        $description = _replacePlayerItems($description);
-    }
-    //if a scene, make sure paths are there
-    if($spanTypesType == spanTypes::SCENE){
-        $description = _replaceScenePaths($description);
-    }
-    //get IDs of keywords
-    $keywordsResult = $keywordsResult = SharedInterface::getKeywordFromID($spanTypesType, $ID);
-    if(is_bool($keywordsResult)){
-        sendError("can't find the required keywords");
-    }
-    //replace one of each keyword ID
-    foreach($keywordsResult as $kw){
-        $description = _replaceKeywordID($description,$kw['keywordID']);
-        //if ID not found
-        if($description == false){
-            sendError("could not find keyword type: ".$keywordTypeNames[intval($kw['Type'])]);
-        }
-    }
-    //make sure its under max length
-    _checkDescIsUnderMaxLength($description,$spanTypesType);
-    if($spanTypesType == spanTypes::SCENE){//second scene check in this method
-        //log scene
-    }
-    SharedInterface::setDescription($description, $ID, $spanTypesType);
-    return true;
-}
-
-/**
- *sends error if too short,
- *return num left if ok
- *scene is scene desc
- */
-function _checkDescIsUnderMaxLength($desc, $spanType){
-    $resultNum = 0;
-    switch($spanType){
-        case(spanTypes::ITEM):
-            $resultNum = maxLength::itemDesc - strlen($desc);
-            break;
-        case(spanTypes::KEYWORD):
-            $resultNum = maxLength::keywordDesc - strlen($desc);
-            break;
-        case(spanTypes::PLAYER):
-            $resultNum = maxLength::playerDesc - strlen($desc);
-            break;
-        case(spanTypes::SCENE):
-            $resultNum = maxLength::sceneDesc - strlen($desc);
-            break;
-    }
-    if($resultNum < 0){
-        sendError("Your description is ".(-1*$status)." chars too long");
-    }
-    else{
-        return $resultNum;
-    }
-}
-
 
 /**
  *adds an item to the player's inventory
