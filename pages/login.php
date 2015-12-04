@@ -14,7 +14,7 @@ if(isset($_SESSION['playerID'])){
 <!--inside <head>
 ------------------------------------>
 <title>Ignatym</title>
-<link rel="stylesheet" type="text/css" href="login.css" />
+<link rel="stylesheet" type="text/css" href="css/login.css" />
 
 <!---------------------------------->
 <?php include("shared/header2.inc");?>
@@ -23,37 +23,8 @@ if(isset($_SESSION['playerID'])){
 <?php
 try{
     if(isset($_POST['uname'])){
-        //sanitize
-        $uname = $_POST['uname'];
-        $pass = $_POST['pass'];
-        if($uname == null || $uname == ""){
-            throw new Exception("Enter a valid username");
-        }
-        if($pass == null || $pass == ""){
-            throw new Exception("Enter a valid password");
-        }
-        //get username, password
-        require_once("../backend/interfaces/loginInterface.php");
-        $playerRow = LoginInterface::getLogin($uname, $pass);
-        if($playerRow == false){
-            throw new Exception("Incorrect username or password");
-        }
-        if($playerRow['loggedIn'] == false){
-            require_once("../backend/interfaces/generalInterface.php");
-            GeneralInterface::changePlayerScene($playerRow['ID'], $playerRow['Scene'], $playerRow['Name']);
-
-        }
-        //find next login id
-        $lastLogin = intval($playerRow['loggedIn']);
-        $nextLogin = $lastLogin < 9 ? $lastLogin+1 : 1;
-        LoginInterface::setLoggedIn($playerRow['ID'], $nextLogin);
-        //select needed info from playerinfo
-        $_SESSION['playerID'] = $playerRow['ID'];
-        $_SESSION['playerName'] = $playerRow['Name'];
-        $_SESSION['currentScene'] = $playerRow['Scene'];
-        $_SESSION['loginID'] = $nextLogin;
-        //updateChatTime();
-        $_SESSION['lastChatTime'] = date_timestamp_get(new DateTime());
+	require_once("../backend/logic/userLogic.php");
+	UserLogic::loginUser($_POST['uname'], $_POST['pword']);
         header("Location: index.php");
     }
 } catch(Exception $e){
@@ -65,7 +36,7 @@ try{
 <!-- login form -->
 <form action="login.php" method="post">
     I am <input type="text" name="uname" maxlength=20><br>
-    Password: <input type="password" name="pass" maxlength=20><br>
+    Password: <input type="password" name="pword" maxlength=20><br>
     <input type="submit">
 </form>
 

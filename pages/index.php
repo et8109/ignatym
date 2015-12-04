@@ -14,7 +14,7 @@ if(!isset($_SESSION['playerID'])){
 <!--inside <head>
 ------------------------------------>
 <title>Ignatym</title>
-<link rel="stylesheet" type="text/css" href="TextCombat.css" />
+<link rel="stylesheet" type="text/css" href="css/TextCombat.css" />
 <audio id="anvil">
     <source src="sounds/anvil.wav" type="audio/wav"/>
     Your browser doesn't support wav sound
@@ -59,7 +59,7 @@ if(!isset($_SESSION['playerID'])){
 <?php include("shared/footer1.inc");?>
 <!--outside <body>
 ------------------------------------>
-<script src="TextCombat.js"></script>
+<script src="js/TextCombat.js"></script>
 <!---------------------------------->
 <?php include("shared/footer2.inc");?>
 <!--inside <html>

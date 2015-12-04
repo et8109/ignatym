@@ -1,7 +1,7 @@
 <?php
-require_once("interface.php");
+require_once("model.php");
 
-class SharedInterface extends Interface_class{
+class DescModel extends Model_class{
     private function __construct() {}//static only
     
     /**
@@ -36,7 +36,7 @@ class SharedInterface extends Interface_class{
      */
     public static function getDescPlayer($pid){
         $pid = self::prepVar($pid);
-        $r = self::$db->querySingle("select Name, Description from playerinfo where ID=$pid");
+        $r = self::$db->querySingle("select Description from playerinfo where ID=$pid");
         return $r;
     }
     
@@ -198,12 +198,22 @@ class SharedInterface extends Interface_class{
     /**
      *sets the given description to the given id for the given type
      */
-    public static function setDescription($desc, $id, $type){
+    /*public static function setDescription($desc, $id, $type){
         $table = self::prepVar(self::getTable($type));
         $id = self::prepVar($id);
         $desc = self::prepVar($desc);
         self::$db->querySingle("update $table set Description=$description where ID=$id");
+    }*/
+
+    /**
+     *sets the given description for the given player id
+     */
+    public static function setPlayerDesc($id, $desc){
+        $id = self::prepVar($id);
+        $desc = self::prepVar($desc);
+        self::$db->querySingle("update $table set Description=$description where ID=$id");
     }
+
     
     /**
      *sets the owner of the item to the given player

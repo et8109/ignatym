@@ -3,9 +3,9 @@
 require_once("../backend/database.php");
 
 /**
- *The interface between the logic/application and the database
+ *The model which controls actual back end data.
  */
-class Interface_class {
+class Model_class {
     protected static $db;
     
     public static function init(){
@@ -17,7 +17,7 @@ class Interface_class {
     }
     
     protected static function prepVar($var){
-        $var = Interface_class::$db->escapeString($var);
+        $var = Model_class::$db->escapeString($var);
         //replace ' with ''
         //$var = str_replace("'", "''", $var);
         //if not a number, surround in quotes
@@ -28,5 +28,5 @@ class Interface_class {
     }
 }
 //initialize db object
-Interface_class::init();
+Model_class::init();
 ?>

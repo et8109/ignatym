@@ -1,10 +1,14 @@
 <?php
-require_once 'interfaces/generalInterface.php';
-$function = $_POST['function'];
-switch($function){
-    case('getDesc'):
-        switch($_POST['type']){
-            case(spanTypes::ITEM):
+require_once '../backend/models/descModel.php';
+
+class DescLogic {
+    private function __construct() {}//static only
+
+    public static function getUserDesc($uid){
+        return DescModel::getDescPlayer($uid)["Description"];
+    }
+}
+            /*case(spanTypes::ITEM):
                 $item =  SharedInterface::getDescItem($_POST['ID']);
                 sendText(getSpanText(spanTypes::ITEM,$_POST['ID'],$item["Name"]));
                 sendText($item["Description"]);
@@ -13,13 +17,6 @@ switch($function){
                 $kw = SharedInterface::getDescKeyword($_POST['ID']);//currently searches by kw name, not id
                 sendText(getSpanText(spanTypes::KEYWORD,$_POST['ID'],$_POST['ID']));
                 sendText($kw["Description"]);
-                break;
-            case(spanTypes::PLAYER):
-                //if no id is set, make it the player
-                $ID = isset($_POST['ID']) ? $_POST['ID'] : $_SESSION['playerID'];
-                $player = SharedInterface::getDescPlayer($_POST['ID']);
-                sendText(getSpanText(spanTypes::PLAYER,$ID,$player["Name"]));
-                sendText($player["Description"]);
                 break;
             case(spanTypes::NPC):
                 $info = SharedInterface::getDescNpc($_POST['ID']);
@@ -269,8 +266,8 @@ switch($function){
              sendText($alert['Description']);
         }
         break;
-    
-    case('clearAlerts'):
+	*/    
+    //case('clearAlerts'):
         /*$permAlerts = array(
             alertTypes::hiddenItem,
             alertTypes::newItem,
@@ -279,7 +276,7 @@ switch($function){
             alertTypes::fired,
             alertTypes::newSpell
         );*/
-        GeneralInterface::clearAlerts($_SESSION['playerID']);
+        /*GeneralInterface::clearAlerts($_SESSION['playerID']);
         break;
     
     case('getTime'):
@@ -294,5 +291,5 @@ switch($function){
         session_destroy();
         throw new Exception("logged out. <a href='login.php'>Back to login</a>");
         break;
-}
+}*/
 ?>

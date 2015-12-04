@@ -29,20 +29,6 @@ class GeneralInterface extends Interface_class{
         return $r;
     }
     
-    public static function changePlayerScene($pid, $sid, $pname){
-        $pid = self::prepVar($pid);
-        $sid = self::prepVar($sid);
-        $pname = self::prepVar($pname);
-        self::removePlayerFromScene($pid);
-        self::$db->querySingle("insert into sceneplayers (sceneID,playerID,playerName) values($sid,$pid,$pname)");
-        self::$db->querySingle("Update playerinfo set Scene=$sid where ID=$pid");
-    }
-    
-    private static function removePlayerFromScene($pid){
-        $pid = self::prepVar($pid);//twice?
-        self::$db->querySingle("delete from sceneplayers where playerID=$pid");
-    }
-    
     public static function deleteItem($iid){
         $iid = self::prepVar($iid);
         self::$db->querySingle("delete from items where ID=$iid");
@@ -118,10 +104,5 @@ class GeneralInterface extends Interface_class{
         self::$db->queryMulti("delete P from playeralerts P, alerts A where P.playerID=$pid and A.ID = P.alertID and A.Perm=0");
     }
     
-    public static function logoutPlayer($pid){
-        $pid = self::prepVar($pid);
-        self::removePlayerFromScene($pid);
-        self::$db->querySingle("update playerinfo set loggedIn=0 where ID=$pid");
-    }
 }
 ?>
