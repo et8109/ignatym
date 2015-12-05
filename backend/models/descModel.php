@@ -208,11 +208,18 @@ class DescModel extends Model_class{
     /**
      *sets the given description for the given player id
      */
-    public static function setPlayerDesc($id, $desc){
+    public static function setUserDesc($id, $desc){
         $id = self::prepVar($id);
         $desc = self::prepVar($desc);
-        self::$db->querySingle("update $table set Description=$description where ID=$id");
+        self::$db->querySingle("update playerinfo set Description=$desc where ID=$id");
     }
+
+    public static function setSceneDesc($id, $desc){
+        $id = self::prepVar($id);
+        $desc = self::prepVar($desc);
+        self::$db->querySingle("update scenes set Description=$desc where ID=$id");
+    }
+
 
     
     /**

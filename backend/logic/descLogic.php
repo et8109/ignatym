@@ -16,6 +16,16 @@ class DescLogic {
 	return $info;
     }
 
+    public static function setUserDesc($uid, $desc){
+        DescModel::setUserDesc($uid, $desc);
+    }
+
+    public static function setSceneDesc($sid, $desc){
+        DescModel::setSceneDesc($sid, $desc);
+    }
+
+
+
 }
             /*case(spanTypes::ITEM):
                 $item =  SharedInterface::getDescItem($_POST['ID']);

@@ -12,20 +12,20 @@ class UserModel extends Model_class{
 
     public static function logoutUser($uid){
         $pid = self::prepVar($uid);
-        self::removePlayerFromScene($uid);
+        self::removeUserFromScene($uid);
         self::$db->querySingle("update playerinfo set loggedIn=0 where ID=$uid");
     }
  
-    public static function changePlayerScene($uid, $sid, $pname){
+    public static function changeUserScene($uid, $sid, $uname){
         $uid = self::prepVar($uid);
         $sid = self::prepVar($sid);
-        $pname = self::prepVar($pname);
-        self::removePlayerFromScene($uid);
-        self::$db->querySingle("insert into sceneplayers (sceneID,playerID,playerName) values($sid,$uid,$pname)");
+        $uname = self::prepVar($uname);
+        self::removeUserFromScene($uid);
+        self::$db->querySingle("insert into sceneplayers (sceneID,playerID,playerName) values($sid,$uid,$uname)");
         self::$db->querySingle("Update playerinfo set Scene=$sid where ID=$uid");
     }
 
-    private static function removePlayerFromScene($uid){
+    private static function removeUserFromScene($uid){
         $uid = self::prepVar($uid);//twice?
         self::$db->querySingle("delete from sceneplayers where playerID=$uid");
     }

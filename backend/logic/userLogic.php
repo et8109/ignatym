@@ -17,7 +17,7 @@ class UserLogic {
             throw new Exception("Incorrect username or password");
         }
         if($info['loggedIn'] == false){
-            UserModel::changePlayerScene($info['ID'], $info['Scene'], $info['Name']);
+            UserModel::changeUserScene($info['ID'], $info['Scene'], $info['Name']);
 
         }
         //find next login id
@@ -37,7 +37,12 @@ class UserLogic {
         UserModel::logoutUser($uid);
     }
 
-
+    public static function setUserScene($uid, $from, $to, $name){
+        UserModel::changeUserScene($uid, $to, $name);
+        //$info = GeneralInterface::getSceneName($_SESSION['currentScene']);
+        //speakActionWalk($_SESSION['currentScene'],$info['Name']);
+        //updateChatTime();
+    }
 }
     /*case('updateDescription'):
         $success = updateDescription($_SESSION['playerID'], $_POST['Description'], spanTypes::PLAYER,$keywordTypeNames);

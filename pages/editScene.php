@@ -22,15 +22,18 @@ if(!isset($_SESSION['playerID'])){
 try{
     require_once("../backend/logic/descLogic.php");
     if(isset($_POST['desc'])){
-	DescLogic::setUserDesc($_SESSION['playerID'], $_POST['desc']);
-
+        DescLogic::setSceneDesc($_SESSION['currentScene'], $_POST['desc']);
+    ?>
+<?php
     } else{
-        $desc = DescLogic::getUserDesc($_SESSION['playerID']); ?>
-
-	editing desc
+        $info = DescLogic::getSceneDesc($_SESSION['currentScene']);
+	$desc = $info["Description"];
+	$name = $info["Name"];
+?>
+	editing <?=$name?>
         <form method="post">
             <textArea name="desc" id="textArea" maxlength="1000"><?=$desc?></textArea><br/>
-    	    <input type="submit" value="update">
+            <input type="submit" value="update">
         </form>
 <?php
     }

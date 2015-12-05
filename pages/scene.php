@@ -20,23 +20,21 @@ if(!isset($_SESSION['playerID'])){
 ------------------------------------>
 <?php
 try{
-    if(isset($_GET["id"])){
-        require_once("../backend/logic/descLogic.php");
-        $info = DescLogic::getSceneDesc($_GET["id"]);
-        ?>
-	<div>
-    	    <?=$info["Name"]?></br>
-            <?=$info["Description"]?>
-	</div>
+    require_once("../backend/logic/descLogic.php");
+    $info = DescLogic::getSceneDesc($_SESSION['currentScene']);
+    ?>
+    <div>
+        <?=$info["Name"]?></br>
+        <?=$info["Description"]?>
+    </div>
 <?php
-    } else{
-	echo "no scene specified";
-    }
 } catch(Exception $e){
     include("shared/errorHandler.php");
     ErrorHandler::handle($e);
 }
 ?>
+<a href="editDesc.php">Edit my description</a></br>
+<a href="editScene.php">Edit scene</a>
 <!---------------------------------->
 <?php include("shared/footer1.inc");?>
 <!--outside <body>

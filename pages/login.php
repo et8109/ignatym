@@ -25,7 +25,7 @@ try{
     if(isset($_POST['uname'])){
 	require_once("../backend/logic/userLogic.php");
 	UserLogic::loginUser($_POST['uname'], $_POST['pword']);
-        header("Location: index.php");
+        header("Location: scene.php");
     }
 } catch(Exception $e){
     include("shared/errorHandler.php");
