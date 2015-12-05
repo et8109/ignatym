@@ -34,7 +34,8 @@ try{
 }
 ?>
 <a href="editDesc.php">Edit my description</a></br>
-<a href="editScene.php">Edit scene</a>
+<a href="editScene.php">Edit scene</a></br>
+<a href="logout.php">Logout</a>
 <!---------------------------------->
 <?php include("shared/footer1.inc");?>
 <!--outside <body>

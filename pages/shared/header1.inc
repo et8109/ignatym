@@ -7,7 +7,7 @@
 <html>
     <head>
         <!-- shared favicon code -->
-        <meta name="description" content="Explore a unique world, improve your character, and impact the game in your own way.">
+        <meta name="Description" content="Explore a unique world, improve your character, and impact the game in your own way.">
         <meta name="keywords" content="game,online,free,multiplayer,text">
         <meta name="author" content="EE">
         <link rel="icon" href="../images/favicon.ico" type="image/x-icon"/>
