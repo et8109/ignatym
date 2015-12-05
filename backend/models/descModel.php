@@ -32,7 +32,7 @@ class DescModel extends Model_class{
     }
     
     /**
-     *returns the name and description of the given player id
+     *returns the description of the given player id
      */
     public static function getDescPlayer($pid){
         $pid = self::prepVar($pid);
@@ -220,17 +220,12 @@ class DescModel extends Model_class{
         self::$db->querySingle("update scenes set Description=$desc where ID=$id");
     }
 
-
-    
-    /**
-     *sets the owner of the item to the given player
-     */
-    public static function setItemOwner($iid, $pid){
-        $iid = self::prepVar($iid);
-        $pid = self::prepVar($pid);
-        self::$db->querySingle("update items set playerID=$pid where ID=$iid");
+    public static function appendToUserDesc($id, $str){
+        $id = self::prepVar($id);
+        $str = self::prepVar($str);
+        self::$db->querySingle("update playerinfo set Description=Description + $str where ID=$id");
     }
-    
+
     /**
      *sets the owner of the item to the given player
      */

@@ -1,13 +1,13 @@
 <?php
-require_once("model.php");
+require_once("table.php");
 
-class UserModel extends Model_class{
+class UserTable extends Table_class{
     private function __construct() {}//static only
 
-    public static function loginUser($uname, $pass){
+    public static function login($uname, $pass){
         $uname = self::prepVar($uname);
         $pass = self::prepVar($pass);
-        return self::$db->querySingle("select ID,loggedIn,Scene,Name from playerinfo where Name=$uname and Password=$pass");
+        return self::$db->querySingle("select Description,ID,loggedIn,Scene,Name from playerinfo where Name=$uname and Password=$pass");
     }
 
     public static function logoutUser($uid){
@@ -16,10 +16,10 @@ class UserModel extends Model_class{
         self::$db->querySingle("update playerinfo set loggedIn=0 where ID=$uid");
     }
  
-    public static function changeUserScene($uid, $sid, $uname){
-        $uid = self::prepVar($uid);
+    public static function changeScene($user, $sid){
+        $uid = self::prepVar($user->getId());
         $sid = self::prepVar($sid);
-        $uname = self::prepVar($uname);
+        $uname = self::prepVar($user->getUname());
         self::removeUserFromScene($uid);
         self::$db->querySingle("insert into sceneplayers (sceneID,playerID,playerName) values($sid,$uid,$uname)");
         self::$db->querySingle("Update playerinfo set Scene=$sid where ID=$uid");

@@ -23,8 +23,8 @@ if(isset($_SESSION['playerID'])){
 <?php
 try{
     if(isset($_POST['uname'])){
-	require_once("../backend/logic/userLogic.php");
-	UserLogic::loginUser($_POST['uname'], $_POST['pword']);
+	require_once("../backend/objects/user.php");
+	User::login($_POST['uname'], $_POST['pword']);
         header("Location: scene.php");
     }
 } catch(Exception $e){

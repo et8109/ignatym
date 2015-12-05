@@ -1,10 +1,30 @@
 <?php
-require_once '../backend/models/userModel.php';
+require_once '../backend/tables/userTable.php';
 
-class UserLogic {
+class User {
+    private $uid;
+    private $uname;
+    private $pword;
+    private $isLoggedIn;
+    private $desc;
+    private $items;
+    private $scene;
+
     private function __construct() {}//static only
 
-    public static function loginUser($uname, $pword){
+    private function setFields($row){
+	$self->uid = $row['ID'];
+	$self->uname = $row['Name'];
+	$self->isLoggedIn = $row['loggedIn'];
+	$self->desc = $row['Description'];
+    }
+
+    public function fromId($uid){
+	$instance = new self();
+        return $instance->setFields(UserTable::getInfo($uid));
+    }
+
+    public static function login($uname, $pword){
 	//sanitize
         if($uname == null || $uname == ""){
             throw new Exception("Enter a valid username");
@@ -12,18 +32,20 @@ class UserLogic {
         if($pword == null || $pword == ""){
             throw new Exception("Enter a valid password");
         }
-	$info = UserModel::loginUser($uname, $pword);
+	$info = UserTable::login($uname, $pword);
         if($info == false){
             throw new Exception("Incorrect username or password");
         }
-        if($info['loggedIn'] == false){
-            UserModel::changeUserScene($info['ID'], $info['Scene'], $info['Name']);
+        $user = new self();
+	$user->setFields($info);
+        if(!$user->isLoggedIn()){
+            UserTable::changeScene($user, $user->scene);
 
         }
         //find next login id
         $lastLogin = intval($info['loggedIn']);
         $nextLogin = $lastLogin < 9 ? $lastLogin+1 : 1;
-        UserModel::setLoggedIn($info['ID'], $nextLogin);
+        UserTable::setLoggedIn($user->getId(), $nextLogin);
         //select needed info from playerinfo
         $_SESSION['playerID'] = $info['ID'];
         $_SESSION['playerName'] = $info['Name'];
@@ -33,8 +55,8 @@ class UserLogic {
         $_SESSION['lastChatTime'] = date_timestamp_get(new DateTime());
     }
 
-    public static function logoutUser($uid){
-        UserModel::logoutUser($uid);
+    public static function logout($uid){
+        UserTable::logoutUser($uid);
     }
 
     public static function setUserScene($uid, $from, $to, $name){
@@ -49,6 +71,17 @@ class UserLogic {
 	$uid = UserModel::registerUser($uname, $pword);
         ItemLogic::createItem($uid, "rags", "simple rags");
     }
+
+    public function isLoggedIn(){
+	return $this->isLoggedIn;
+    }
+    public function getId(){
+	return $this->uid;
+    }
+    public function getUname(){
+        return $this->uname;
+    }
+
 }
     /*case('updateDescription'):
         $success = updateDescription($_SESSION['playerID'], $_POST['Description'], spanTypes::PLAYER,$keywordTypeNames);

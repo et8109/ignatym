@@ -20,8 +20,8 @@ if(!isset($_SESSION['playerID'])){
 ------------------------------------>
 <?php
 try{
-    require_once("../backend/logic/userLogic.php");
-    UserLogic::logoutUser($_SESSION['playerID']);
+    require_once("../backend/objects/user.php");
+    User::logout($_SESSION['playerID']);
     session_destroy();
     header("Location: index.php");
 } catch(Exception $e){

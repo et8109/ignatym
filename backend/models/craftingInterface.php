@@ -10,22 +10,6 @@ class CraftingInterface extends Interface_class{
         self::$db->querySingle("remove from scenekeywords where ID=$sid and keywordID=$kid limit 1");
     }
     
-    /**
-     *returns the id of the creted item
-     */
-    public static function createItem($pid, $iname, $idesc, $isContainer){
-        $pid = self::prepVar($pid);
-        $iname = self::prepVar($iname);
-        $idesc = self::prepVar($idesc);
-        if($isContainer){
-            $room = self::prepVar(2);
-            self::$db->querySingle("insert into items (playerID, Name, Description, room) values ($pid,$iname,$idesc,$room)");
-        } else{
-            self::$db->querySingle("insert into items (playerID, Name, Description) values ($pid,$iname,$idesc)");
-        }
-        return self::$db->lastQueryID();
-    }
-    
     public static function createItemKeywords($iid, $kid, $ktype){
         $iid = self::prepVar($iid);
         $kid = self::prepVar($kid);

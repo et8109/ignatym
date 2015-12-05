@@ -366,20 +366,6 @@ function removeAlert($alertNum){
 }
 
 /**
- *adds an item to the player's inventory
- *adds an alert for a new item
- *checkPlayerCanTakeItem first!
- */
-function addItemIdToPlayer($itemID, $itemName){
-    checkPlayerCanTakeItem();
-    //change playerID for the item
-    SharedInterface::setItemOwner($itemID, $_SESSION['playerID']);
-    addWordToPlayerDesc(spanTypes::ITEM,$itemID,$itemName,$_SESSION['playerID']);
-    //add an alert for the player
-    Req::insert()->alert($_SESSION['playerID'])->newItem()->run();
-    return true;
-}
-/**
  *makes sure the player can take an arbitrary item
  *sends error on fail, returns true on success
  */
