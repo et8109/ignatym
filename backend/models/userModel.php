@@ -36,6 +36,16 @@ class UserModel extends Model_class{
         self::$db->querySingle("update playerinfo set loggedIn=$loginID, lastLoginTime=CURRENT_TIMESTAMP where ID=$uid");
     }
 
+    public static function registerUser($uname, $pword){
+        $uname = self::prepVar($uname);
+        $pword = self::prepVar($pword);
+        self::$db->querySingle("insert into playerinfo (Name, Password, Description, Scene, Health) values ($uname, $pword, 'I\'m new, so be nice to me!', 101, 3)");
+        if (self::$db->lastQueryNumRows() != 1){
+           throw new Exception("username taken");
+	}
+    }
+    
+
 
     //--------- from before
     public static function getLogin($uname, $pass){

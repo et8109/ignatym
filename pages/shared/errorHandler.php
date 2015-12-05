@@ -4,7 +4,7 @@
         
         public static function handle($e){
             $message = $e->getMessage();
-            echo "<img id='errorPoint' src='../images/errorPoint.png'><span id='error'>$message</span>";
+            echo "<span id='error'>$message</span>";
         }
     }
 ?>

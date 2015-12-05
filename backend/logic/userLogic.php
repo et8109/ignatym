@@ -43,6 +43,10 @@ class UserLogic {
         //speakActionWalk($_SESSION['currentScene'],$info['Name']);
         //updateChatTime();
     }
+
+    public static function registerUser($uname, $pword){
+	UserModel::registerUser($uname, $pword);
+    }
 }
     /*case('updateDescription'):
         $success = updateDescription($_SESSION['playerID'], $_POST['Description'], spanTypes::PLAYER,$keywordTypeNames);

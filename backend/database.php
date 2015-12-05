@@ -29,7 +29,7 @@ class Database {
         }
         $numRows = mysqli_num_rows($result);
         if($numRows > 1){
-            throw new dbException("number of rows returned by query > 1", dbException::CODE_TOO_MANY_ROWS_RETURNED);
+            throw new tooManyRowsException();
         }
         $row = $result->fetch_assoc();
         mysqli_free_result($result);
@@ -59,21 +59,15 @@ class Database {
         $con = mysqli_connect(self::$hostName,self::$username,self::$password,self::$name);
         //check connection
         if (mysqli_connect_errno()){
-            throw new dbException("could not connect to database", dbException::CODE_COULD_NOT_CONNECT);
+            throw new couldNotConnectException();
         }
         return $con;
     }
 }
 
-class dbException extends Exception{
-    const CODE_COULD_NOT_CONNECT = 0;
-    const CODE_TOO_MANY_ROWS_RETURNED = 1;
-    private $msg;
-    
-    function __construct($msg, $code){
-        parent::__construct($msg,$code);
-    }
-}
-
+class dbException extends Exception{}
+class tooManyRowsException extends dbException{}
+class couldNotConnectException extends dbException{}
+class resultIsBoolException extends dbException{}
 
 ?>
