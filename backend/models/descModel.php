@@ -32,15 +32,6 @@ class DescModel extends Model_class{
     }
     
     /**
-     *returns the description of the given player id
-     */
-    public static function getDescPlayer($pid){
-        $pid = self::prepVar($pid);
-        $r = self::$db->querySingle("select Description from playerinfo where ID=$pid");
-        return $r;
-    }
-    
-    /**
      *returns general player info
      *NOT the player's desc
      */

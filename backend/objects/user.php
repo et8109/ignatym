@@ -10,18 +10,15 @@ class User {
     private $items;
     private $scene;
 
-    private function __construct() {}//static only
-
-    private function setFields($row){
-	$self->uid = $row['ID'];
-	$self->uname = $row['Name'];
-	$self->isLoggedIn = $row['loggedIn'];
-	$self->desc = $row['Description'];
+    private function __construct($row){
+	$this->uid = $row['ID'];
+	$this->uname = $row['Name'];
+	$this->isLoggedIn = $row['loggedIn'];
+	$this->desc = $row['Description'];
     }
 
     public function fromId($uid){
-	$instance = new self();
-        return $instance->setFields(UserTable::getInfo($uid));
+        return new self(UserTable::getInfo($uid));
     }
 
     public static function login($uname, $pword){
@@ -36,8 +33,7 @@ class User {
         if($info == false){
             throw new Exception("Incorrect username or password");
         }
-        $user = new self();
-	$user->setFields($info);
+	$user = new self($info);
         if(!$user->isLoggedIn()){
             UserTable::changeScene($user, $user->scene);
 
@@ -59,17 +55,24 @@ class User {
         UserTable::logoutUser($uid);
     }
 
-    public static function setUserScene($uid, $from, $to, $name){
-        UserModel::changeUserScene($uid, $to, $name);
+    public static function shortcut_setDesc($uid, $desc){
+	UserTable::setDesc($uid, $desc);
+    }
+
+    public static function shortcut_getDesc($uid){
+	return UserTable::getDesc($uid)["Description"];
+    }
+
+    public static function shortcut_walk($uid, $from, $to, $name){
+        UserTable::changeScene($uid, $to, $name);
         //$info = GeneralInterface::getSceneName($_SESSION['currentScene']);
         //speakActionWalk($_SESSION['currentScene'],$info['Name']);
         //updateChatTime();
     }
 
-    public static function registerUser($uname, $pword){
-        require_once 'itemLogic.php';
-	$uid = UserModel::registerUser($uname, $pword);
-        ItemLogic::createItem($uid, "rags", "simple rags");
+    public static function register($uname, $pword){
+	UserTable::registerUser($uname, $pword);
+        //ItemLogic::createItem($uid, "rags", "simple rags");
     }
 
     public function isLoggedIn(){

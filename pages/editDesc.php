@@ -20,12 +20,11 @@ if(!isset($_SESSION['playerID'])){
 ------------------------------------>
 <?php
 try{
-    require_once("../backend/logic/descLogic.php");
+    require_once("../backend/objects/user.php");
     if(isset($_POST['desc'])){
-	DescLogic::setUserDesc($_SESSION['playerID'], $_POST['desc']);
-
+	User::shortcut_setDesc($_SESSION['playerID'], $_POST['desc']);
     } else{
-        $desc = DescLogic::getUserDesc($_SESSION['playerID']); ?>
+        $desc = User::shortcut_getDesc($_SESSION['playerID']); ?>
 
 	editing desc
         <form method="post">

@@ -22,7 +22,7 @@ if(isset($_SESSION['playerID'])){
 <?php
 try{
     if(isset($_POST['uname'])){
-        require_once("../backend/logic/userLogic.php");
+        require_once("../backend/objects/user.php");
 
 	$uname = $_POST['uname'];
         $pword1 = $_POST['pass1'];
@@ -35,7 +35,7 @@ try{
 	    throw new Exception("your passwords don't match");
 	}
 
-	UserLogic::registerUser($uname, $pword1);
+	User::register($uname, $pword1);
         ?>
 	Sucess!
 	<a href="login.php">Back to login</a>

@@ -15,11 +15,25 @@ class UserTable extends Table_class{
         self::removeUserFromScene($uid);
         self::$db->querySingle("update playerinfo set loggedIn=0 where ID=$uid");
     }
+
+    public static function getDesc($uid){
+        $uid = self::prepVar($uid);
+        $r = self::$db->querySingle("select Description from playerinfo where ID=$uid");
+        return $r;
+    }
+
+    public static function setDesc($uid, $desc){
+        $uid = self::prepVar($uid);
+	$desc = self::prepVar($desc);
+        self::$db->querySingle("update playerinfo set Description=$desc where ID=$uid");
+    }
+
+
  
-    public static function changeScene($user, $sid){
-        $uid = self::prepVar($user->getId());
+    public static function changeScene($uid, $sid, $uname){
+        $uid = self::prepVar($uid);
         $sid = self::prepVar($sid);
-        $uname = self::prepVar($user->getUname());
+        $uname = self::prepVar($uname);
         self::removeUserFromScene($uid);
         self::$db->querySingle("insert into sceneplayers (sceneID,playerID,playerName) values($sid,$uid,$uname)");
         self::$db->querySingle("Update playerinfo set Scene=$sid where ID=$uid");

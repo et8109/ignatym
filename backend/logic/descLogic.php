@@ -4,20 +4,12 @@ require_once '../backend/models/descModel.php';
 class DescLogic {
     private function __construct() {}//static only
 
-    public static function getUserDesc($uid){
-        return DescModel::getDescPlayer($uid)["Description"];
-    }
-
     public static function getSceneDesc($sid){
         $info = DescModel::getDescScene($sid);
         if ($info == null){
 	   throw new Exception("Scene not found");
 	}
 	return $info;
-    }
-
-    public static function setUserDesc($uid, $desc){
-        DescModel::setUserDesc($uid, $desc);
     }
 
     public static function setSceneDesc($sid, $desc){

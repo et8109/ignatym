@@ -21,8 +21,8 @@ if(!isset($_SESSION['playerID'])){
 <?php
 try{
     if(isset($_GET['sid'])){
-        require_once("../backend/logic/userLogic.php");
-        UserLogic::setUserScene($_SESSION['playerID'], $_SESSION['currentScene'], $_GET['sid'], $_SESSION['playerName']);
+        require_once("../backend/objects/user.php");
+        User::shortcut_walk($_SESSION['playerID'], $_SESSION['currentScene'], $_GET['sid'], $_SESSION['playerName']);
         $_SESSION['currentScene'] = $_GET['sid'];
     }
     header("Location: scene.php");

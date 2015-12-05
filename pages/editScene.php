@@ -20,15 +20,15 @@ if(!isset($_SESSION['playerID'])){
 ------------------------------------>
 <?php
 try{
-    require_once("../backend/logic/descLogic.php");
+    require_once("../backend/objects/scene.php");
     if(isset($_POST['desc'])){
-        DescLogic::setSceneDesc($_SESSION['currentScene'], $_POST['desc']);
+        Scene::shortcut_setDesc($_SESSION['currentScene'], $_POST['desc']);
     ?>
 <?php
     } else{
-        $info = DescLogic::getSceneDesc($_SESSION['currentScene']);
-	$desc = $info["Description"];
-	$name = $info["Name"];
+        $scene = Scene::fromId($_SESSION['currentScene']);
+	$desc = $scene->getDesc();
+	$name = $scene->getName();
 ?>
 	editing <?=$name?>
         <form method="post">
