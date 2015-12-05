@@ -7,6 +7,15 @@ class DescLogic {
     public static function getUserDesc($uid){
         return DescModel::getDescPlayer($uid)["Description"];
     }
+
+    public static function getSceneDesc($sid){
+        $info = DescModel::getDescScene($sid);
+        if ($info == null){
+	   throw new Exception("Scene not found");
+	}
+	return $info;
+    }
+
 }
             /*case(spanTypes::ITEM):
                 $item =  SharedInterface::getDescItem($_POST['ID']);
