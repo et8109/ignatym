@@ -10,6 +10,8 @@ class User {
     private $items;
     private $scene;
 
+    const MAX_DESC_LEN = 200;
+
     private function __construct($row){
 	$this->uid = $row['ID'];
 	$this->uname = $row['Name'];
@@ -17,7 +19,7 @@ class User {
 	$this->desc = $row['Description'];
     }
 
-    public function fromId($uid){
+    public static function fromId($uid){
         return new self(UserTable::getInfo($uid));
     }
 
@@ -71,8 +73,18 @@ class User {
     }
 
     public static function register($uname, $pword){
-	UserTable::registerUser($uname, $pword);
-        //ItemLogic::createItem($uid, "rags", "simple rags");
+	$id = UserTable::register($uname, $pword);
+	$user = User::fromId($id);
+        require_once("item.php");
+        Item::createItem($user, "rags", "simple rags");
+    }
+
+    public function hasRoomForItem(){
+	return strlen($this->desc) + Item::MAX_NAME_LEN < self::MAX_DESC_LEN;
+    }
+
+    public function appendToDesc($str){
+	UserTable::appendToDesc($this->uid, $str);
     }
 
     public function isLoggedIn(){

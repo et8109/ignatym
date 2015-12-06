@@ -4,6 +4,12 @@ require_once("table.php");
 class UserTable extends Table_class{
     private function __construct() {}//static only
 
+    public static function getInfo($uid){
+        $uid = self::prepVar($uid);
+        return self::$db->querySingle("select Description,ID,loggedIn,Name from playerinfo where ID=$uid");
+    }
+
+
     public static function login($uname, $pass){
         $uname = self::prepVar($uname);
         $pass = self::prepVar($pass);
@@ -28,6 +34,11 @@ class UserTable extends Table_class{
         self::$db->querySingle("update playerinfo set Description=$desc where ID=$uid");
     }
 
+    public static function appendToDesc($uid, $str){
+        $uid = self::prepVar($uid);
+        $str = self::prepVar($str);
+        self::$db->querySingle("update playerinfo set Description=concat(Description,$str) where ID=$uid");
+    }
 
  
     public static function changeScene($uid, $sid, $uname){
@@ -50,13 +61,14 @@ class UserTable extends Table_class{
         self::$db->querySingle("update playerinfo set loggedIn=$loginID, lastLoginTime=CURRENT_TIMESTAMP where ID=$uid");
     }
 
-    public static function registerUser($uname, $pword){
+    public static function register($uname, $pword){
         $uname = self::prepVar($uname);
         $pword = self::prepVar($pword);
         self::$db->querySingle("insert into playerinfo (Name, Password, Description, Scene, Health) values ($uname, $pword, 'I\'m new, so be nice to me!', 101, 3)");
         if (self::$db->lastQueryNumRows() != 1){
            throw new Exception("username taken");
 	}
+        return self::$db->lastQueryID();
     }
     
 
