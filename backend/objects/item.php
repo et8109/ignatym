@@ -18,7 +18,8 @@ class Item {
         return new self(ItemTable::getInfo($iid));
     }
 
-    public static function createItem($user, $iname, $idesc){
+    public static function createItem($user, $iname, $inputDesc){
+        require_once 'desc.php';
         /*//make sure the player is a blacksmith
         $level = getPlayerManageLevel();
         if($level != keywordTypes::APPSHP && $level != keywordTypes::MANAGER){
@@ -28,17 +29,8 @@ class Item {
         checkPlayerCanTakeItem();
         $keywordIDs = array();
         $IdOut = -1;
+        */
         //make sure all required keyword types were replaced
-        $desc = $_POST['Description'];
-        $numTypes = sizeof($itemKeywordTypes);
-        for($i=0; $i<$numTypes; $i++){
-            $type = $itemKeywordTypes[$i];
-            $desc = replaceKeywordType($desc, $type, $IdOut);
-            $keywordIDs[$type] = $IdOut;
-            if($desc == false){
-                throw new Exception("type ".$keywordTypeNames[$type]." keyword was not found");
-            }
-        }*/
         /*//check for optional keywords
         $tempDesc = replaceKeywordType($desc, keywordTypes::CONTAINER,$IdOut);
 	$isContainer = false;
@@ -60,13 +52,15 @@ class Item {
 	if(!$user->hasRoomForItem()){
 	    throw new Exception("No room for item");
 	}
+	$reqKwIds = [3,];
+        $itemDesc = Desc::create($inputDesc, $reqKwIds);
         //add the item into db
-        $lastID = ItemTable::createItem($user->getId(), $iname, $idesc, false);
-        //add the item to itemKeywords with it's keywords
-        /*foreach ($itemKeywordTypes as $t){
-            CraftingInterface::createItemKeywords($lastID, $keywordIDs[$t], $t);
-        }*/
-	$user->appendToDesc($iname);
+        $iid = ItemTable::createItem($user->getId(), $iname, $itemDesc->getDesc(), false);
+	foreach($itemDesc->getKeywordIds() as $kwid){
+	    KeywordTable::createItemKeywords($iid, $kwid);
+	}
+	//return item object
+	return new self($iid, $iname, $itemDesc->getDesc());
     }
 
 }

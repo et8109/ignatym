@@ -58,7 +58,13 @@ class User {
     }
 
     public static function shortcut_setDesc($uid, $desc){
-	UserTable::setDesc($uid, $desc);
+	require_once("desc.php");
+	$kwIds = UserTable::getKeywordIds($uid);
+	$kwIds = !$kwIds ? [] : $kwIds;
+	$itemIds = UserTable::getItemIds($uid);
+        $itemIds = !$itemIds ? [] : $itemIds;
+	$userDesc = Desc::create($desc, $kwIds)->withItems($uid, $itemIds);
+	UserTable::setDesc($uid, $userDesc->getDesc());
     }
 
     public static function shortcut_getDesc($uid){
@@ -76,7 +82,8 @@ class User {
 	$id = UserTable::register($uname, $pword);
 	$user = User::fromId($id);
         require_once("item.php");
-        Item::createItem($user, "rags", "simple rags");
+        $item = Item::createItem($user, "rags", "simple rags");
+	User::shortcut_setDesc($id, "Me and some rags .");
     }
 
     public function hasRoomForItem(){

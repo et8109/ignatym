@@ -11,14 +11,17 @@ class ItemTable extends Table_class{
         $uid = self::prepVar($uid);
         $iname = self::prepVar($iname);
         $idesc = self::prepVar($idesc);
-        if($isContainer){
-            $room = self::prepVar(2);
-            self::$db->querySingle("insert into items (playerID, Name, Description, room) values ($uid,$iname,$idesc,$room)");
-        } else{
-            self::$db->querySingle("insert into items (playerID, Name, Description) values ($uid,$iname,$idesc)");
-        }
+        $room = self::prepVar(2);
+        self::$db->querySingle("insert into items (playerID, Name, Description, room) values ($uid,$iname,$idesc,$room)");
         return self::$db->lastQueryID();
     }
+
+    public static function getIdByName($uid, $name){
+        $name = self::prepVar($name);
+        $uid = self::prepVar($uid);
+        return self::$db->querySingle("select ID from items where playerID=$uid and Name=$name");
+    }
+
 
     ///////////// old
 

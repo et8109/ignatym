@@ -70,7 +70,16 @@ class UserTable extends Table_class{
 	}
         return self::$db->lastQueryID();
     }
-    
+
+    public static function getKeywordIds($uid){
+        $uid = self::prepVar($uid);
+        return self::$db->querySingle("select keywordID as ID from playerkeywords where ID=$uid");
+    }
+
+    public static function getItemIds($uid){
+        $uid = self::prepVar($uid);
+        return self::$db->querySingle("select ID from items as ID where playerID=$uid");
+    }
 
 
     //--------- from before
