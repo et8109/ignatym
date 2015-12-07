@@ -1,6 +1,8 @@
 <?php
 require_once("table.php");
-
+/*
+ * Needed?
+ */
 class KeywordTable extends Table_class{
     private function __construct() {}//static only
     

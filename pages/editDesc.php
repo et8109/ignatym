@@ -24,7 +24,7 @@ try{
     if(isset($_POST['desc'])){
 	User::shortcut_setDesc($_SESSION['playerID'], $_POST['desc']);
     } else{
-        $desc = User::shortcut_getDesc($_SESSION['playerID']); ?>
+        $desc = User::shortcut_getDesc($_SESSION['playerID'], False); ?>
 
 	editing desc
         <form method="post">

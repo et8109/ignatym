@@ -14,18 +14,23 @@ if(!isset($_SESSION['playerID'])){
 <!--inside <head>
 ------------------------------------>
 <title>Description</title>
+<script src="http://code.jquery.com/jquery-latest.min.js"></script>
+<script src="js/scene.js"></script>
+
 <!---------------------------------->
 <?php include("shared/header2.inc");?>
 <!--inside <body>
 ------------------------------------>
 <?php
 try{
-    require_once("../backend/logic/descLogic.php");
-    $info = DescLogic::getSceneDesc($_SESSION['currentScene']);
+    require_once("../backend/objects/scene.php");
+    $scene = Scene::fromId($_SESSION['currentScene']);
+    $desc = $scene->getDesc();
+    $name = $scene->getName();
     ?>
     <div>
-        <?=$info["Name"]?></br>
-        <?=$info["Description"]?>
+        <?=$name?></br>
+        <?=$desc?>
     </div>
 <?php
 } catch(Exception $e){

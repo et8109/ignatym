@@ -17,7 +17,9 @@ class Scene {
     }
 
     public static function shortcut_setDesc($sid, $desc){
-	SceneTable::setDesc($sid, $desc);
+	require_once 'desc.php';
+	$newDesc = Desc::create($desc, SceneTable::getKeywordIds($sid));
+	SceneTable::setDesc($this->sid, $newDesc->getDesc());
     }
 
     public function getDesc(){

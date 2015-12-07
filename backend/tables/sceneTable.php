@@ -16,5 +16,11 @@ class SceneTable extends Table_class{
         return $r;
     }
 
+    public static function getKeywordIds($sid){
+        $sid = self::prepVar($sid);
+        return self::$db->querySingle("select keywordID as ID from scenekeywords where ID=$sid");
+    }
+
+
 
 }

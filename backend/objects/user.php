@@ -67,8 +67,9 @@ class User {
 	UserTable::setDesc($uid, $userDesc->getDesc());
     }
 
-    public static function shortcut_getDesc($uid){
-	return UserTable::getDesc($uid)["Description"];
+    public static function shortcut_getDesc($uid, $tags=True){
+	$d = UserTable::getDesc($uid)["Description"];
+	return $tags ? $d : strip_tags($d);
     }
 
     public static function shortcut_walk($uid, $from, $to, $name){

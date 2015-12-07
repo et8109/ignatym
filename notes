@@ -1,0 +1,8 @@
+sudo /usr/sbin/apache2ctl stop
+
+apache root set in /etc/apache2/sites-available/000-default.conf
+apache permissions set in /etc/apache2/conf/httpd.conf
+
+change requires to be location independant with function
+
+item creation / keyword checking very inefficient
