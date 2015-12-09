@@ -21,6 +21,10 @@ class SceneTable extends Table_class{
         return self::$db->querySingle("select keywordID as ID from scenekeywords where ID=$sid");
     }
 
+    public static function getPaths($sid){
+        $sid = self::prepVar($sid);
+        return self::$db->queryMulti("select s.Name, sp.endID as ID from scenepaths sp, scenes s where sp.startID=$sid and sp.endID=s.ID");
+    }
 
 
 }

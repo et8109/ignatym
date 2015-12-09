@@ -27,7 +27,7 @@ try{
 <?php
     } else{
         $scene = Scene::fromId($_SESSION['currentScene']);
-	$desc = $scene->getDesc();
+	$desc = $scene->getDesc(false);
 	$name = $scene->getName();
 ?>
 	editing <?=$name?>

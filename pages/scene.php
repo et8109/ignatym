@@ -32,6 +32,8 @@ try{
         <?=$name?></br>
         <?=$desc?>
     </div>
+    <div id="desc">
+    </div>
 <?php
 } catch(Exception $e){
     include("shared/errorHandler.php");
