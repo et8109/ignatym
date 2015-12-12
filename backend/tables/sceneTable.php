@@ -16,9 +16,15 @@ class SceneTable extends Table_class{
         return $r;
     }
 
-    public static function getKeywordIds($sid){
+    public static function getKeywords($sid){
         $sid = self::prepVar($sid);
-        return self::$db->querySingle("select keywordID as ID from scenekeywords where ID=$sid");
+        $r = self::$db->querySingle("select sk.keywordID as ID, kw.Word from scenekeywords sk, keywordwords kw where sk.ID=$sid and kw.ID=sk.keywordID");
+	if(isset($r['ID'])){
+	    $ret = [];
+	    $ret[] = $r;
+	    return $ret;
+	}
+	return $r;
     }
 
     public static function getPaths($sid){
@@ -26,5 +32,14 @@ class SceneTable extends Table_class{
         return self::$db->queryMulti("select s.Name, sp.endID as ID from scenepaths sp, scenes s where sp.startID=$sid and sp.endID=s.ID");
     }
 
-
+    public static function getPlayers($sid){
+	$sid = self::prepVar($sid);
+	$r = self::$db->queryMulti("select ID, Name from playerinfo where scene=$sid");
+	if(isset($r['ID'])){
+            $ret = [];
+            $ret[] = $r;
+            return $ret;
+        }
+        return $r;
+    }
 }

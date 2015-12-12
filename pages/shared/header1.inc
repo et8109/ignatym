@@ -3,6 +3,7 @@
         echo "error: ".$e->getMessage();
     }
     set_exception_handler("handle");
+    require_once("../constants.php")
     ?>
 <html>
     <head>

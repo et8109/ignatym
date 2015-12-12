@@ -1,6 +1,6 @@
 <?php
 
-require_once("../backend/database.php");
+require_once(ROOT."/backend/database.php");
 
 /**
  *The model which controls actual back end data.

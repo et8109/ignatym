@@ -18,8 +18,9 @@ class Scene {
 
     public static function shortcut_setDesc($sid, $desc){
 	require_once 'desc.php';
-	$newDesc = Desc::create($desc, SceneTable::getKeywordIds($sid))->withPaths(SceneTable::getPaths($sid));
-	SceneTable::setDesc($this->sid, $newDesc->getDesc());
+	$newDesc = new Desc($desc);
+	$newDesc = $newDesc->withKeywords(SceneTable::getKeywords($sid))->withPaths(SceneTable::getPaths($sid));
+	SceneTable::setDesc($sid, $newDesc->getDesc());
     }
 
     public function getDesc($tags=True){
@@ -31,4 +32,14 @@ class Scene {
         return $this->sname;
     }
 
+    public function getPlayers(){
+	$htmlList = [];
+	$rows = SceneTable::getPlayers($this->sid);
+	foreach($rows as $p){
+	    $id = $p['ID'];
+	    $name = $p['Name'];
+	    $htmlList[] = "<span class='user' onclick='getUserDesc($id)'>$name</span>";
+	}
+	return $htmlList;
+    }
 }

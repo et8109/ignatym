@@ -41,18 +41,11 @@ class UserTable extends Table_class{
     }
 
  
-    public static function changeScene($uid, $sid, $uname){
+    public static function changeScene($uid, $sid){
         $uid = self::prepVar($uid);
         $sid = self::prepVar($sid);
-        $uname = self::prepVar($uname);
         self::removeUserFromScene($uid);
-        self::$db->querySingle("insert into sceneplayers (sceneID,playerID,playerName) values($sid,$uid,$uname)");
         self::$db->querySingle("Update playerinfo set Scene=$sid where ID=$uid");
-    }
-
-    private static function removeUserFromScene($uid){
-        $uid = self::prepVar($uid);//twice?
-        self::$db->querySingle("delete from sceneplayers where playerID=$uid");
     }
 
     public static function setLoggedIn($uid, $loginID){
@@ -71,14 +64,14 @@ class UserTable extends Table_class{
         return self::$db->lastQueryID();
     }
 
-    public static function getKeywordIds($uid){
+    public static function getKeywords($uid){
         $uid = self::prepVar($uid);
-        return self::$db->querySingle("select keywordID as ID from playerkeywords where ID=$uid");
+        return self::$db->querySingle("select uk.keywordID as ID, kw.Word from playerkeywords uk, keywordwords kw where uk.ID=$uid and kw.ID=uk.keywordID");
     }
 
-    public static function getItemIds($uid){
+    public static function getItems($uid){
         $uid = self::prepVar($uid);
-        return self::$db->querySingle("select ID from items as ID where playerID=$uid");
+        return self::$db->querySingle("select ID, Name from items as ID where playerID=$uid");
     }
 
 

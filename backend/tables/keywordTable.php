@@ -25,7 +25,7 @@ class KeywordTable extends Table_class{
 
     public static function getKeywordDesc($kwid){
 	$kwid = self::prepVar($kwid);
-        return self::$db->querySingle("select Description from keywords where ID=$kwid");
+        return self::$db->querySingle("select Description from keywords where ID=$kwid")["Description"];
 
     }
 }

@@ -27,6 +27,7 @@ try{
     $scene = Scene::fromId($_SESSION['currentScene']);
     $desc = $scene->getDesc();
     $name = $scene->getName();
+    $players = $scene->getPlayers();
     ?>
     <div>
         <?=$name?></br>
@@ -34,12 +35,17 @@ try{
     </div>
     <div id="desc">
     </div>
+    </br>
 <?php
+    foreach($players as $p){
+	echo "$p ";
+    }
 } catch(Exception $e){
     include("shared/errorHandler.php");
     ErrorHandler::handle($e);
 }
 ?>
+</br></br>
 <a href="editDesc.php">Edit my description</a></br>
 <a href="editScene.php">Edit scene</a></br>
 <a href="logout.php">Logout</a>

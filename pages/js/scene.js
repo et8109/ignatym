@@ -1,8 +1,15 @@
-$(function(){ alert('welcome')});
+//$(function(){ alert('welcome')});
 
-function getDesc(kwid){
-    $.get("getDesc.php?id="+kwid,
+function getKwDesc(kwid){
+    $.get("ajax/getDesc.php?id="+kwid,
         function(data){
 	    $("#desc").html(data);
         });
 }
+
+/*function getUserDesc(uid){
+    $.get("getDesc.php?id="+kwid,
+        function(data){
+            $("#desc").html(data);
+        });
+}*/

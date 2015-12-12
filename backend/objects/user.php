@@ -59,11 +59,12 @@ class User {
 
     public static function shortcut_setDesc($uid, $desc){
 	require_once("desc.php");
-	$kwIds = UserTable::getKeywordIds($uid);
-	$kwIds = !$kwIds ? [] : $kwIds;
-	$itemIds = UserTable::getItemIds($uid);
-        $itemIds = !$itemIds ? [] : $itemIds;
-	$userDesc = Desc::create($desc, $kwIds)->withItems($uid, $itemIds);
+	$kws = UserTable::getKeywords($uid);
+	$kws = !$kws ? [] : $kws;
+	$items = UserTable::getItems($uid);
+        $items = !$items ? [] : $items;
+	$userDesc = new Desc($desc);
+	$userDesc->withKeywords($kws)->withItems($items);
 	UserTable::setDesc($uid, $userDesc->getDesc());
     }
 
