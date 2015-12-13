@@ -44,7 +44,6 @@ class UserTable extends Table_class{
     public static function changeScene($uid, $sid){
         $uid = self::prepVar($uid);
         $sid = self::prepVar($sid);
-        self::removeUserFromScene($uid);
         self::$db->querySingle("Update playerinfo set Scene=$sid where ID=$uid");
     }
 
