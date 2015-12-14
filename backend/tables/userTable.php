@@ -18,7 +18,6 @@ class UserTable extends Table_class{
 
     public static function logoutUser($uid){
         $pid = self::prepVar($uid);
-        self::removeUserFromScene($uid);
         self::$db->querySingle("update playerinfo set loggedIn=0 where ID=$uid");
     }
 
@@ -50,7 +49,7 @@ class UserTable extends Table_class{
     public static function setLoggedIn($uid, $loginID){
         $uid = self::prepVar($uid);
         $loginID = self::prepVar($loginID);
-        self::$db->querySingle("update playerinfo set loggedIn=$loginID, lastLoginTime=CURRENT_TIMESTAMP where ID=$uid");
+        self::$db->querySingle("update playerinfo set loggedIn = 1, lastLoginTime=CURRENT_TIMESTAMP where ID=$uid");
     }
 
     public static function register($uname, $pword){
@@ -65,12 +64,28 @@ class UserTable extends Table_class{
 
     public static function getKeywords($uid){
         $uid = self::prepVar($uid);
-        return self::$db->querySingle("select uk.keywordID as ID, kw.Word from playerkeywords uk, keywordwords kw where uk.ID=$uid and kw.ID=uk.keywordID");
+        $r = self::$db->querySingle("select uk.keywordID as ID, kw.Word from playerkeywords uk, keywordwords kw where uk.ID=$uid and kw.ID=uk.keywordID");
+
+        if(isset($r['ID'])){
+            $ret = [];
+            $ret[] = $r;
+            return $ret;
+        }
+        return $r;
+
     }
 
     public static function getItems($uid){
         $uid = self::prepVar($uid);
-        return self::$db->querySingle("select ID, Name from items as ID where playerID=$uid");
+        $r = self::$db->querySingle("select ID, Name from items as ID where playerID=$uid");
+
+	if(isset($r['ID'])){
+            $ret = [];
+            $ret[] = $r;
+            return $ret;
+        }
+        return $r;
+
     }
 
 

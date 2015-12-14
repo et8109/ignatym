@@ -13,3 +13,12 @@ function getUserDesc(uid){
             $("#desc").html(data);
         });
 }
+
+function getItemDesc(uid){
+    alert("yep");
+    $.get("ajax/getItemDesc.php?id="+uid,
+        function(data){
+            $("#desc").html(data);
+        });
+
+}

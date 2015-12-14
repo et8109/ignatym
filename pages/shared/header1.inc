@@ -13,4 +13,4 @@
         <meta name="author" content="EE">
         <link rel="icon" href="../images/favicon.ico" type="image/x-icon"/>
         <link rel="shortcut icon" href="../images/favicon.ico" type="image/x-icon"/>
-        <link rel="stylesheet" type="text/css" href="shared/base.css" />
+        <link rel="stylesheet" type="text/css" href="css/base.css" />

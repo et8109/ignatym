@@ -6,7 +6,8 @@
  */
 
 body{
-background-color:#A89423; /*old background*/
+/*background-color:#A89423; /*old background*/
+background-color:blue;
 /*background-color:#624A0A;*/
 /*overflow: scroll;*/
 overflow: hidden;

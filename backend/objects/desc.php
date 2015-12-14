@@ -22,8 +22,8 @@ class Desc {
     }
 
     public function withItems($items){
-	foreach($items as $id => $name){
-            $this->replaceWord([$name,], $id, "item");
+	foreach($items as $item){
+            $this->replaceWord([$item['Name'],], $item['ID'], "item");
         }
 	return $this;
     }

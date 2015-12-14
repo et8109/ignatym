@@ -22,6 +22,11 @@ class ItemTable extends Table_class{
         return self::$db->querySingle("select ID from items where playerID=$uid and Name=$name");
     }
 
+    public static function getItemDesc($id){
+	$id = self::prepVar($id);
+        return self::$db->querySingle("select Description from items where ID=$id");
+    }
+
 
     ///////////// old
 

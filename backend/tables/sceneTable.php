@@ -34,7 +34,7 @@ class SceneTable extends Table_class{
 
     public static function getPlayers($sid){
 	$sid = self::prepVar($sid);
-	$r = self::$db->queryMulti("select ID, Name from playerinfo where scene=$sid");
+	$r = self::$db->queryMulti("select ID, Name from playerinfo where scene=$sid and loggedIn = 1");
 	if(isset($r['ID'])){
             $ret = [];
             $ret[] = $r;
