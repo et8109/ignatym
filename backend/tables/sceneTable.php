@@ -42,4 +42,16 @@ class SceneTable extends Table_class{
         }
         return $r;
     }
+
+    public static function getEnemies($sid){
+        $sid = self::prepVar($sid);
+        $r = self::$db->queryMulti("select npcID, npcName from scenenpcs where sceneID=$sid");
+        if(isset($r['npcID'])){
+            $ret = [];
+            $ret[] = $r;
+            return $ret;
+        }
+        return $r;
+    }
+
 }

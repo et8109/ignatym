@@ -5,6 +5,7 @@ class User {
     private $uid;
     private $uname;
     private $pword;
+    private $health;
     private $isLoggedIn;
     private $desc;
     private $items;
@@ -17,6 +18,7 @@ class User {
 	$this->uname = $row['Name'];
 	$this->isLoggedIn = $row['loggedIn'];
 	$this->desc = $row['Description'];
+        $this->health = $row['Health'];
     }
 
     public static function fromId($uid){
@@ -104,6 +106,12 @@ class User {
     }
     public function getUname(){
         return $this->uname;
+    }
+    public function getDesc(){
+        return $this->desc;
+    }
+    public function getHealth(){
+        return $this->health;
     }
 
 }

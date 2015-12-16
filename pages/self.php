@@ -13,9 +13,8 @@ if(!isset($_SESSION['playerID'])){
 <?php include("shared/header1.inc");?>
 <!--inside <head>
 ------------------------------------>
-<title>Description</title>
+<title>Self</title>
 <script src="http://code.jquery.com/jquery-latest.min.js"></script>
-<script src="js/scene.js"></script>
 
 <!---------------------------------->
 <?php include("shared/header2.inc");?>
@@ -23,30 +22,16 @@ if(!isset($_SESSION['playerID'])){
 ------------------------------------>
 <?php
 try{
-    require_once("../backend/objects/scene.php");
-    $scene = Scene::fromId($_SESSION['currentScene']);
-    $desc = $scene->getDesc();
-    $name = $scene->getName();
-    $players = $scene->getPlayers();
-    $npcs = $scene->getNpcs();
+    require_once("../backend/objects/user.php");
+    $user = User::fromId($_SESSION['playerID']);
+    $uname = $user->getUname();
+    $desc = $user->getDesc();
+    $health = $user->getHealth();
     ?>
-    <div>
-        <?=$name?></br>
-        <?=$desc?>
-<?php
-    foreach($npcs as $n){
-        echo "</br>$n ";
-    }
-    echo "</br>";
-    foreach($players as $p){
-	echo "$p ";
-    }
-?>
-    </div>
-    <div id="desc">
-    </div>
-    <div id="prompt">
-    </div>
+        Profile page</br>
+        <?=$uname?></br>
+        <?=$desc?></br>
+        Health: <?=$health?>
 <?php
 } catch(Exception $e){
     include("shared/errorHandler.php");
@@ -54,8 +39,8 @@ try{
 }
 ?>
 </br></br>
-<a href="self.php">Status</a></br>
-<a href="editScene.php">Edit scene</a></br>
+<a href="editDesc.php">Edit my description</a></br>
+<a href="scene.php">Back to scene</a></br>
 <a href="logout.php">Logout</a>
 <!---------------------------------->
 <?php include("shared/footer1.inc");?>

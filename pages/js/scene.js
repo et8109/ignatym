@@ -14,11 +14,29 @@ function getUserDesc(uid){
         });
 }
 
-function getItemDesc(uid){
-    alert("yep");
-    $.get("ajax/getItemDesc.php?id="+uid,
+function getItemDesc(iid){
+    $.get("ajax/getItemDesc.php?id="+iid,
         function(data){
             $("#desc").html(data);
         });
+}
+
+function getNpcDesc(nid){
+    $.get("ajax/getNpcDesc.php?id="+nid,
+        function(data){
+            $("#desc").html(data);
+        });
+}
+
+function startCraft(){
+    $("#prompt").html("starting craft");
+}
+
+function attack(nid){
+    $.get("ajax/attack.php?nid="+nid,
+        function(data){
+            $("#prompt").html(data);
+        });
 
 }
+

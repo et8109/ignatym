@@ -6,7 +6,7 @@ class UserTable extends Table_class{
 
     public static function getInfo($uid){
         $uid = self::prepVar($uid);
-        return self::$db->querySingle("select Description,ID,loggedIn,Name from playerinfo where ID=$uid");
+        return self::$db->querySingle("select Description,ID,loggedIn,Name, Health from playerinfo where ID=$uid");
     }
 
 

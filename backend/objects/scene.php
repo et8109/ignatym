@@ -42,4 +42,16 @@ class Scene {
 	}
 	return $htmlList;
     }
+    
+    public function getNpcs(){
+        $htmlList = [];
+        $rows = SceneTable::getEnemies($this->sid);
+        foreach($rows as $p){
+            $id = $p['npcID'];
+            $name = $p['npcName'];
+            $htmlList[] = "<span class='npc' onclick='getNpcDesc($id)'>$name</span>";
+        }
+        return $htmlList;
+    }
+
 }

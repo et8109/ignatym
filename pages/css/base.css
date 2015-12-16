@@ -10,3 +10,28 @@ a{
     cursor: pointer;
     text-decoration: underline;
 }
+.user{
+    color:grey;
+    cursor: pointer;
+    text-decoration: underline;
+}
+.item{
+    color:green;
+    cursor: pointer;
+    text-decoration: underline;
+}
+.npc{
+    color:orange;
+    cursor: pointer;
+    text-decoration: underline;
+}
+.action{
+    color:red;
+    cursor: pointer;
+    font-style: italic;
+    text-decoration: underline;
+}
+#desc{
+    border-top: solid 1px grey;
+    border-bottom: solid 1px grey;
+}
