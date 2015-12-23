@@ -1,5 +1,5 @@
 <?php
-require_once '../backend/tables/sceneTable.php';
+require_once ROOT.'/backend/tables/sceneTable.php';
 
 class Scene {
     private $sid;

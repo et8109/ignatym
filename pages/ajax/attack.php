@@ -1,12 +1,13 @@
 <?php
-ob_start();
-session_start();
-if(!isset($_SESSION['playerID'])){
-        header("Location: login.php");
-    }
-require_once("../../constants.php");
+/**
+ * Loads all user info.
+ * Loads all npc info.
+ * Calcualates attack result.
+ */
+require_once("ajaxSetup.php");
 require_once(ROOT."/backend/objects/user.php");
+require_once(ROOT."/backend/objects/npc.php");
 $user = User::fromId($_SESSION['playerID']);
-$enemy = Npc::fromId($_GET["nid"]);
+$enemy = Npc::fromIds($_GET["nid"], $_SESSION['currentScene']);
 $user->attack($enemy);
 ?>

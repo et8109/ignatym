@@ -20,6 +20,11 @@ a{
     cursor: pointer;
     text-decoration: underline;
 }
+.path{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
 .npc{
     color:orange;
     cursor: pointer;

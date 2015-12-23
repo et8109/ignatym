@@ -37,6 +37,12 @@ function attack(nid){
         function(data){
             $("#prompt").html(data);
         });
+}
 
+function walk(sid){
+    $.get("ajax/walk.php?sid="+sid,
+        function(data){
+            $("#main").html(data);
+        });
 }
 

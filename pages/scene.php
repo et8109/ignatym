@@ -30,7 +30,7 @@ try{
     $players = $scene->getPlayers();
     $npcs = $scene->getNpcs();
     ?>
-    <div>
+    <div id="main">
         <?=$name?></br>
         <?=$desc?>
 <?php

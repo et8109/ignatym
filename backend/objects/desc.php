@@ -62,7 +62,7 @@ class Desc {
     }
 
     private static function getPathWrapper($word, $id){
-	return "<a href='walk.php?sid=$id'>$word</a>";
+	return "<span class='path' onclick='walk($id)'>$word</span>";
     }
 
     public function getDesc(){

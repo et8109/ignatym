@@ -1,5 +1,5 @@
 <?php
-require_once '../backend/tables/userTable.php';
+require_once ROOT.'/backend/tables/userTable.php';
 
 class User {
     private $uid;
@@ -92,6 +92,13 @@ class User {
 
     public function hasRoomForItem(){
 	return strlen($this->desc) + Item::MAX_NAME_LEN < self::MAX_DESC_LEN;
+    }
+
+    public function attack($npc){
+        $npc->getHit(1);
+	$this->health = $this->health-1;
+        UserTable::setHealth($this->uid, $this->health);
+	echo "attacked";
     }
 
     public function appendToDesc($str){

@@ -31,6 +31,7 @@ try{
         Profile page</br>
         <?=$uname?></br>
         <?=$desc?></br>
+        <a href="editDesc.php">Edit my description</a></br>
         Health: <?=$health?>
 <?php
 } catch(Exception $e){
@@ -39,8 +40,7 @@ try{
 }
 ?>
 </br></br>
-<a href="editDesc.php">Edit my description</a></br>
-<a href="scene.php">Back to scene</a></br>
+<a href="scene.php">Back to scene</a></br></br>
 <a href="logout.php">Logout</a>
 <!---------------------------------->
 <?php include("shared/footer1.inc");?>
