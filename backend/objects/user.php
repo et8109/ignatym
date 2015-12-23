@@ -12,6 +12,7 @@ class User {
     private $scene;
 
     const MAX_DESC_LEN = 200;
+    const MAX_HEALTH = 5;
 
     private function __construct($row){
 	$this->uid = $row['ID'];
@@ -81,6 +82,11 @@ class User {
         //speakActionWalk($_SESSION['currentScene'],$info['Name']);
         //updateChatTime();
     }
+   
+    public static function shortcut_regen($uid){
+        UserTable::setHealth($uid, User::MAX_HEALTH);
+    }
+
 
     public static function register($uname, $pword){
 	$id = UserTable::register($uname, $pword);
@@ -95,10 +101,18 @@ class User {
     }
 
     public function attack($npc){
+        if($this->health <= 0){
+	    throw new Exception("</br>You are dead");
+	    return;
+        }
+        if($npc->getHealth() <= 0){
+            throw new Exception("</br>Enemy is dead");
+            return;
+        }
         $npc->getHit(1);
 	$this->health = $this->health-1;
         UserTable::setHealth($this->uid, $this->health);
-	echo "attacked";
+	echo "</br>Hit for 1 dmg";
     }
 
     public function appendToDesc($str){

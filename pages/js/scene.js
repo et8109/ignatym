@@ -29,17 +29,25 @@ function getNpcDesc(nid){
 }
 
 function startCraft(){
-    $("#prompt").html("starting craft");
+    $("#log").append("starting craft");
 }
 
 function attack(nid){
     $.get("ajax/attack.php?nid="+nid,
         function(data){
-            $("#prompt").html(data);
+            $("#log").append(data);
+        });
+}
+
+function regen(){
+    $.get("ajax/regen.php",
+        function(data){
+            $("#log").append(data);
         });
 }
 
 function walk(sid){
+    $("#desc").empty();
     $.get("ajax/walk.php?sid="+sid,
         function(data){
             $("#main").html(data);

@@ -94,7 +94,6 @@ class UserTable extends Table_class{
         self::$db->querySingle("update playerinfo set Health=$health where ID=$uid");
     }
 
-
     //--------- from before
     public static function getLogin($uname, $pass){
         $uname = self::prepVar($uname);

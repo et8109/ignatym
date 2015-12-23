@@ -45,7 +45,7 @@ try{
     </div>
     <div id="desc">
     </div>
-    <div id="prompt">
+    <div id="log">
     </div>
 <?php
 } catch(Exception $e){

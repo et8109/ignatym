@@ -6,7 +6,7 @@ class Npc {
     private $health;
 
     private function __construct($row){
-	$this->uid = $row['ID'];
+	$this->nid = $row['ID'];
         $this->health = $row['health'];
     }
 
