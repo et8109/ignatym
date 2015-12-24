@@ -35,7 +35,7 @@ function startCraft(){
 function attack(nid){
     $.get("ajax/attack.php?nid="+nid,
         function(data){
-            $("#log").append(data);
+            parseResponse(data);
         });
 }
 
@@ -48,9 +48,27 @@ function regen(){
 
 function walk(sid){
     $("#desc").empty();
+    $("#log").empty();
     $.get("ajax/walk.php?sid="+sid,
         function(data){
             $("#main").html(data);
         });
 }
 
+function parseResponse(data){
+    alert(data);
+    data = JSON.parse(data);
+    if(data['main'] != ""){
+      $("#main").html(data['main']);
+    }
+    if(data['desc'] != ""){
+      $("#desc").html(data['desc']);
+    }
+    for(l of data['log']){
+      $("#log").append(l);
+    }
+    for(u of data['upd']){
+      alert(u['type']);
+      $("."+u['type']+"#"+u['id']).css({'color':u['color']});
+    }
+}

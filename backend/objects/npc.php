@@ -5,6 +5,8 @@ class Npc {
     private $nid;
     private $health;
 
+    const MAX_HEALTH = 5;
+
     private function __construct($row){
 	$this->nid = $row['ID'];
         $this->health = $row['health'];
@@ -20,7 +22,7 @@ class Npc {
     }
 
     public function getId(){
-	return $this->uid;
+	return $this->nid;
     }
     public function getHealth(){
         return $this->health;

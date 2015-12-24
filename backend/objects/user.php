@@ -105,14 +105,14 @@ class User {
 	    throw new Exception("</br>You are dead");
 	    return;
         }
-        if($npc->getHealth() <= 0){
+        /*if($npc->getHealth() <= 0){
             throw new Exception("</br>Enemy is dead");
             return;
-        }
+        }*/
         $npc->getHit(1);
 	$this->health = $this->health-1;
         UserTable::setHealth($this->uid, $this->health);
-	echo "</br>Hit for 1 dmg";
+	return "</br>Hit for 1 dmg";
     }
 
     public function appendToDesc($str){

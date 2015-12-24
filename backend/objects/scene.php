@@ -49,7 +49,7 @@ class Scene {
         foreach($rows as $p){
             $id = $p['npcID'];
             $name = $p['npcName'];
-            $htmlList[] = "<span class='npc' onclick='getNpcDesc($id)'>$name</span>";
+            $htmlList[] = "<span id=$id class='npc' onclick='getNpcDesc($id)'>$name</span>";
         }
         return $htmlList;
     }

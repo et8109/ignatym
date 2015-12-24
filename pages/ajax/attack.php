@@ -10,8 +10,11 @@ require_once(ROOT."/backend/objects/npc.php");
 $user = User::fromId($_SESSION['playerID']);
 $enemy = Npc::fromIds($_GET["nid"], $_SESSION['currentScene']);
 try{
-    $user->attack($enemy);
+    Response::addLog($user->attack($enemy));
+    Response::updateNpc($enemy);
+    Response::send();
 } catch (Exception $e){
-    echo $e->getMessage();
+    Response::addLog($e->getMessage());
+    Response::send();
 }
 ?>
