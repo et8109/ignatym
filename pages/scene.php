@@ -23,23 +23,27 @@ if(!isset($_SESSION['playerID'])){
 ------------------------------------>
 <?php
 try{
-    require_once("../backend/objects/scene.php");
+    require_once(ROOT."/backend/objects/scene.php");
+    require_once(ROOT."/backend/objects/user.php");
+    require_once(ROOT."/backend/objects/npc.php");
     $scene = Scene::fromId($_SESSION['currentScene']);
     $desc = $scene->getDesc();
     $name = $scene->getName();
-    $players = $scene->getPlayers();
-    $npcs = $scene->getNpcs();
+    $players = User::usersInScene($scene->getId());
+    $npcs = Npc::npcsInScene($scene->getId());
     ?>
     <div id="main">
         <?=$name?></br>
         <?=$desc?>
 <?php
     foreach($npcs as $n){
-        echo "</br>$n ";
+        $html = $n->getHtml();
+        echo "</br>$html ";
     }
     echo "</br>";
     foreach($players as $p){
-	echo "$p ";
+        $html = $p->getHtml();
+	echo "$html ";
     }
 ?>
     </div>

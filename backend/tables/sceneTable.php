@@ -31,27 +31,4 @@ class SceneTable extends Table_class{
         $sid = self::prepVar($sid);
         return self::$db->queryMulti("select s.Name, sp.endID as ID from scenepaths sp, scenes s where sp.startID=$sid and sp.endID=s.ID");
     }
-
-    public static function getPlayers($sid){
-	$sid = self::prepVar($sid);
-	$r = self::$db->queryMulti("select ID, Name from playerinfo where scene=$sid and loggedIn = 1");
-	if(isset($r['ID'])){
-            $ret = [];
-            $ret[] = $r;
-            return $ret;
-        }
-        return $r;
-    }
-
-    public static function getEnemies($sid){
-        $sid = self::prepVar($sid);
-        $r = self::$db->queryMulti("select npcID, npcName from scenenpcs where sceneID=$sid");
-        if(isset($r['npcID'])){
-            $ret = [];
-            $ret[] = $r;
-            return $ret;
-        }
-        return $r;
-    }
-
 }

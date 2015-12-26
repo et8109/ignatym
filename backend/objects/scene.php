@@ -32,26 +32,7 @@ class Scene {
         return $this->sname;
     }
 
-    public function getPlayers(){
-	$htmlList = [];
-	$rows = SceneTable::getPlayers($this->sid);
-	foreach($rows as $p){
-	    $id = $p['ID'];
-	    $name = $p['Name'];
-	    $htmlList[] = "<span class='user' onclick='getUserDesc($id)'>$name</span>";
-	}
-	return $htmlList;
+    public function getId(){
+        return $this->sid;
     }
-    
-    public function getNpcs(){
-        $htmlList = [];
-        $rows = SceneTable::getEnemies($this->sid);
-        foreach($rows as $p){
-            $id = $p['npcID'];
-            $name = $p['npcName'];
-            $htmlList[] = "<span id=$id class='npc' onclick='getNpcDesc($id)'>$name</span>";
-        }
-        return $htmlList;
-    }
-
 }

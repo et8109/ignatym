@@ -12,7 +12,7 @@ class NpcTable extends Table_class{
     public static function getInfo($nid, $sid){
         $nid = self::prepVar($nid);
         $sid = self::prepVar($sid);
-        return self::$db->querySingle("select NpcID as ID, health from scenenpcs where sceneID=$sid and npcID=$nid");
+        return self::$db->querySingle("select NpcID as ID, npcName as Name, health from scenenpcs where sceneID=$sid and npcID=$nid");
     }
 
     public static function setHealth($nid, $health){
@@ -20,4 +20,16 @@ class NpcTable extends Table_class{
         $health = self::prepVar($health);
 	self::$db->querySingle("update scenenpcs set health=$health where npcID=$nid");
     }
+
+    public static function getInScene($sid){
+        $sid = self::prepVar($sid);
+        $r = self::$db->queryMulti("select npcID as ID, npcName as Name, health from scenenpcs where sceneID=$sid");
+        if(isset($r['ID'])){
+            $ret = [];
+            $ret[] = $r;
+            return $ret;
+        }
+        return $r;
+    }
+
 }

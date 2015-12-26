@@ -31,17 +31,19 @@ class Response {
   }
 
   static function updateNpc($npc){
-    $health = $npc->getHealth();
-    $color = "";
-    if($health == 0){
-      $color = "black";
-    } else{
-      $color = "90".(floor(($health/NPC::MAX_HEALTH)*99))."00";
-    }
     $update = [
 	'type' => "npc",
         'id' => $npc->getId(),
-        'color' => $color
+        'classes' => $npc->getCssClasses()
+    ];
+    Response::$updates[] = $update;
+  }
+
+  static function updateUser($user){
+    $update = [
+        'type' => "user",
+        'id' => $user->getId(),
+        'classes' => $user->getCssClasses()
     ];
     Response::$updates[] = $update;
   }

@@ -10,11 +10,17 @@ a{
     cursor: pointer;
     text-decoration: underline;
 }
+
 .user{
     color:grey;
     cursor: pointer;
     text-decoration: underline;
+} .user.hurt{
+    color: red;
+} .user.dead{
+    color: black;
 }
+
 .item{
     color:green;
     cursor: pointer;
@@ -26,9 +32,13 @@ a{
 }
 
 .npc{
-    color:orange;
     cursor: pointer;
     text-decoration: underline;
+    color: orange;
+} .npc.hurt{
+    color: red;
+} .npc.dead{
+    color: black;
 }
 .action{
     color:red;

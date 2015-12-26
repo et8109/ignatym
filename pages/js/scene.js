@@ -39,6 +39,13 @@ function attack(nid){
         });
 }
 
+function resurrect(nid){
+    $.get("ajax/resurrect.php?nid="+nid,
+        function(data){
+            parseResponse(data);
+        });
+}
+
 function regen(){
     $.get("ajax/regen.php",
         function(data){
@@ -68,7 +75,6 @@ function parseResponse(data){
       $("#log").append(l);
     }
     for(u of data['upd']){
-      alert(u['type']);
-      $("."+u['type']+"#"+u['id']).css({'color':u['color']});
+      $("."+u['type']+"#"+u['id']).attr("class", u['classes']);
     }
 }

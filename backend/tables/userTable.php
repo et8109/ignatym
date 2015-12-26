@@ -94,6 +94,18 @@ class UserTable extends Table_class{
         self::$db->querySingle("update playerinfo set Health=$health where ID=$uid");
     }
 
+    public static function getInScene($sid){
+        $sid = self::prepVar($sid);
+        $r = self::$db->queryMulti("select ID, Name, Health, Description from playerinfo where scene=$sid and loggedIn = 1");
+        if(isset($r['ID'])){
+            $ret = [];
+            $ret[] = $r;
+            return $ret;
+        }
+        return $r;
+    }
+
+
     //--------- from before
     public static function getLogin($uname, $pass){
         $uname = self::prepVar($uname);

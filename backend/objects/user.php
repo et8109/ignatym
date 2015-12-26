@@ -6,7 +6,6 @@ class User {
     private $uname;
     private $pword;
     private $health;
-    private $isLoggedIn;
     private $desc;
     private $items;
     private $scene;
@@ -17,13 +16,26 @@ class User {
     private function __construct($row){
 	$this->uid = $row['ID'];
 	$this->uname = $row['Name'];
-	$this->isLoggedIn = $row['loggedIn'];
 	$this->desc = $row['Description'];
         $this->health = $row['Health'];
     }
 
     public static function fromId($uid){
         return new self(UserTable::getInfo($uid));
+    }
+
+    public static function usersInScene($sid){
+        $users = [];
+        $rows = UserTable::getInScene($sid);
+        foreach($rows as $info){
+            $users[] = new User($info);
+        }
+        return $users;
+    }
+  
+    public function getHtml(){
+        $classes = $this->getCssClasses();
+        return "<span id=$this->uid class='$classes' onclick='getUserDesc($this->uid)'>$this->uname</span>";
     }
 
     public static function login($uname, $pword){
@@ -105,10 +117,10 @@ class User {
 	    throw new Exception("</br>You are dead");
 	    return;
         }
-        /*if($npc->getHealth() <= 0){
+        if($npc->getHealth() <= 0){
             throw new Exception("</br>Enemy is dead");
             return;
-        }*/
+        }
         $npc->getHit(1);
 	$this->health = $this->health-1;
         UserTable::setHealth($this->uid, $this->health);
@@ -117,6 +129,16 @@ class User {
 
     public function appendToDesc($str){
 	UserTable::appendToDesc($this->uid, $str);
+    }
+
+    public function getCssClasses(){
+      $status = "full";
+      if($this->health == 0){
+        $status = "dead";
+      } else if($this->health < User::MAX_HEALTH){
+        $status = "hurt";
+      }
+      return "user $status";
     }
 
     public function isLoggedIn(){
