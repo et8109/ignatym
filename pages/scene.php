@@ -32,7 +32,8 @@ try{
     $players = User::usersInScene($scene->getId());
     $npcs = Npc::npcsInScene($scene->getId());
     ?>
-    <div id="main">
+    <div id="dlist">
+    <div class="desc" id="0">
         <?=$name?></br>
         <?=$desc?>
 <?php
@@ -47,7 +48,6 @@ try{
     }
 ?>
     </div>
-    <div id="desc">
     </div>
     <div id="log">
     </div>

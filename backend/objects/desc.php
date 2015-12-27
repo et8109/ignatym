@@ -54,11 +54,11 @@ class Desc {
     }
 
     private static function getKeywordWrapper($word, $id){
-	return "<span class='keyword' onclick='getKwDesc($id)'>$word</span>";	
+	return "<span class='keyword' onclick='getKwDesc($id, this)'>$word</span>";	
     }
 
     private static function getItemWrapper($word, $id){
-        return "<span class='item' onclick='getItemDesc($id)'>$word</span>"; 
+        return "<span class='item' onclick='getItemDesc($id, this)'>$word</span>"; 
     }
 
     private static function getPathWrapper($word, $id){

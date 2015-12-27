@@ -46,6 +46,10 @@ a{
     font-style: italic;
     text-decoration: underline;
 }
+
+.act{
+   font-size: 150%;
+}
 #desc{
     border-top: solid 1px grey;
     border-bottom: solid 1px grey;

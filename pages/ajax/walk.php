@@ -20,7 +20,6 @@ if(isset($_GET['sid'])){
     $players = User::usersInScene($scene->getId());
     $npcs = Npc::npcsInScene($scene->getId());
 ?>
-    <div id="main">
         <?=$name?></br>
         <?=$desc?>
 <?php
@@ -33,8 +32,5 @@ if(isset($_GET['sid'])){
         $html = $p->getHtml();
         echo "$html ";
     }
-?>
-    </div>
-<?php
-    }
+}
 ?>

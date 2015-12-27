@@ -40,7 +40,7 @@ class Npc {
 
     public function getHtml(){
         $classes = $this->getCssClasses();
-        return "<span id=$this->nid class='$classes' onclick='getNpcDesc($this->nid)'>$this->nname</span>";
+        return "<span id=$this->nid class='$classes' onclick='getNpcDesc($this->nid, this)'>$this->nname</span>";
     }
 
 
