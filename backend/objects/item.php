@@ -1,10 +1,11 @@
 <?php
-require_once '../backend/tables/itemTable.php';
+require_once ROOT.'/backend/tables/itemTable.php';
 
 class Item {
     private $iid;
     private $iname;
-    private $desc; 
+    private $desc;
+    private $ownerID;
 
     const MAX_NAME_LEN = 10;
 
@@ -12,9 +13,10 @@ class Item {
 	$this->iid = $row['ID'];
 	$this->iname = $row['Name'];
 	$this->desc = $row['Description'];
+        $this->ownerID = $row['playerID'];
     }
 
-    public function fromId($iid){
+    public static function fromId($iid){
         return new self(ItemTable::getInfo($iid));
     }
 
@@ -52,8 +54,9 @@ class Item {
 	if(!$user->hasRoomForItem()){
 	    throw new Exception("No room for item");
 	}
-	$reqKwIds = [3,];
-        $itemDesc = Desc::create($inputDesc, $reqKwIds);
+	$reqKwIds = KeywordTable::getKeywordWordsFromIds("(3)");
+        $itemDesc = new Desc($inputDesc);
+	$itemDesc = $itemDesc->withKeywords($reqKwIds);
         //add the item into db
         $iid = ItemTable::createItem($user->getId(), $iname, $itemDesc->getDesc(), false);
 	foreach($itemDesc->getKeywordIds() as $kwid){
@@ -63,5 +66,20 @@ class Item {
 	return new self($iid, $iname, $itemDesc->getDesc());
     }
 
+    public static function shortcut_delete($iid){
+      ItemTable::remove($iid);
+    }
+
+    public function getOwnerId(){
+      return $this->ownerID;
+    }
+
+    public function getId(){
+      return $this->iid;
+    }
+
+    public function getDesc(){
+      return $this->desc;
+    }
 }
 ?>

@@ -77,8 +77,7 @@ class UserTable extends Table_class{
 
     public static function getItems($uid){
         $uid = self::prepVar($uid);
-        $r = self::$db->querySingle("select ID, Name from items as ID where playerID=$uid");
-
+        $r = self::$db->queryMulti("select ID, Name from items where playerID=$uid");
 	if(isset($r['ID'])){
             $ret = [];
             $ret[] = $r;

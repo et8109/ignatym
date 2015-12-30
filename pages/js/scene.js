@@ -31,7 +31,19 @@ function getNpcDesc(nid, span){
 }
 
 function startCraft(){
-    $("#log").append("starting craft");
+    var form = $("<form id='craftform'></form>");
+    form.append("Name: <input type='text' name='name'></br>");
+    form.append("Description: <textarea name='desc' /></br>");
+    form.append("<input type='submit'>");
+    $("#log").append(form);
+    $("#craftform").submit(function(evt){
+      evt.preventDefault();
+      $.post("ajax/craft.php", 
+            $("#craftform").serialize(), 
+            function(data){
+              parseResponse(data);
+            });
+    });
 }
 
 function attack(nid){
@@ -52,6 +64,14 @@ function regen(){
     $.get("ajax/regen.php",
         function(data){
             $("#log").append(data);
+        });
+}
+
+function dropItem(iid){
+    $.get("ajax/dropItem.php?iid="+iid,
+        function(data){
+        alert(data);
+            parseResponse(data);
         });
 }
 

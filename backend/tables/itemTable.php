@@ -22,9 +22,14 @@ class ItemTable extends Table_class{
         return self::$db->querySingle("select ID from items where playerID=$uid and Name=$name");
     }
 
-    public static function getItemDesc($id){
+    public static function getInfo($id){
 	$id = self::prepVar($id);
-        return self::$db->querySingle("select Description from items where ID=$id");
+        return self::$db->querySingle("select Description, ID, Name, playerID from items where ID=$id");
+    }
+
+    public static function remove($iid){
+        $iid = self::prepVar($iid);
+        self::$db->querySingle("delete from items where ID=$iid");
     }
 
 

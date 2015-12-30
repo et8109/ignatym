@@ -1,9 +1,10 @@
 <?php
-require_once '../backend/tables/keywordTable.php';
+require_once ROOT.'/backend/tables/keywordTable.php';
 
 class Desc {
     private $descArray;
     private $numWords;
+    private $kwIds = [];
 
     public function __construct($desc){
 	$this->descArray = explode(" ",$desc);
@@ -17,6 +18,7 @@ class Desc {
         }
 	foreach($IdToWords as $id => $words){
 	    $this->replaceWord($words, $id, "kw");
+            $this->kwIds[] = $id;
 	}
 	return $this;
     }
@@ -67,6 +69,10 @@ class Desc {
 
     public function getDesc(){
 	return implode(" ",$this->descArray);
+    }
+   
+    public function getKeywordIds(){
+      return $this->kwIds;
     }
 }
 ?>
