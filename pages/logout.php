@@ -23,7 +23,7 @@ try{
     require_once("../backend/objects/user.php");
     User::logout($_SESSION['playerID']);
     session_destroy();
-    header("Location: index.php");
+    header("Location: login.php");
 } catch(Exception $e){
     include("shared/errorHandler.php");
     ErrorHandler::handle($e);

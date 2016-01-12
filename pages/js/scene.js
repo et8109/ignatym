@@ -72,7 +72,7 @@ function dropItem(iid){
 }
 
 function walk(sid){
-    $(".desc:not(#0.desc)").empty();
+    $(".desc:not(#0.desc)").remove();
     $("#log").empty();
     $.get("ajax/walk.php?sid="+sid,
         function(data){

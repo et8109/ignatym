@@ -54,6 +54,10 @@ a{
     border-top: solid 1px grey;
 }
 #log{
+    position: absolute;
+    top: 50%;
+    width: 99%;
+
     min-height: 50px;
     max-height: 100px;
     overflow-y: scroll;
