@@ -59,7 +59,7 @@ class Desc {
 	return "<span class='keyword' onclick='getKwDesc($id, this)'>$word</span>";	
     }
 
-    private static function getItemWrapper($word, $id){
+    public static function getItemWrapper($word, $id){
         return "<span class='item' onclick='getItemDesc($id, this)'>$word</span>"; 
     }
 

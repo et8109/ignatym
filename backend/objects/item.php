@@ -17,11 +17,18 @@ class Item {
     }
 
     public static function fromId($iid){
-        return new self(ItemTable::getInfo($iid));
+	$info = ItemTable::getInfo($iid);
+	if($info == NULL){
+	  throw new ItemNotFoundException();
+        }
+        return new self($info);
     }
 
     public static function createItem($user, $iname, $inputDesc){
         require_once 'desc.php';
+        if(trim($iname) == "" ){
+	    throw new Exception("item name invalid");
+        }
         /*//make sure the player is a blacksmith
         $level = getPlayerManageLevel();
         if($level != keywordTypes::APPSHP && $level != keywordTypes::MANAGER){
@@ -62,6 +69,8 @@ class Item {
 	foreach($itemDesc->getKeywordIds() as $kwid){
 	    KeywordTable::createItemKeywords($iid, $kwid);
 	}
+        //TODO check player desc has room first
+        $user->appendToDesc(" ".Desc::getItemWrapper($iname, $iid));
 	//return item object
 	return new self($iid, $iname, $itemDesc->getDesc());
     }
@@ -82,4 +91,6 @@ class Item {
       return $this->desc;
     }
 }
+
+class ItemNotFoundException extends Exception{};
 ?>

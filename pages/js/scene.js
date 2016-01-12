@@ -30,12 +30,9 @@ function getNpcDesc(nid, span){
         });
 }
 
-function startCraft(){
-    var form = $("<form id='craftform'></form>");
-    form.append("Name: <input type='text' name='name'></br>");
-    form.append("Description: <textarea name='desc' /></br>");
-    form.append("<input type='submit'>");
-    $("#log").append(form);
+function startCraft(span){
+    var form = "<form id='craftform'> Name: <input type='text' name='name'></br> Description: <textarea name='desc' /></br> <input type='submit'></form>";
+    addDesc(form, span);
     $("#craftform").submit(function(evt){
       evt.preventDefault();
       $.post("ajax/craft.php", 
@@ -63,14 +60,13 @@ function resurrect(nid){
 function regen(){
     $.get("ajax/regen.php",
         function(data){
-            $("#log").append(data);
+            parseResponse(data);
         });
 }
 
 function dropItem(iid){
     $.get("ajax/dropItem.php?iid="+iid,
         function(data){
-        alert(data);
             parseResponse(data);
         });
 }
@@ -103,6 +99,7 @@ function addDesc(txt, src){
 }
 
 function parseResponse(data){
+    alert(data);
     data = JSON.parse(data);
     if(data['main'] != ""){
       $("#0.desc").html(data['main']);

@@ -33,7 +33,7 @@ class Response {
   static function updateNpc($npc){
     $update = [
 	'type' => "npc",
-        'id' => $npc->getId(),
+        'id' => "n".$npc->getId(),
         'classes' => $npc->getCssClasses()
     ];
     Response::$updates[] = $update;
@@ -42,7 +42,7 @@ class Response {
   static function updateUser($user){
     $update = [
         'type' => "user",
-        'id' => $user->getId(),
+        'id' => "u".$user->getId(),
         'classes' => $user->getCssClasses()
     ];
     Response::$updates[] = $update;

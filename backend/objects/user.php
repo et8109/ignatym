@@ -35,7 +35,7 @@ class User {
   
     public function getHtml(){
         $classes = $this->getCssClasses();
-        return "<span id=$this->uid class='$classes' onclick='getUserDesc($this->uid, this)'>$this->uname</span>";
+        return "<span id=u$this->uid class='$classes' onclick='getUserDesc($this->uid, this)'>$this->uname</span>";
     }
 
     public static function login($uname, $pword){

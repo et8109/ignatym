@@ -6,7 +6,13 @@ if(!isset($_SESSION['playerID'])){
     }
 require_once("../../constants.php");
 require_once(ROOT."/backend/objects/item.php");
-$item = Item::fromId($_GET["id"]);
+try{
+    $item = Item::fromId($_GET["id"]);
+} catch(ItemNotFoundException $e){
+    echo "Item not found";
+    die();
+}
+
 echo $item->getDesc();
 if($item->getOwnerId() == $_SESSION['playerID']){
     $iid = $item->getId();
