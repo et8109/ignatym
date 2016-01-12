@@ -50,7 +50,12 @@ a{
 .act{
    font-size: 150%;
 }
-#desc{
+.desc{
     border-top: solid 1px grey;
-    border-bottom: solid 1px grey;
+}
+#log{
+    min-height: 50px;
+    max-height: 100px;
+    overflow-y: scroll;
+    background-color: brown;
 }

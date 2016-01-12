@@ -99,7 +99,6 @@ function addDesc(txt, src){
 }
 
 function parseResponse(data){
-    alert(data);
     data = JSON.parse(data);
     if(data['main'] != ""){
       $("#0.desc").html(data['main']);

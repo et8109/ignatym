@@ -49,6 +49,7 @@ try{
 ?>
     </div>
     </div>
+    </br>
     <div id="log">
     </div>
 <?php
