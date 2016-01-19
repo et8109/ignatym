@@ -1,0 +1,61 @@
+body{
+    background-color:#624A0A;
+    color:tan;
+}
+a{
+    color:tan;
+}
+.keyword{
+    color:blue;
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.user{
+    color:grey;
+    cursor: pointer;
+    text-decoration: underline;
+} .user.hurt{
+    color: red;
+} .user.dead{
+    color: black;
+}
+
+.item{
+    color:green;
+    cursor: pointer;
+    text-decoration: underline;
+}
+.path{
+    cursor: pointer;
+    text-decoration: underline;
+}
+
+.npc{
+    cursor: pointer;
+    text-decoration: underline;
+    color: orange;
+} .npc.hurt{
+    color: red;
+} .npc.dead{
+    color: black;
+}
+.action{
+    color:red;
+    cursor: pointer;
+    font-style: italic;
+    text-decoration: underline;
+}
+
+.act{
+   font-size: 150%;
+}
+.desc{
+    border-top: solid 1px grey;
+    margin-bottom: 30px;
+}
+#log{
+    height: 30%;
+    overflow-y: scroll;
+    background-color: brown;
+}

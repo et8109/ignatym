@@ -1,8 +1,8 @@
 <?php
 class Database {
-    private static $hostName = "localhost";
+    private static $hostName = "127.0.0.1";
     private static $username = "root";//"ignatymc_admin";
-    private static $password = null;//"1Gn4tym";
+    private static $password = Null;//"1Gn4tym";
     private static $name = "ignatymc_main";
     private $con;
     public function __construct() {
@@ -38,9 +38,12 @@ class Database {
     
     public function queryMulti($sql){
         $result = mysqli_query($this->con, $sql);
-        $arr =  $result->fetch_all(MYSQLI_ASSOC);
+	$rows = [];
+	while($row = mysqli_fetch_array($result, MYSQLI_ASSOC)){
+	    $rows[] = $row;
+	}
         mysqli_free_result($result);
-        return $arr;
+        return $rows;
     }
     
     public function lastQueryNumRows(){
