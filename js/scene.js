@@ -71,17 +71,18 @@ function dropItem(iid){
         });
 }
 
-function editDesc(){
+function editUserDesc(){
   $.post("ajax/editUserDesc.php",
-	$("#descForm").serialize(),
+	$("#userDescForm").serialize(),
         function(data){
+	    alert(data);
             parseResponse(data);
         });
 }
 
 function editSceneDesc(){
   $.post("ajax/editSceneDesc.php",
-        $("#descForm").serialize(),
+        $("#sceneDescForm").serialize(),
         function(data){
             parseResponse(data);
         });
@@ -104,7 +105,7 @@ function setActive(obj){
 }
 
 function getDescDivNum(obj){
-  var n = parseInt( $(obj).parent().attr('id') );
+  var n = parseInt( $(obj).closest(".desc").attr('id') );
   return n;
 }
 

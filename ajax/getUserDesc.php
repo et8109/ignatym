@@ -12,7 +12,7 @@ if($_GET['id'] == $_SESSION['playerID']){
   ?>
       <?=$desc?></br>
       Health: <?=$health?>
-      <form id="descForm" onsubmit= "editDesc(); return false;">
+      <form id="userDescForm" onsubmit= "editUserDesc(); return false;">
         <textArea name="desc" id="inputDesc" maxlength="1000"><?php echo strip_tags($desc); ?></textArea><br/>
         <input type="submit" value="update">
       </form>

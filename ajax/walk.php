@@ -20,8 +20,8 @@ if(isset($_GET['sid'])){
     $players = User::usersInScene($scene->getId());
     $npcs = Npc::npcsInScene($scene->getId());
 ?>
-        <?=$name?></br>
-        <?=$desc?>
+        <h1><?=$name?></h1></br>
+        <p><?=$desc?></p>
 <?php
     foreach($npcs as $n){
 	$html = $n->getHtml();
@@ -33,7 +33,7 @@ if(isset($_GET['sid'])){
         echo "$html ";
     }
 ?>
-<form id="descForm" onsubmit= "editSceneDesc(); return false;">
+<form id="sceneDescForm" onsubmit= "editSceneDesc(); return false;">
   <textArea name="desc" id="inputDesc" maxlength="1000"><?php echo strip_tags($desc); ?></textArea><br/>
   <input type="submit" value="update">
 </form>
