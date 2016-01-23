@@ -50,8 +50,6 @@ try{
 }
 ?>
 </br></br>
-<a href="self.php">Status</a></br>
-<a href="editScene.php">Edit scene</a></br>
 <a href="logout.php">Logout</a>
 </body>
 </html>

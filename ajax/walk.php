@@ -32,5 +32,11 @@ if(isset($_GET['sid'])){
         $html = $p->getHtml();
         echo "$html ";
     }
+?>
+<form id="descForm" onsubmit= "editSceneDesc(); return false;">
+  <textArea name="desc" id="inputDesc" maxlength="1000"><?php echo strip_tags($desc); ?></textArea><br/>
+  <input type="submit" value="update">
+</form>
+<?php
 }
 ?>

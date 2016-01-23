@@ -6,3 +6,12 @@ apache permissions set in /etc/apache2/conf/httpd.conf
 change requires to be location independant with function
 
 item creation / keyword checking very inefficient
+
+
+---
+doing now:
+
+page class in shared
+redo db
+redo css
+simplify objects

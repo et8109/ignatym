@@ -18,8 +18,7 @@ if(isset($_POST['uname'])){
 
 
 include("shared/header.inc");?>
-<!--inside <head>
------------------------------------->
+
 <title>Ignatym</title>
 <link rel="stylesheet" type="text/css" href="css/login.css" />
 </head>

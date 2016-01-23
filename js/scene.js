@@ -71,6 +71,23 @@ function dropItem(iid){
         });
 }
 
+function editDesc(){
+  $.post("ajax/editUserDesc.php",
+	$("#descForm").serialize(),
+        function(data){
+            parseResponse(data);
+        });
+}
+
+function editSceneDesc(){
+  $.post("ajax/editSceneDesc.php",
+        $("#descForm").serialize(),
+        function(data){
+            parseResponse(data);
+        });
+}
+
+
 function walk(sid){
     $(".desc:not(#0.desc)").remove();
     $("#log").empty();
