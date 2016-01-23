@@ -18,29 +18,12 @@ try{
     require_once(ROOT."/backend/objects/scene.php");
     require_once(ROOT."/backend/objects/user.php");
     require_once(ROOT."/backend/objects/npc.php");
-    $scene = Scene::fromId($_SESSION['currentScene']);
-    $desc = $scene->getDesc();
-    $name = $scene->getName();
-    $players = User::usersInScene($scene->getId());
-    $npcs = Npc::npcsInScene($scene->getId());
     ?>
     <div id="log">
     </div>
     <div id="dlist">
     <div class="desc" id="0">
-        <?=$name?></br>
-        <?=$desc?>
-<?php
-    foreach($npcs as $n){
-        $html = $n->getHtml();
-        echo "</br>$html ";
-    }
-    echo "</br></br>";
-    foreach($players as $p){
-        $html = $p->getHtml();
-	echo "$html ";
-    }
-?>
+    <span class="action" onclick=walk(<?=$_SESSION['currentScene']?>)>Awaken</span>
     </div>
     </div>
 <?php
