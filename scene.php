@@ -20,14 +20,14 @@ try{
     require_once(ROOT."/backend/objects/npc.php");
     ?>
     <div id="main">
-    <div id="log">
-    </div>
-    <div id="dlist">
-    <div class="desc" id="0">
-    <span class="action" onclick=walk(<?=$_SESSION['currentScene']?>)>Awaken</span>
-    </div>
-    </div>
-    <a href="logout.php">Logout</a>
+      <div id="dlist">
+        <div class="desc" id="0">
+        <span class="action" onclick=walk(<?=$_SESSION['currentScene']?>)>Awaken</span>
+        </div>
+      </div>
+      <div id="log">
+      </div>
+      <a href="logout.php">Logout</a>
     </div>
 <?php
 } catch(Exception $e){
@@ -35,6 +35,5 @@ try{
     ErrorHandler::handle($e);
 }
 ?>
-</br></br>
 </body>
 </html>

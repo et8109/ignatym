@@ -75,7 +75,6 @@ function editUserDesc(){
   $.post("ajax/editUserDesc.php",
 	$("#userDescForm").serialize(),
         function(data){
-	    alert(data);
             parseResponse(data);
         });
 }

@@ -20,14 +20,13 @@ if(isset($_GET['sid'])){
     $players = User::usersInScene($scene->getId());
     $npcs = Npc::npcsInScene($scene->getId());
 ?>
-        <h1><?=$name?></h1></br>
+        <h1><?=$name?></h1>
         <p><?=$desc?></p>
 <?php
     foreach($npcs as $n){
 	$html = $n->getHtml();
         echo "</br>$html ";
     }
-    echo "</br>";
     foreach($players as $p){
         $html = $p->getHtml();
         echo "$html ";

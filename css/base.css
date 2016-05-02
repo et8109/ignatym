@@ -1,20 +1,24 @@
 body{
     background-color:#624A0A;
     color:tan;
-    font-size: 1.5vw;
+    font-size: 35px;
+    margin: 0px;
+    padding: 0px;
 }
 a{
     color:tan;
 }
 #main{
     margin: auto;
+    padding-bottom: 10px;
     max-width: 500px;
     border-left: solid 2px black;
     border-right: solid 2px black;
-    height: 100%;
+    min-height: 100%;
     background-color: brown;
 }
 h1{
+    font-size: 40px;
     text-align: center;
 }
 p{
